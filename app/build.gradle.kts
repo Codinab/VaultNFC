@@ -1,7 +1,13 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+
+    id("com.google.gms.google-services")
 }
+
+
+
+
 
 android {
     namespace = "com.example.vaultnfc"
@@ -60,8 +66,24 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
+    //Crypto
     implementation("androidx.security:security-crypto:1.0.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
+
+    //ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    //LiveData
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.3")
+
+    //Icons
+    implementation("androidx.compose.material:material-icons-core:1.6.3")
+    implementation("androidx.compose.material:material-icons-extended:1.6.3")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -71,3 +93,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+
