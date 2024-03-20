@@ -13,7 +13,7 @@ class FirebaseRepository {
     }
 
     suspend fun removePassword(passwordId: String) {
-        db.collection("passwords").document(passwordId).delete().await()
+        collectionRef.document(passwordId).delete().await()
     }
 
     suspend fun getAllPasswords(): List<PasswordItem> {
