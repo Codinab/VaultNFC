@@ -107,7 +107,7 @@ fun PasswordItemView(password: PasswordItem, onRemove: (PasswordItem) -> Unit) {
             ) {
                 if (isPasswordVisible) {
                     Text(
-                        text = "Password: ${password.password}",
+                        text = "Password: ${password.encryptedPassword}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )
@@ -125,7 +125,7 @@ fun PasswordItemView(password: PasswordItem, onRemove: (PasswordItem) -> Unit) {
                     )
                 }
                 IconButton(onClick = {
-                    clipboardManager.setText(AnnotatedString(password.password))
+                    clipboardManager.setText(AnnotatedString(password.encryptedPassword))
                     Toast.makeText(context, "Password copied!", Toast.LENGTH_SHORT).show()
                 }) {
                     Icon(Icons.Filled.ContentCopy, contentDescription = "Copy Password")
