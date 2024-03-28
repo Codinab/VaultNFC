@@ -89,15 +89,15 @@ fun PasswordItemView(password: PasswordItem, onRemove: (PasswordItem) -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Title: ${password.title}",
+                    text = "Username: ${password.username}", // Changed from Title to Username
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = {
-                    clipboardManager.setText(AnnotatedString(password.title))
-                    Toast.makeText(context, "Title copied!", Toast.LENGTH_SHORT).show()
+                    clipboardManager.setText(AnnotatedString(password.username)) // Copying username instead of title
+                    Toast.makeText(context, "Username copied!", Toast.LENGTH_SHORT).show() // Changed toast message
                 }) {
-                    Icon(Icons.Filled.ContentCopy, contentDescription = "Copy Title")
+                    Icon(Icons.Filled.ContentCopy, contentDescription = "Copy Username") // Changed content description
                 }
             }
             Spacer(Modifier.height(4.dp))

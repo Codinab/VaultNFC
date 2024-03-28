@@ -9,7 +9,7 @@ data class PasswordItem(
     val title: String = "",
     val username: String = "",
     val encryptedPassword: String = "", // Store passwords encrypted
-    val uri: URI = URI(""),
+    val uri: String = "",
     val notes: String = "",
     val creationDate: Date = Date(), // Using java.util.Date for creation date
     val lastModifiedDate: Date = Date(), // Using java.util.Date for last modification date

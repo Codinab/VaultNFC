@@ -1,13 +1,24 @@
+package com.example.vaultnfc.ui.screens
+
+import PasswordsViewModel
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import java.net.URI
 
 @Composable
 fun AddPasswordScreen(navController: NavController, passwordsViewModel: PasswordsViewModel = viewModel()) {
@@ -15,11 +26,10 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
     var title by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var uri by remember { mutableStateOf(URI("")) }
+    var uri by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        // Additional fields like username, website, and notes can be added here similarly
         TextField(
             value = title,
             onValueChange = { title = it },
@@ -35,10 +45,9 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             onValueChange = { password = it },
             label = { Text("Password") }
         )
-        val uriString = ""
         TextField(
-            value = uriString,
-            onValueChange = { uri = URI(uriString) },
+            value = uri,
+            onValueChange = { uri = it },
             label = { Text("Uri") }
         )
         TextField(
