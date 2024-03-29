@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,21 +35,23 @@ fun PasswordGeneratorScreen(passwordGeneratorViewModel: PasswordGeneratorViewMod
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
-    // State for generated password
+    // State for generated password and input parameters
     var generatedPassword by remember { mutableStateOf(passwordGeneratorViewModel.generatePassword()) }
-    // State for input parameters
-    var length by remember { mutableStateOf(passwordGeneratorViewModel.defaultLength) }
-    var probabilityNumbers by remember { mutableStateOf(passwordGeneratorViewModel.defaultProbabilityNumbers) }
-    var probabilitySymbols by remember { mutableStateOf(passwordGeneratorViewModel.defaultProbabilitySymbols) }
-    var probabilityUppercase by remember { mutableStateOf(passwordGeneratorViewModel.defaultProbabilityUppercase) }
-    var probabilityLowercase by remember { mutableStateOf(passwordGeneratorViewModel.defaultProbabilityLowercase) }
+    var length by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultLength) }
+    var probabilityNumbers by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityNumbers) }
+    var probabilitySymbols by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilitySymbols) }
+    var probabilityUppercase by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityUppercase) }
+    var probabilityLowercase by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityLowercase) }
+
+    // Calculate total probability for percentage calculation
+    val totalProbability = probabilityNumbers + probabilitySymbols + probabilityUppercase + probabilityLowercase
 
     Column(modifier = Modifier.padding(16.dp)) {
-        ParameterInputRow("Length", length, onChange = { length = it })
-        ParameterInputRow("Numbers", probabilityNumbers, onChange = { probabilityNumbers = it })
-        ParameterInputRow("Symbols", probabilitySymbols, onChange = { probabilitySymbols = it })
-        ParameterInputRow("Uppercase", probabilityUppercase, onChange = { probabilityUppercase = it })
-        ParameterInputRow("Lowercase", probabilityLowercase, onChange = { probabilityLowercase = it })
+        ParameterInputRow("Length", length, 0, onChange = { length = it })
+        ParameterInputRow("Numbers", probabilityNumbers, totalProbability, onChange = { probabilityNumbers = it })
+        ParameterInputRow("Symbols", probabilitySymbols, totalProbability, onChange = { probabilitySymbols = it })
+        ParameterInputRow("Uppercase", probabilityUppercase, totalProbability, onChange = { probabilityUppercase = it })
+        ParameterInputRow("Lowercase", probabilityLowercase, totalProbability, onChange = { probabilityLowercase = it })
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -81,6 +84,7 @@ fun PasswordGeneratorScreen(passwordGeneratorViewModel: PasswordGeneratorViewMod
 fun ParameterInputRow(
     label: String,
     value: Int,
+    total: Int,
     onChange: (Int) -> Unit
 ) {
     Row(
@@ -89,11 +93,17 @@ fun ParameterInputRow(
     ) {
         Text("$label:", modifier = Modifier.width(100.dp))
         IconButton(onClick = { if (value > 0) onChange(value - 1) }) {
-            Icon(Icons.Filled.Remove, "Decrease $label")
+            Icon(Icons.Filled.Remove, contentDescription = "Decrease $label")
         }
         Text("$value", modifier = Modifier.width(40.dp), textAlign = TextAlign.Center)
         IconButton(onClick = { onChange(value + 1) }) {
-            Icon(Icons.Filled.Add, "Increase $label")
+            Icon(Icons.Filled.Add, contentDescription = "Increase $label")
+        }
+        // Calculate and display the percentage
+        if (total > 0) { // Avoid division by zero
+            val percentage = (value.toFloat() / total * 100).toInt()
+            Text("$percentage%", modifier = Modifier.padding(start = 8.dp))
         }
     }
 }
+

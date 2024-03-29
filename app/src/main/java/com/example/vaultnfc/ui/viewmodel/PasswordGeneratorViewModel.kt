@@ -20,8 +20,17 @@ class PasswordGeneratorViewModel : ViewModel() {
         probabilityNumbers: Int = defaultProbabilityNumbers,
         probabilitySymbols: Int = defaultProbabilitySymbols,
         probabilityUppercase: Int = defaultProbabilityUppercase,
-        probabilityLowercase: Int = defaultProbabilityLowercase
+        probabilityLowercase: Int = defaultProbabilityLowercase,
     ): String {
+        if (length == 0) return ""
+        if (arrayOf(
+                probabilityNumbers,
+                probabilitySymbols,
+                probabilityUppercase,
+                probabilityLowercase
+            ).all { it == 0 }
+        ) return ""
+
         // Build a character pool with each type of character added in proportion to its probability
         val charPool = buildCharPool(
             probabilityNumbers, probabilitySymbols, probabilityUppercase, probabilityLowercase
@@ -39,7 +48,7 @@ class PasswordGeneratorViewModel : ViewModel() {
         probabilityNumbers: Int,
         probabilitySymbols: Int,
         probabilityUppercase: Int,
-        probabilityLowercase: Int
+        probabilityLowercase: Int,
     ): String {
         // Repeat each character set according to its probability to ensure its frequency in the pool
         val numbersPool = numbers.repeat(probabilityNumbers)
