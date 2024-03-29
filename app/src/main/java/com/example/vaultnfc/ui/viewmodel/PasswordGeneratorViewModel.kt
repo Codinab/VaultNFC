@@ -9,11 +9,11 @@ class PasswordGeneratorViewModel : ViewModel() {
     private val lowercaseLetters = "abcdefghijklmnopqrstuvwxyz"
     private val secureRandom = SecureRandom()
 
-    private val defaultLength = 120
-    private val defaultProbabilityNumbers = 1
-    private val defaultProbabilitySymbols = 1
-    private val defaultProbabilityUppercase = 1
-    private val defaultProbabilityLowercase = 1
+    val defaultLength = 12
+    val defaultProbabilityNumbers = 1
+    val defaultProbabilitySymbols = 1
+    val defaultProbabilityUppercase = 1
+    val defaultProbabilityLowercase = 1
 
     fun generatePassword(
         length: Int = defaultLength,

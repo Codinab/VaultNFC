@@ -14,3 +14,7 @@
 .cxx
 local.properties
 /caches/**
+/kotlin-profile/*.profile
+/wrapper/dists/**
+/daemon/**
+/native/**

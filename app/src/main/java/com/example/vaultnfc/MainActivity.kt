@@ -1,25 +1,17 @@
 package com.example.vaultnfc
 
+import PasswordGeneratorViewModel
+import PasswordsViewModel
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
-import com.example.vaultnfc.ui.theme.VaultNFCTheme
-import androidx.security.crypto.EncryptedSharedPreferences
 import com.example.vaultnfc.ui.AppNavigation
+import com.example.vaultnfc.ui.theme.VaultNFCTheme
 import com.example.vaultnfc.ui.viewmodel.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -48,6 +40,23 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        val passwordsViewModel = ViewModelProvider(this)[PasswordsViewModel::class.java]
+        val passwordGeneratorViewModel = ViewModelProvider(this)[PasswordGeneratorViewModel::class.java]
+
+
+        try {
+            val password = passwordGeneratorViewModel.generatePassword()
+            val encrypted = passwordsViewModel.encryptPassword(password, "a")
+            val decrypted = passwordsViewModel.decryptPassword(encrypted, "a")
+
+            println("Password: $password")
+            println("Encrypted: $encrypted")
+            println("Decrypted: $decrypted")
+        } catch (exception: Exception) {
+            println(exception)
+        }
+
 
         setContent {
             VaultNFCTheme {
