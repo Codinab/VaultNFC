@@ -76,6 +76,7 @@ fun PasswordItemView(password: PasswordItem, onRemove: (PasswordItem) -> Unit) {
     var isPasswordVisible by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
+    val passwordsViewModel: PasswordsViewModel = viewModel()
 
     Card(
         modifier = Modifier
@@ -107,7 +108,8 @@ fun PasswordItemView(password: PasswordItem, onRemove: (PasswordItem) -> Unit) {
             ) {
                 if (isPasswordVisible) {
                     Text(
-                        text = "Password: ${password.encryptedPassword}",
+                        text = "Password: ${
+                            passwordsViewModel.decryptPassword(password.encryptedPassword, "Test")}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )

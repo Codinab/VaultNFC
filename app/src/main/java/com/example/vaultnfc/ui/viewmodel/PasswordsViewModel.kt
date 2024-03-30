@@ -1,4 +1,3 @@
-import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +7,7 @@ import com.example.vaultnfc.data.repository.FirebaseRepository
 import com.example.vaultnfc.model.PasswordItem
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
@@ -69,45 +69,39 @@ class PasswordsViewModel : ViewModel() {
     // SecureRandom for IV generation
     private val secureRandom = SecureRandom()
 
-    // Placeholder for your encryption method
-    fun encryptPassword(password: String, masterPassword: String): String {
-        val secretKey = deriveKeyFromPassword(masterPassword)
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        val ivBytes = ByteArray(cipher.blockSize)
+    fun encryptPassword(data: String, password: String): String {
+        val salt = ByteArray(16) // Generate a new salt for each encryption
+        secureRandom.nextBytes(salt)
+        val key = deriveKeyFromPassword(password, salt)
+        val cipher = Cipher.getInstance("AES/CTR/NoPadding")
+        val ivBytes = ByteArray(16) // Initialization Vector
         secureRandom.nextBytes(ivBytes)
         val ivSpec = IvParameterSpec(ivBytes)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec)
-        val encryptedBytes = cipher.doFinal(password.toByteArray(Charsets.UTF_8))
-        val ivAndEncrypted = ivBytes + encryptedBytes
-        return Base64.encodeToString(ivAndEncrypted, Base64.DEFAULT)
+        cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
+        val encryptedData = cipher.doFinal(data.toByteArray(Charsets.UTF_8))
+        // Concatenate salt, IV, and encrypted data for transmission
+        return Base64.getEncoder().encodeToString(salt + ivBytes + encryptedData)
     }
 
-    // Placeholder for your decryption method
-    fun decryptPassword(encryptedData: String, masterPassword: String): String {
-        val ivAndEncryptedBytes = Base64.decode(encryptedData, Base64.DEFAULT)
-        val secretKey = deriveKeyFromPassword(masterPassword)
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        val ivBytes = ivAndEncryptedBytes.copyOfRange(0, cipher.blockSize)
-        val encryptedBytes =
-            ivAndEncryptedBytes.copyOfRange(cipher.blockSize, ivAndEncryptedBytes.size)
-        val ivSpec = IvParameterSpec(ivBytes)
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec)
-        val decryptedBytes = cipher.doFinal(encryptedBytes)
-        return String(decryptedBytes, Charsets.UTF_8)
+    fun decryptPassword(encrypted: String, password: String): String {
+        val decoded = Base64.getDecoder().decode(encrypted)
+        val salt = decoded.copyOfRange(0, 16)
+        val iv = decoded.copyOfRange(16, 32)
+        val encryptedData = decoded.copyOfRange(32, decoded.size)
+        val key = deriveKeyFromPassword(password, salt)
+        val cipher = Cipher.getInstance("AES/CTR/NoPadding")
+        val ivSpec = IvParameterSpec(iv)
+        cipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
+        val decryptedData = cipher.doFinal(encryptedData)
+        return String(decryptedData, Charsets.UTF_8)
     }
 
-    // Method to derive a SecretKeySpec from a password
-    fun deriveKeyFromPassword(password: String): SecretKeySpec {
-        val salt =
-            ByteArray(16) // Consider a secure way to generate and store a unique salt per user
-        val iterationCount = 10000
-        val keyLength = 256
+    fun deriveKeyFromPassword(password: String, salt: ByteArray): SecretKeySpec {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val spec = PBEKeySpec(password.toCharArray(), salt, iterationCount, keyLength)
-        val tmp = factory.generateSecret(spec)
-        val secretKey = SecretKeySpec(tmp.encoded, "AES")
-        return secretKey
+        val spec = PBEKeySpec(password.toCharArray(), salt, 65536, 256)
+        return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")
     }
+
 
     // Placeholder for your method to generate an IV
     private fun generateEncryptionIV(): String {

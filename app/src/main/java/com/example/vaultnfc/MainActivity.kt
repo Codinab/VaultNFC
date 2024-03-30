@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
 
         try {
-            val password = passwordGeneratorViewModel.generatePassword()
+            val password = passwordGeneratorViewModel.generatePassword().toCharArray().toString()
             val encrypted = passwordsViewModel.encryptPassword(password, "a")
             val decrypted = passwordsViewModel.decryptPassword(encrypted, "a")
 
