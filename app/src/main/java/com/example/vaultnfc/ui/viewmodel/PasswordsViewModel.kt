@@ -140,7 +140,7 @@ class PasswordsViewModel : ViewModel() {
         return String(decryptedData, Charsets.UTF_8)
     }
 
-    fun deriveKeyFromPassword(password: String, salt: ByteArray): SecretKeySpec {
+    private fun deriveKeyFromPassword(password: String, salt: ByteArray): SecretKeySpec {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
         val spec = PBEKeySpec(password.toCharArray(), salt, 65536, 256)
         return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")

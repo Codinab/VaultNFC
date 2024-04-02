@@ -117,13 +117,13 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
                 Text("Back")
             }
             Button(onClick = {
-                if (title.isNotEmpty() && password.isNotEmpty()) {
+                if (title.isNotEmpty()) {
                     passwordsViewModel.addPassword(title, username, password, uri, notes).also {
                         Toast.makeText(context, "Password added successfully", Toast.LENGTH_SHORT).show()
                         navController.navigateUp()
                     }
                 } else {
-                    Toast.makeText(context, "Title and password cannot be empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT).show()
                 }
             }) {
                 Text("Add")

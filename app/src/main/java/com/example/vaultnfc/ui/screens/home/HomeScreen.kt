@@ -1,5 +1,6 @@
 package com.example.vaultnfc.ui.screens.home
 
+import PasswordsViewModel
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,7 +27,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,7 +42,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.BlackEnd
@@ -49,6 +54,21 @@ import com.example.vaultnfc.ui.theme.RedEnd
 @Composable
 fun HomeScreen(navController: NavController) {
     var isSidebarOpen by remember { mutableStateOf(false) }
+
+    val passwordsViewModel: PasswordsViewModel = viewModel()
+    val passwordsList by passwordsViewModel.passwordsList.observeAsState(emptyList())
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    DisposableEffect(currentRoute) {
+        if (currentRoute == Screen.Home.route) {
+            passwordsViewModel.fetch()
+        }
+
+        onDispose { }
+    }
+
 
     Box(
         modifier = Modifier
@@ -79,7 +99,6 @@ fun HomeScreen(navController: NavController) {
                             tint = Color.Red
                         )
                     }
-
                     Image( //Logo
                         painter = painterResource(id = R.drawable.logo_menu),
                         contentDescription = null,
@@ -88,12 +107,12 @@ fun HomeScreen(navController: NavController) {
                             .padding(horizontal = 10.dp)
                     )
                     TextButton(             //Button add password
-                        onClick = { isSidebarOpen = true },
+                        onClick = { navController.navigate(Screen.AddPassword.route) },
                         modifier = Modifier
                             .size(80.dp)
                     ) {
                         Icon(Icons.Filled.Add,
-                            contentDescription = "Copy Username",
+                            contentDescription = "Add button",
                             modifier = Modifier.size(60.dp),
                             tint = Color.Red
                         )
@@ -110,7 +129,8 @@ fun HomeScreen(navController: NavController) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(20) { index ->
+                items(passwordsList.size) { index ->
+                    val password = passwordsList[index]
                     Spacer(
                         modifier = Modifier
                             .height(2.dp)
@@ -120,17 +140,17 @@ fun HomeScreen(navController: NavController) {
                     Text(
                         text = buildAnnotatedString {
                             withStyle(style = SpanStyle(fontSize = 20.sp)) {
-                                append("Password_ID $index\n")
+                                append("${password.title}\n")
                             }
                             withStyle(style = SpanStyle(fontSize = 16.sp)) {
-                                append("Username $index")
+                                append(password.username)
                             }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
                             .clickable {
-                                navController.navigate(Screen.AddPassword.route)
+                                // Your click action here
                             }
 
                     )
