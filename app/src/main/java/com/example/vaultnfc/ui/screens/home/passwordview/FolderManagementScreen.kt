@@ -31,7 +31,7 @@ fun FolderView(folderName: String, passwordsInFolder: List<PasswordItem>, onRemo
     ) {
         Column {
             Text(
-                text = folderName, // Use "Default Folder" for passwords not in a specific folder
+                text = folderName,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(16.dp)
             )
