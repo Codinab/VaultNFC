@@ -3,7 +3,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vaultnfc.data.repository.FirebaseRepository
+import com.example.vaultnfc.data.repository.PasswordsRepository
+import com.example.vaultnfc.data.repository.FolderRepository
+import com.example.vaultnfc.model.Folder
 import com.example.vaultnfc.model.PasswordItem
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
@@ -18,16 +20,57 @@ class PasswordsViewModel : ViewModel() {
     private val _passwordsList = MutableLiveData<List<PasswordItem>>()
     val passwordsList: LiveData<List<PasswordItem>> = _passwordsList
 
-    private val firebaseRepository = FirebaseRepository() // Instance of FirebaseRepository
+    private val passwordsRepository = PasswordsRepository()
+    private val folderRepository = FolderRepository()
+
+    private val _foldersList = MutableLiveData<List<Folder>>()
+    val foldersList: LiveData<List<Folder>> = _foldersList
+
+
 
     init {
+        //addTestFolders()
         fetchPasswords()
+        fetchFolders()
     }
 
+    fun addTestFolders() {
+        viewModelScope.launch {
+            try {
+                folderRepository.addFolder(Folder(name = "Personal"))
+                folderRepository.addFolder(Folder(name = "Work"))
+                Log.d("PasswordsViewModel", "Test folders added successfully")
+            } catch (e: Exception) {
+                Log.e("PasswordsViewModel", "Error adding test folders", e)
+            }
+        }
+    }
+
+    fun fetch() {
+        fetchPasswords()
+        fetchFolders()
+    }
+
+
+    private fun fetchFolders() {
+        viewModelScope.launch {
+            try {
+                val fetchedFolders = folderRepository.getAllFolders()
+                _foldersList.value = fetchedFolders
+                Log.d("FetchFolders", "Started")
+                _foldersList.value?.forEach { folder ->
+                    Log.d("FetchFolders", "Folder: ${folder.name}")
+                }
+                Log.d("FetchFolders", "Ended")
+            } catch (e: Exception) {
+                Log.e("PasswordsViewModel", "Error fetching folders", e)
+            }
+        }
+    }
     private fun fetchPasswords() {
         viewModelScope.launch {
             try {
-                val fetchedPasswords = firebaseRepository.getAllPasswords()
+                val fetchedPasswords = passwordsRepository.getAllPasswords()
                 _passwordsList.value = fetchedPasswords
                 Log.d("PasswordsViewModel", "Updating passwords")
             } catch (e: Exception) {
@@ -57,9 +100,10 @@ class PasswordsViewModel : ViewModel() {
                     notes = notes,
                     encryptionIV = encryptionIV
                 )
-                firebaseRepository.addPassword(passwordItem)
+                passwordsRepository.addPassword(passwordItem)
                 // After adding, fetch the latest list to update the local list
                 fetchPasswords()
+                fetchFolders()
             } catch (e: Exception) {
                 // Handle exceptions
             }
@@ -112,9 +156,11 @@ class PasswordsViewModel : ViewModel() {
     fun removePassword(passwordItem: PasswordItem) {
         viewModelScope.launch {
             try {
-                firebaseRepository.removePassword(passwordItem.id)
+                passwordsRepository.removePassword(passwordItem.id)
                 // Refresh the list after removal
                 fetchPasswords()
+                fetchFolders()
+
 
                 Log.d("PasswordsViewModel", "Removed password: ${passwordItem.title}")
             } catch (e: Exception) {

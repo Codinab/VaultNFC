@@ -1,4 +1,4 @@
-package com.example.vaultnfc.ui.screens
+package com.example.vaultnfc.ui.screens.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -14,11 +14,6 @@ import com.example.vaultnfc.ui.Screen
 fun HomeScreen(navController: NavController) {
     Column(modifier = Modifier.padding(16.dp)) {
         // Add a button to navigate to the AddPassword screen
-        Button(onClick = { navController.navigate(Screen.AddPassword.route) }) {
-            Text("Add New Password")
-
-        }
-
         Button(onClick = { navController.navigate(Screen.PasswordsList.route) }) {
             Text("View Stored Passwords")
         }

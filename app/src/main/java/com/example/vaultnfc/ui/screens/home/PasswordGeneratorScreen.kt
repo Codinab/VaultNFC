@@ -29,9 +29,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 
 @Composable
-fun PasswordGeneratorScreen(passwordGeneratorViewModel: PasswordGeneratorViewModel = viewModel()) {
+fun PasswordGeneratorScreen(
+    navController: NavController,
+    passwordGeneratorViewModel: PasswordGeneratorViewModel = viewModel(),
+) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
@@ -44,20 +48,46 @@ fun PasswordGeneratorScreen(passwordGeneratorViewModel: PasswordGeneratorViewMod
     var probabilityLowercase by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityLowercase) }
 
     // Calculate total probability for percentage calculation
-    val totalProbability = probabilityNumbers + probabilitySymbols + probabilityUppercase + probabilityLowercase
+    val totalProbability =
+        probabilityNumbers + probabilitySymbols + probabilityUppercase + probabilityLowercase
+
+
 
     Column(modifier = Modifier.padding(16.dp)) {
+        Button(onClick = { navController.navigateUp() }) {
+            Text("Back")
+        }
         ParameterInputRow("Length", length, 0, onChange = { length = it })
-        ParameterInputRow("Numbers", probabilityNumbers, totalProbability, onChange = { probabilityNumbers = it })
-        ParameterInputRow("Symbols", probabilitySymbols, totalProbability, onChange = { probabilitySymbols = it })
-        ParameterInputRow("Uppercase", probabilityUppercase, totalProbability, onChange = { probabilityUppercase = it })
-        ParameterInputRow("Lowercase", probabilityLowercase, totalProbability, onChange = { probabilityLowercase = it })
+        ParameterInputRow(
+            "Numbers",
+            probabilityNumbers,
+            totalProbability,
+            onChange = { probabilityNumbers = it })
+        ParameterInputRow(
+            "Symbols",
+            probabilitySymbols,
+            totalProbability,
+            onChange = { probabilitySymbols = it })
+        ParameterInputRow(
+            "Uppercase",
+            probabilityUppercase,
+            totalProbability,
+            onChange = { probabilityUppercase = it })
+        ParameterInputRow(
+            "Lowercase",
+            probabilityLowercase,
+            totalProbability,
+            onChange = { probabilityLowercase = it })
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
             generatedPassword = passwordGeneratorViewModel.generatePassword(
-                length, probabilityNumbers, probabilitySymbols, probabilityUppercase, probabilityLowercase
+                length,
+                probabilityNumbers,
+                probabilitySymbols,
+                probabilityUppercase,
+                probabilityLowercase
             )
         }) {
             Text("Generate Password")
@@ -85,11 +115,13 @@ fun ParameterInputRow(
     label: String,
     value: Int,
     total: Int,
-    onChange: (Int) -> Unit
+    onChange: (Int) -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
     ) {
         Text("$label:", modifier = Modifier.width(100.dp))
         IconButton(onClick = { if (value > 0) onChange(value - 1) }) {

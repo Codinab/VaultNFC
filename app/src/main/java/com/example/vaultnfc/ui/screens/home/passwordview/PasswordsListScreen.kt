@@ -1,23 +1,27 @@
-package com.example.vaultnfc.ui.screens
+package com.example.vaultnfc.ui.screens.home.passwordview
 
 import PasswordsViewModel
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.model.PasswordItem
+import com.example.vaultnfc.ui.Screen
 
 
 @Composable
@@ -46,29 +51,57 @@ fun PasswordsListScreen(
 ) {
     val passwordsList by passwordsViewModel.passwordsList.observeAsState(emptyList())
 
+    Box(modifier = Modifier.fillMaxSize()) { // Use Box for layering components
+        // Your existing list and back button inside a column
+        Column {
+            Button(onClick = { navController.navigateUp() }) {
+                Text("Back")
+            }
 
-
-    Column {
-        Button(onClick = { navController.navigateUp() }) {
-            Text("Back")
+            PasswordsListView(
+                passwordsList = passwordsList,
+                onRemove = passwordsViewModel::removePassword
+            )
         }
 
-        PasswordsListView(
-            passwordsList = passwordsList,
-            onRemove = passwordsViewModel::removePassword
-        )
+        // Floating Action Button for adding new password, positioned at the bottom left
+        FloatingActionButton(
+            onClick = { navController.navigate(Screen.AddPassword.route) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd) // Position at the bottom right
+                .padding(16.dp) // Add some padding to ensure it's not sticking to the edge
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "Add New Password")
+        }
     }
 }
+
 
 
 @Composable
 fun PasswordsListView(passwordsList: List<PasswordItem>, onRemove: (PasswordItem) -> Unit) {
+    // Separate passwords with no folder from those with folders (including a null which we treat as "Default Folder")
+    val passwordsNoFolder = passwordsList.filter { it.folderName.isEmpty() }
+    val passwordsInFolders = passwordsList.filterNot { it.folderName.isEmpty() }
+    val groupedPasswords = passwordsInFolders.groupBy { it.folderName ?: "Default Folder" }
+
     LazyColumn {
-        items(passwordsList) { password ->
+        // First, list passwords that do not belong to any folder directly
+        items(passwordsNoFolder) { password ->
             PasswordItemView(password = password, onRemove = onRemove)
+        }
+
+        // Next, handle grouped passwords within folders
+        groupedPasswords.forEach { (folderName, passwordsInFolder) ->
+            item {
+                FolderView(folderName, passwordsInFolder, onRemove)
+            }
         }
     }
 }
+
+
+
 
 
 @Composable

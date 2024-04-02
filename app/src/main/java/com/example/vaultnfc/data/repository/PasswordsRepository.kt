@@ -4,7 +4,7 @@ import com.example.vaultnfc.model.PasswordItem
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-class FirebaseRepository {
+class PasswordsRepository {
     private val db = FirebaseFirestore.getInstance()
     private val collectionRef = db.collection("passwords")
 

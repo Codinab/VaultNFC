@@ -7,5 +7,9 @@ sealed class Screen(val route: String) {
     data object PasswordsList : Screen("passwords_list_screen")
     data object Login : Screen("login_screen")
     data object PasswordGenerator : Screen("password_generator_screen")
-
+    data object EditPassword : Screen("edit_password_screen")
+    data object PasswordDetails : Screen("password_details_screen")
+    data object NFCSharePopup : Screen("nfc_share_popup_screen")
+    data object NFCReceivePopup : Screen("nfc_receive_popup_screen")
 }
+

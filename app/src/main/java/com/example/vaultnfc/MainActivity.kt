@@ -41,23 +41,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val passwordsViewModel = ViewModelProvider(this)[PasswordsViewModel::class.java]
-        val passwordGeneratorViewModel = ViewModelProvider(this)[PasswordGeneratorViewModel::class.java]
-
-
-        try {
-            val password = passwordGeneratorViewModel.generatePassword().toCharArray().toString()
-            val encrypted = passwordsViewModel.encryptPassword(password, "a")
-            val decrypted = passwordsViewModel.decryptPassword(encrypted, "a")
-
-            println("Password: $password")
-            println("Encrypted: $encrypted")
-            println("Decrypted: $decrypted")
-        } catch (exception: Exception) {
-            println(exception)
-        }
-
-
         setContent {
             VaultNFCTheme {
                 AppNavigation(baseContext)
