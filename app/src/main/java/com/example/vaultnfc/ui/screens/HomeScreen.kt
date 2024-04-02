@@ -16,8 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,7 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -39,7 +46,6 @@ import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.RedEnd
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview
 @Composable
 fun HomeScreen(navController: NavController) {
     var isSidebarOpen by remember { mutableStateOf(false) }
@@ -62,15 +68,15 @@ fun HomeScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(             //Boto llista
+                    TextButton(             //Button list
                         onClick = { isSidebarOpen = true },
                         modifier = Modifier
                             .size(80.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.l_google_logo),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
+                        Icon(Icons.Filled.FormatListNumbered,
+                            contentDescription = "Copy Username",
+                            modifier = Modifier.size(60.dp),
+                            tint = Color.Red
                         )
                     }
 
@@ -81,15 +87,15 @@ fun HomeScreen(navController: NavController) {
                             .size(80.dp)
                             .padding(horizontal = 10.dp)
                     )
-                    TextButton(             //Boto afegir password
+                    TextButton(             //Button add password
                         onClick = { isSidebarOpen = true },
                         modifier = Modifier
                             .size(80.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.l_google_logo),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
+                        Icon(Icons.Filled.Add,
+                            contentDescription = "Copy Username",
+                            modifier = Modifier.size(60.dp),
+                            tint = Color.Red
                         )
                     }
                 }
@@ -100,10 +106,42 @@ fun HomeScreen(navController: NavController) {
                     .fillMaxWidth()
                     .background(color = Color.Red)
             )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(20) { index ->
+                    Spacer(
+                        modifier = Modifier
+                            .height(2.dp)
+                            .fillMaxWidth()
+                            .background(color = Color.Red)
+                    )
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontSize = 20.sp)) {
+                                append("Password_ID $index\n")
+                            }
+                            withStyle(style = SpanStyle(fontSize = 16.sp)) {
+                                append("Username $index")
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                navController.navigate(Screen.AddPassword.route)
+                            }
+
+                    )
+
+                }
+            }
         }
+
         if (isSidebarOpen) {
             SideBar(
-                onClose = { isSidebarOpen = false},
+                onClose = { isSidebarOpen = false },
                 navController
             )
         }
@@ -176,16 +214,28 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                 Column(
                     modifier = Modifier.padding(8.dp)
                 ) {
+                    Spacer(
+                        modifier = Modifier
+                            .height(2.dp)
+                            .fillMaxWidth()
+                            .background(color = Color.Red)
+                    )
+                    TextButton(
+                        onClick = { navController.navigate(Screen.PasswordGenerator.route)}
+                    ) {
+                        Text("PASSWORD GENERATOR", color = RedEnd, fontSize = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                     TextButton(
                         onClick = { /* Handle settings button click */ }
                     ) {
-                        Text("SETTINGS", color = RedEnd, fontSize = 20.sp)
+                        Text("SETTINGS", color = RedEnd, fontSize = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     TextButton(
                         onClick = { /* Handle logout button click */ }
                     ) {
-                        Text("LOG OUT", color = RedEnd, fontSize = 20.sp)
+                        Text("LOG OUT", color = RedEnd, fontSize = 18.sp)
                     }
                 }
             }
