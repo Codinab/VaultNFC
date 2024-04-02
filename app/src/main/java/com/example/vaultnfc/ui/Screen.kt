@@ -8,4 +8,5 @@ sealed class Screen(val route: String) {
     data object Login : Screen("login_screen")
     data object PasswordGenerator : Screen("password_generator_screen")
 
+
 }

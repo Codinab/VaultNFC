@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">VaultNFC</string>
+    <string name="welcome_to_vaultnfc">Welcome to VaultNFC</string>
 </resources>
