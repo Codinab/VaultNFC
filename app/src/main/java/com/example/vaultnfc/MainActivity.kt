@@ -4,6 +4,8 @@ import PasswordGeneratorViewModel
 import PasswordsViewModel
 import android.app.Activity
 import android.content.Intent
+import android.nfc.NdefMessage
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -47,6 +49,23 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // Check if the intent is an NFC intent
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent?.action) {
+            intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)?.also { rawMessages ->
+                // Process the messages
+                // For example, parse the first message
+                val messages = rawMessages.map { it as NdefMessage }
+                val payload = messages[0].records[0].payload
+                // Assuming payload contains a serialized PasswordItem
+                val passwordItemJson = String(payload)
+                // Pass the JSON string to your ViewModel or directly to the Composable
+            }
+        }
+    }
+
 
 
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
