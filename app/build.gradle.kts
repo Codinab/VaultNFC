@@ -1,11 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-
     id("com.google.gms.google-services")
 }
-
-
 
 
 
@@ -86,6 +83,13 @@ dependencies {
 
     //Login
     implementation ("com.google.android.gms:play-services-auth:21.0.0")
+
+
+    // Gson dependency for JSON serialization/deserialization
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    //Firebase store
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
