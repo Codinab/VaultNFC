@@ -12,7 +12,20 @@
           "package_name": "com.example.vaultnfc"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "355050411055-bvddsdlcma6dc0fuu4cseh2bucavf0s1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.vaultnfc",
+            "certificate_hash": "f5141b4e9798fbdc3d61943aa47f1db593dc329a"
+          }
+        },
+        {
+          "client_id": "355050411055-8nh9c9937jajmsdnne5jdo4quuc86h92.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCMpLuzAloS6dh_PilITUKDF6PLChaIQxg"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "355050411055-8nh9c9937jajmsdnne5jdo4quuc86h92.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

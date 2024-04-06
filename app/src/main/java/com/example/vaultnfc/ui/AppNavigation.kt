@@ -4,7 +4,7 @@ package com.example.vaultnfc.ui
 import PasswordGeneratorScreen
 import android.content.Context
 import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
-import com.example.vaultnfc.ui.screens.home.HomeScreen
+import com.example.vaultnfc.ui.screens.home.PasswordsScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,8 +27,8 @@ fun AppNavigation(context: Context) {
         Screen.Login.route
     }
 
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
-        composable(Screen.Home.route) { HomeScreen(navController) }
+    NavHost(navController = navController, startDestination = Screen.Opening.route) {
+        composable(Screen.Home.route) { PasswordsScreen(navController) }
         composable(Screen.Settings.route) { SettingsScreen(navController) }
         composable(Screen.AddPassword.route) { AddPasswordScreen(navController) }
         composable(Screen.PasswordsList.route) { PasswordsListScreen(navController) }
@@ -38,6 +38,8 @@ fun AppNavigation(context: Context) {
         composable(Screen.PasswordDetails.route) { PasswordDetailsScreen(navController) }
         // Assuming NFCSharePopupScreen and NFCReceivePopupScreen are dialogues or popups and may not require a composable route.
         composable(Screen.PasswordGenerator.route) { PasswordGeneratorScreen(navController) }
+        composable(Screen.Register.route) { RegisterScreen(navController) }
+        composable(Screen.Opening.route) { OpeningScreen(navController) }
 
     }
 

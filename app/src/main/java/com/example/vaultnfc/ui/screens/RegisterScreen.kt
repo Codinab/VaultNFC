@@ -13,7 +13,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -33,27 +32,13 @@ import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
-    // Add state for email and password
+fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    // Example error handling
-    val loginError by viewModel.loginError.observeAsState()
-
-    val isLoggedIn by viewModel.isLoggedIn.observeAsState(initial = false)
-
+    var confirmPassword by remember { mutableStateOf("") }
+    val registrationError by loginViewModel.registrationError.observeAsState()
     val context = LocalContext.current
 
-    // Navigate to home screen if already logged in
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn) {
-            navController.navigate(Screen.Home.route) {
-                popUpTo(Screen.Login.route) {
-                    inclusive = true
-                }
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -62,7 +47,6 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Email input
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -74,7 +58,6 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Password input
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -84,29 +67,42 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Login button
         Button(
             onClick = {
-                viewModel.login(email, password, context) {
-                    navController.navigate(Screen.Home.route)
+                if (password == confirmPassword) {
+                    loginViewModel.register(email, password, context) {
+                        navController.navigate(Screen.Login.route)
+                    }
+                } else {
+                    loginViewModel.registrationError.postValue("Passwords do not match")
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Login")
+            Text("Register")
         }
 
-        // Handle login errors
-        loginError?.let {
+        // Handle registration errors
+        registrationError?.let {
             Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
         }
 
-        // Navigation to registration screen
-        TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-            Text("Don't have an account? Register")
+        // Navigation to login screen
+        TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
+            Text("Already have an account? Login")
         }
     }
 }
-
