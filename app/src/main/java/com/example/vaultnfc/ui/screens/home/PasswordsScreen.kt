@@ -113,7 +113,7 @@ fun PasswordsScreen(navController: NavController) {
                             .padding(horizontal = 10.dp)
                     )
                     TextButton(             //Button add password
-                        onClick = { navController.navigate(Screen.AddPassword.route) },
+                        onClick = { navController.navigate(Screen.WifiDirect.route) },
                         modifier = Modifier.size(80.dp)
                     ) {
                         Icon(
@@ -125,6 +125,7 @@ fun PasswordsScreen(navController: NavController) {
                     }
                 }
             }
+
             Spacer(
                 modifier = Modifier
                     .height(2.dp)

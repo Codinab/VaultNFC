@@ -15,6 +15,8 @@ sealed class Screen(val route: String) {
 
     data object Opening : Screen("opening_screen")
 
+    data object WifiDirect : Screen("wifi_direct_screen")
+
 
 
 

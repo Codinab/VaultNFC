@@ -3,18 +3,20 @@ package com.example.vaultnfc.ui
 
 import PasswordGeneratorScreen
 import android.content.Context
-import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
-import com.example.vaultnfc.ui.screens.home.PasswordsScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.vaultnfc.ui.screens.*
-import com.example.vaultnfc.ui.screens.home.passwordview.PasswordsListScreen
-import com.example.vaultnfc.ui.screens.LoginScreen
 import com.example.vaultnfc.ui.screens.SettingsScreen
+import com.example.vaultnfc.ui.screens.WifiDirectCommunication
+import com.example.vaultnfc.ui.screens.home.PasswordsScreen
+import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.EditPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.PasswordDetailsScreen
+import com.example.vaultnfc.ui.screens.home.passwordview.PasswordsListScreen
+import com.example.vaultnfc.ui.screens.starting.LoginScreen
+import com.example.vaultnfc.ui.screens.starting.OpeningScreen
+import com.example.vaultnfc.ui.screens.starting.RegisterScreen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 @Composable
@@ -40,7 +42,7 @@ fun AppNavigation(context: Context) {
         composable(Screen.PasswordGenerator.route) { PasswordGeneratorScreen(navController) }
         composable(Screen.Register.route) { RegisterScreen(navController) }
         composable(Screen.Opening.route) { OpeningScreen(navController) }
-
+        composable(Screen.WifiDirect.route) { WifiDirectCommunication(navController) }
     }
 
 }
