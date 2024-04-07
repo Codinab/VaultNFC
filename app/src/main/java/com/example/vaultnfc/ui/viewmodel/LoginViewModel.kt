@@ -13,15 +13,6 @@ class LoginViewModel : ViewModel() {
     val registrationError = MutableLiveData<String?>()
     val isLoggedIn = MutableLiveData<Boolean>()
 
-    // Check if user is already logged in when ViewModel is initialized
-    fun checkIfLoggedIn(context: Context) {
-        val (email, password) = SecureStorage.getLoginDetails(context)
-        if (email != null && password != null) {
-            // Automatically log the user in with the saved credentials
-            login(email, password, context) {}
-        }
-    }
-
     fun login(email: String, password: String, context: Context, onSuccess: () -> Unit) {
         if (checkUserParameters(email, password, loginError)) return
 
@@ -35,6 +26,12 @@ class LoginViewModel : ViewModel() {
                 loginError.postValue(task.exception?.message ?: "Login failed")
             }
         }
+    }
+
+    fun logout(context: Context) {
+        SecureStorage.clearLoginDetails(context)
+        auth.signOut()
+        isLoggedIn.postValue(false)
     }
 
     fun register(email: String, password: String, context: Context, onSuccess: () -> Unit) {

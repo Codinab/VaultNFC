@@ -54,6 +54,7 @@ import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.RedEnd
+import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -66,8 +67,7 @@ fun PasswordsScreen(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val context = LocalContext.current
-    var showMenu by remember { mutableStateOf(false) } // Change to use `by` for simpler syntax
+    var showMenu by remember { mutableStateOf(false) }
 
 
     DisposableEffect(currentRoute) {
@@ -208,6 +208,8 @@ fun PasswordsScreen(navController: NavController) {
 
 @Composable
 fun SideBar(onClose: () -> Unit, navController: NavController) {
+    val loginViewModel: LoginViewModel = viewModel()
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -283,7 +285,10 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                         Text("SETTINGS", color = RedEnd, fontSize = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = { /* Handle logout button click */ }) {
+                    TextButton(onClick = {
+                        loginViewModel.logout(context)
+                        navController.navigate(Screen.Opening.route)
+                    }) {
                         Text("LOG OUT", color = RedEnd, fontSize = 18.sp)
                     }
                 }

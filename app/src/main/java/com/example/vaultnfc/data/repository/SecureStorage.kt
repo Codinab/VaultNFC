@@ -23,6 +23,11 @@ object SecureStorage {
         )
     }
 
+    fun clearLoginDetails(context: Context) {
+        val prefs = getEncryptedPreferences(context)
+        prefs.edit().remove(EMAIL_KEY).remove(PASSWORD_KEY).apply()
+    }
+
     fun saveLoginDetails(context: Context, email: String, password: String) {
         val prefs = getEncryptedPreferences(context)
         prefs.edit().putString(EMAIL_KEY, email).putString(PASSWORD_KEY, password).apply()
