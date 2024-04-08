@@ -4,7 +4,6 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -43,10 +42,13 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
 
 
     fun startServer() {
-
+        viewModelScope.launch(Dispatchers.IO) {
             val serverUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // Example UUID
             try {
-                bluetoothAdapter?.listenUsingRfcommWithServiceRecord("MyBluetoothService", serverUUID).use { serverSocket ->
+                bluetoothAdapter?.listenUsingRfcommWithServiceRecord(
+                    "MyBluetoothService",
+                    serverUUID
+                ).use { serverSocket ->
                     val socket = try {
                         serverSocket?.accept() // This call blocks until a connection is accepted
                     } catch (e: IOException) {
@@ -62,7 +64,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
             } catch (e: IOException) {
                 Log.e(TAG, "Server socket's listen() method failed", e)
             }
-
+        }
     }
 
 
