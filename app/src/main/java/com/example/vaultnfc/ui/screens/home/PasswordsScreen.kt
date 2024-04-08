@@ -113,7 +113,7 @@ fun PasswordsScreen(navController: NavController) {
                             .padding(horizontal = 10.dp)
                     )
                     TextButton(             //Button add password
-                        onClick = { navController.navigate(Screen.AddPassword.route) },
+                        onClick = { navController.navigate(Screen.Bluetooth.route) },
                         modifier = Modifier.size(80.dp)
                     ) {
                         Icon(

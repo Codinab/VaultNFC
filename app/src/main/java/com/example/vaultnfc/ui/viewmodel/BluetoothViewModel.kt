@@ -6,11 +6,7 @@ import android.Manifest.permission.BLUETOOTH_ADMIN
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Context.BLUETOOTH_SERVICE
-import android.content.Intent
-import android.content.IntentFilter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,20 +28,6 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
         bluetoothManager.adapter
     }
 
-    private val bluetoothStateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (BluetoothAdapter.ACTION_STATE_CHANGED == intent?.action) {
-                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-                _bluetoothStateChangeEvent.postValue(Event(state))
-            }
-        }
-    }
-
-    init {
-        // Register for Bluetooth state changes
-        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        application.registerReceiver(bluetoothStateReceiver, filter)
-    }
 
     fun checkAndEnableBluetooth() {
         if (bluetoothAdapter != null && !bluetoothAdapter!!.isEnabled) {
@@ -64,7 +46,6 @@ class BluetoothViewModel(application: Application) : AndroidViewModel(applicatio
     override fun onCleared() {
         super.onCleared()
         // Unregister receiver to avoid memory leaks
-        getApplication<Application>().unregisterReceiver(bluetoothStateReceiver)
     }
 }
 

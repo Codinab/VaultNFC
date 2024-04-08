@@ -1,13 +1,23 @@
 package com.example.vaultnfc.ui.screens
 
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,11 +25,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vaultnfc.ui.viewmodel.BluetoothViewModel
+import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 
 @Composable
-fun BluetoothScreen(viewModel: BluetoothViewModel) {
+fun BluetoothScreen(application: Application, viewModel: BluetoothViewModel) {
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
@@ -32,7 +45,91 @@ fun BluetoothScreen(viewModel: BluetoothViewModel) {
 
     // Observe Bluetooth state changes and react accordingly.
     ObserveBluetoothStateChanges(viewModel, context)
+
+    BluetoothChatScreen(application)
+
+
 }
+
+@Composable
+fun BluetoothChatScreen(application: Application) {
+    //init viewmodel with application
+    val viewModel: MyBluetoothServiceViewModel = viewModel(factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application))
+    // Observe LiveData objects
+    val readMessages by viewModel.readMessages.observeAsState()
+    val writeMessages by viewModel.writeMessages.observeAsState()
+    val toastMessages by viewModel.toastMessages.observeAsState()
+
+    var inputText by remember { mutableStateOf("") }
+
+    Column {
+        // Display the latest message received
+        Text("Received: ${String(readMessages ?: ByteArray(0))}")
+
+        // Display the latest message sent confirmation
+        Text("Sent: $writeMessages")
+
+        // Display the latest toast message
+        Text("Status: $toastMessages")
+
+        TextField(
+            value = inputText,
+            onValueChange = { inputText = it },
+            label = { Text("Type your message here") },
+            keyboardActions = KeyboardActions(onDone = {
+                viewModel.write(inputText.toByteArray())
+                inputText = "" // Clear the input field after sending the message
+            })
+        )
+
+        Button(onClick = {
+            viewModel.write(inputText.toByteArray())
+            inputText = "" // Clear the input field after sending the message
+        }) {
+            Text("Send")
+        }
+
+        val discoveredDevices by viewModel.discoveredDevices.observeAsState(initial = emptyList())
+
+        Button(onClick = { viewModel.startDiscovery() }) {
+            Text("Discover Devices")
+        }
+
+        Button(onClick = { viewModel.startServer() }) {
+            Text("Start Server")
+        }
+
+        Column {
+            Text("Discovered Devices")
+            LazyColumn {
+                items(discoveredDevices) { device ->
+                    DeviceItem(device) { selectedDevice ->
+                        viewModel.connectToDevice(selectedDevice)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Unit) {
+    ListItem(
+        modifier = Modifier.clickable { onDeviceClicked(device) },
+        headlineContent = {
+            Column {
+                Text(device.name ?: "Unknown Device")
+                Text(device.address ?: "Unknown Address")
+                Text("Bond State: ${device.bondState}")
+            }
+
+        }
+    )
+}
+
+
+
+
 
 @Composable
 fun SetupBluetoothPermissionHandling(viewModel: BluetoothViewModel, context: Context) {
