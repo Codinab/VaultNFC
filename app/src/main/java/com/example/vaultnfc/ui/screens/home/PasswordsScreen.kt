@@ -299,7 +299,7 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
 
                     // Settings Button
                     TextButton(
-                        onClick = { /* Handle settings button click */ },
+                        onClick = {navController.navigate(Screen.Settings.route)},
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(

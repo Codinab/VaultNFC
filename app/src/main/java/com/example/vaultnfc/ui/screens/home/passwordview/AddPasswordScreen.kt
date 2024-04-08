@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -218,7 +219,8 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
                 colors = ButtonDefaults.buttonColors(RedEnd),
                 modifier = Modifier
                     .padding(end = 16.dp)
-                    .heightIn(min = 36.dp),
+                    .heightIn(min = 36.dp)
+                    .shadow(18.dp, RoundedCornerShape(1.dp)),
                 shape = RoundedCornerShape(1.dp)
             ) {
                 Text("Back", color = Color.White)
@@ -236,7 +238,8 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
                 },
                 colors = ButtonDefaults.buttonColors(RedEnd),
                 modifier = Modifier
-                    .heightIn(min = 36.dp),
+                    .heightIn(min = 36.dp)
+                    .shadow(18.dp, RoundedCornerShape(1.dp)),
                 shape = RoundedCornerShape(1.dp)
             ) {
                 Text("Add", color = Color.White)
