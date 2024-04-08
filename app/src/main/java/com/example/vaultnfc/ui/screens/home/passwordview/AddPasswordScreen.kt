@@ -2,7 +2,6 @@ package com.example.vaultnfc.ui.screens.home.passwordview
 
 import PasswordsViewModel
 import android.widget.Toast
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,9 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FindInPage
+import androidx.compose.material.icons.outlined.NoteAlt
+import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -20,8 +23,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,10 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.ui.theme.RedEnd
@@ -68,18 +70,18 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             modifier = Modifier.padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Title",
-                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            )
-            BasicTextField(
+            OutlinedTextField(
                 value = title,
-                onValueChange = { title = it },
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                modifier = Modifier
-                    .border(color = Color.Red, width = 1.dp)
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .width(300.dp)
+                onValueChange = {title = it},
+                label = {Text(text = "Enter the Title", color = Color.Black)},
+                leadingIcon = {
+                    Icon(imageVector = Icons.Outlined.Title, contentDescription ="Set the title")
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Red,
+                    unfocusedBorderColor = RedEnd,
+                    )
+
             )
         }
         // Label and field for Username
@@ -87,18 +89,18 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             modifier = Modifier.padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Username",
-                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            )
-            BasicTextField(
+            OutlinedTextField(
                 value = username,
-                onValueChange = { username = it },
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                modifier = Modifier
-                    .border(color = Color.Red, width = 1.dp)
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .width(300.dp)
+                onValueChange = {username = it},
+                label = {Text(text = "Enter the username", color = Color.Black)},
+                leadingIcon = {
+                    Icon(imageVector = Icons.Outlined.Person, contentDescription ="Set the title")
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Red,
+                    unfocusedBorderColor = RedEnd,
+                )
+
             )
         }
         // Label and field for Password
@@ -106,18 +108,18 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             modifier = Modifier.padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Password",
-                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            )
-            BasicTextField(
+            OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                modifier = Modifier
-                    .border(color = Color.Red, width = 1.dp)
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .width(300.dp)
+                onValueChange = {password = it},
+                label = {Text(text = "Enter the Password", color = Color.Black)},
+                leadingIcon = {
+                    Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Red,
+                    unfocusedBorderColor = RedEnd,
+                )
+
             )
         }
         // Label and field for URI
@@ -125,18 +127,18 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             modifier = Modifier.padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "URI",
-                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            )
-            BasicTextField(
+            OutlinedTextField(
                 value = uri,
-                onValueChange = { uri = it },
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                modifier = Modifier
-                    .border(color = Color.Red, width = 1.dp)
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .width(300.dp)
+                onValueChange = {uri = it},
+                label = {Text(text = "Enter the URI", color = Color.Black)},
+                leadingIcon = {
+                    Icon(imageVector = Icons.Outlined.FindInPage, contentDescription ="Set the title")
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Red,
+                    unfocusedBorderColor = RedEnd,
+                )
+
             )
         }
         // Label and field for Notes
@@ -144,18 +146,18 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             modifier = Modifier.padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Notes",
-                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            )
-            BasicTextField(
+            OutlinedTextField(
                 value = notes,
-                onValueChange = { notes = it },
-                textStyle = TextStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 16.sp),
-                modifier = Modifier
-                    .border(color = Color.Red, width = 1.dp)
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .width(300.dp)
+                onValueChange = {notes = it},
+                label = {Text(text = "Enter the Notes", color = Color.Black)},
+                leadingIcon = {
+                    Icon(imageVector = Icons.Outlined.NoteAlt, contentDescription ="Set the title")
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Red,
+                    unfocusedBorderColor = RedEnd,
+                )
+
             )
         }
         ExposedDropdownMenuBox(
@@ -164,11 +166,15 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
                 expanded = !expanded
             }
         ) {
-            TextField(
+            OutlinedTextField(
                 readOnly = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Red,
+                    unfocusedBorderColor = RedEnd,
+                ),
                 value = selectedFolder ?: "No Folder",
                 onValueChange = {},
-                label = { Text("Folder") },
+                label = { Text("Folder", color = Color.Black) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 },
