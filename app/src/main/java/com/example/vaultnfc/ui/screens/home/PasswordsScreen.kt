@@ -5,10 +5,8 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,17 +15,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,9 +42,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -53,7 +52,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.BlackEnd
+import com.example.vaultnfc.ui.theme.ButtonRed
+import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
+import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -69,7 +71,6 @@ fun PasswordsScreen(navController: NavController) {
 
     var showMenu by remember { mutableStateOf(false) }
 
-
     DisposableEffect(currentRoute) {
         if (currentRoute == Screen.Home.route) {
             passwordsViewModel.fetch()
@@ -78,53 +79,37 @@ fun PasswordsScreen(navController: NavController) {
         onDispose { }
     }
 
-
     Box(
-        modifier = Modifier.fillMaxWidth()
-            .wrapContentSize(Alignment.BottomEnd)
+        modifier = Modifier.fillMaxSize()
     ) {
         Column {
-            Box(                    //Header
+            Box( // Top bar
                 modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
-                    .background(color = Color.LightGray), contentAlignment = Alignment.Center
+                    .background(color = WhiteEnd), // Set background color to match the FloatingActionButton color
+                contentAlignment = Alignment.Center
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                IconButton(
+                    onClick = { isSidebarOpen = true },
+                    modifier = Modifier.align(Alignment.CenterStart)
                 ) {
-                    TextButton(             //Button list
-                        onClick = { isSidebarOpen = true }, modifier = Modifier.size(80.dp)
-                    ) {
-                        Icon(
-                            Icons.Filled.FormatListNumbered,
-                            contentDescription = "Copy Username",
-                            modifier = Modifier.size(60.dp),
-                            tint = Color.Red
-                        )
-                    }
-                    Image( //Logo
-                        painter = painterResource(id = R.drawable.logo_menu),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .padding(horizontal = 10.dp)
+                    Icon(
+                        Icons.Filled.Menu,
+                        contentDescription = "Menu",
+                        tint = ButtonRed // Set color of the menu icon
                     )
-                    TextButton(             //Button add password
-                        onClick = { navController.navigate(Screen.AddPassword.route) },
-                        modifier = Modifier.size(80.dp)
-                    ) {
-                        Icon(
-                            Icons.Filled.Add,
-                            contentDescription = "Add button",
-                            modifier = Modifier.size(60.dp),
-                            tint = Color.Red
-                        )
-                    }
                 }
+
+                // Center-aligned logo
+                Image(
+                    painter = painterResource(id = R.drawable.logo_menu),
+                    contentDescription = "Logo",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+
             }
+
             Spacer(
                 modifier = Modifier
                     .height(2.dp)
@@ -137,28 +122,40 @@ fun PasswordsScreen(navController: NavController) {
             ) {
                 items(passwordsList.size) { index ->
                     val password = passwordsList[index]
-                    Spacer(
+                    val backgroundColor = Color.White
+
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = LightRed),
                         modifier = Modifier
-                            .height(2.dp)
                             .fillMaxWidth()
-                            .background(color = Color.Red)
-                    )
-                    Text(text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontSize = 20.sp)) {
-                            append("${password.title}\n")
+                            .padding(vertical = 8.dp, horizontal = 16.dp)
+                            .background(color = backgroundColor)
+                            .clickable { navController.navigate(Screen.PasswordDetails.route) }
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = password.title,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            Text(
+                                text = password.username,
+                                color = Color.Black
+                            )
                         }
-                        withStyle(style = SpanStyle(fontSize = 16.sp)) {
-                            append(password.username)
-                        }
-                    }, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            // Your click action here
-                        }
+                    }
 
-                    )
-
+                    if (index != passwordsList.size - 1) {
+                        Spacer(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
+                                .background(color = Color.LightGray)
+                        )
+                    }
                 }
             }
         }
@@ -173,6 +170,7 @@ fun PasswordsScreen(navController: NavController) {
             FloatingActionButton(
                 onClick = { showMenu = !showMenu }, // Toggle the visibility of the menu
                 modifier = Modifier.padding(16.dp),
+                containerColor = ButtonRed // Set background color of the FloatingActionButton
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add New Password")
             }
@@ -181,21 +179,21 @@ fun PasswordsScreen(navController: NavController) {
             DropdownMenu(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false },
+                offset = DpOffset(160.dp, -70.dp)
             ) {
                 // Option to add a new password
-                DropdownMenuItem(text = { Text("Create password") }, onClick = {
+                DropdownMenuItem(text = { Text("Create password", fontWeight = FontWeight.Bold) }, onClick = {
                     showMenu = false // Dismiss the menu
                     navController.navigate(Screen.AddPassword.route) // Navigate to AddPassword screen
                 })
-                // Option to receive a password via NFC
-                DropdownMenuItem(text = { Text("Receive via NFC") }, onClick = {
+                // Option to receive a password via Bluetooth
+                DropdownMenuItem(text = { Text("Receive via Bluetooth", fontWeight = FontWeight.Bold)}, onClick = {
                     showMenu = false // Dismiss the menu
-                    // Implement your logic to start receiving a password via NFC
+                    // Implement your logic to start receiving a password via Bluetooth
                     // This might involve navigating to another screen or opening a dialog
                 })
             }
         }
-
 
         if (isSidebarOpen) {
             SideBar(
@@ -204,6 +202,7 @@ fun PasswordsScreen(navController: NavController) {
         }
     }
 }
+
 
 
 @Composable
@@ -249,7 +248,7 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                                 .fillMaxWidth()
                                 .background(color = Color.Red)
                         )
-                        Text("FOLDERS", modifier = Modifier.padding(8.dp))
+                        Text("FOLDERS" ,modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
                         Spacer(
                             modifier = Modifier
                                 .height(2.dp)
@@ -257,42 +256,80 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                                 .background(color = Color.Red)
                         )
 
-                        repeat(20) { // Example of 20 items, replace with your folder items
-                            TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
-                                Text(
-                                    "Folder $it",
-                                    modifier = Modifier.padding(8.dp),
-                                    color = BlackEnd
-                                )
+                        repeat(20) { index -> // Example of 20 items, replace with your folder items
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(color = WhiteEnd)
+                            ) {
+                                TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
+                                    Text(
+                                        "Folder $index",
+                                        modifier = Modifier.padding(8.dp),
+                                        color = BlackEnd
+                                    )
+                                }
                             }
                         }
                     }
                 }
+                Spacer(
+                    modifier = Modifier
+                        .height(2.dp)
+                        .fillMaxWidth()
+                        .background(color = Color.Red)
+                )
                 Column(
                     modifier = Modifier.padding(8.dp)
                 ) {
-                    Spacer(
-                        modifier = Modifier
-                            .height(2.dp)
-                            .fillMaxWidth()
-                            .background(color = Color.Red)
-                    )
-                    TextButton(onClick = { navController.navigate(Screen.PasswordGenerator.route) }) {
-                        Text("PASSWORD GENERATOR", color = RedEnd, fontSize = 18.sp)
+                    // Password Generator Button
+                    TextButton(
+                        onClick = { navController.navigate(Screen.PasswordGenerator.route) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            "PASSWORD GENERATOR",
+                            color = RedEnd,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = { /* Handle settings button click */ }) {
-                        Text("SETTINGS", color = RedEnd, fontSize = 18.sp)
+
+                    // Settings Button
+                    TextButton(
+                        onClick = { /* Handle settings button click */ },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            "SETTINGS",
+                            color = RedEnd,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = {
-                        loginViewModel.logout(context)
-                        navController.navigate(Screen.Opening.route)
-                    }) {
-                        Text("LOG OUT", color = RedEnd, fontSize = 18.sp)
+
+                    // Log Out Button
+                    TextButton(
+                        onClick = {
+                            loginViewModel.logout(context)
+                            navController.navigate(Screen.Opening.route)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            "LOG OUT",
+                            color = RedEnd,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
                     }
                 }
             }
         }
     }
 }
+

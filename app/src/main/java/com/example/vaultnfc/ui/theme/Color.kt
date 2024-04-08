@@ -14,3 +14,8 @@ val BlackEnd = Color(0xFF000000)
 val GreyEnd = Color(0xFFD8D8D8)
 val RedEnd = Color(0xFFD72323)
 val WhiteEnd = Color(0xFFF5EDED)
+
+val LightRed= Color(0xFFFFB8BA)
+val ButtonRed= Color(0xFFee2400)
+
+val TopBarColor = Color(0xFFFFCDD2)
