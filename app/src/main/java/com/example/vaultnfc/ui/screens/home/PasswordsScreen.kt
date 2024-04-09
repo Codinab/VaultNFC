@@ -2,6 +2,8 @@ package com.example.vaultnfc.ui.screens.home
 
 import PasswordsViewModel
 import android.annotation.SuppressLint
+import android.app.Application
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,10 +57,11 @@ import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
+import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun PasswordsScreen(navController: NavController) {
+fun PasswordsScreen(navController: NavController, application: Application) {
     var isSidebarOpen by remember { mutableStateOf(false) }
 
     val passwordsViewModel: PasswordsViewModel = viewModel()
@@ -68,6 +71,10 @@ fun PasswordsScreen(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     var showMenu by remember { mutableStateOf(false) }
+
+    val myBluetoothServiceViewModel: MyBluetoothServiceViewModel = viewModel(
+        factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
+    )
 
 
     DisposableEffect(currentRoute) {
@@ -113,7 +120,7 @@ fun PasswordsScreen(navController: NavController) {
                             .padding(horizontal = 10.dp)
                     )
                     TextButton(             //Button add password
-                        onClick = { navController.navigate(Screen.Bluetooth.route) },
+                        onClick = {  },
                         modifier = Modifier.size(80.dp)
                     ) {
                         Icon(
@@ -154,11 +161,11 @@ fun PasswordsScreen(navController: NavController) {
                         .fillMaxWidth()
                         .padding(8.dp)
                         .clickable {
-                            // Your click action here
+                            myBluetoothServiceViewModel.passwordItem.postValue(password)
+                            navController.navigate(Screen.BluetoothClient.route)
+                            Toast.makeText(application, "Password set ${password.title}", Toast.LENGTH_SHORT).show()
                         }
-
                     )
-
                 }
             }
         }
@@ -188,10 +195,9 @@ fun PasswordsScreen(navController: NavController) {
                     navController.navigate(Screen.AddPassword.route) // Navigate to AddPassword screen
                 })
                 // Option to receive a password via NFC
-                DropdownMenuItem(text = { Text("Receive via NFC") }, onClick = {
+                DropdownMenuItem(text = { Text("Receive via Bluetooth") }, onClick = {
                     showMenu = false // Dismiss the menu
-                    // Implement your logic to start receiving a password via NFC
-                    // This might involve navigating to another screen or opening a dialog
+                    navController.navigate(Screen.BluetoothServer.route)
                 })
             }
         }

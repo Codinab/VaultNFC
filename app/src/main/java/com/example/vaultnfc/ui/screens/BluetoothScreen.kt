@@ -1,24 +1,18 @@
 package com.example.vaultnfc.ui.screens
 
-import android.app.Activity
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,10 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vaultnfc.ui.viewmodel.BluetoothViewModel
-import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 
+@Deprecated("This function is deprecated")
 @Composable
 fun BluetoothScreen(application: Application, viewModel: BluetoothViewModel) {
     val context = LocalContext.current
@@ -47,12 +40,11 @@ fun BluetoothScreen(application: Application, viewModel: BluetoothViewModel) {
     // Observe Bluetooth state changes and react accordingly.
     ObserveBluetoothStateChanges(viewModel, context)
 
-    BluetoothChatScreen(application)
 
-
+    //BluetoothChatScreen(application)
 }
 
-@Composable
+/*@Composable
 fun BluetoothChatScreen(application: Application) {
     //init viewmodel with application
     val viewModel: MyBluetoothServiceViewModel = viewModel(
@@ -62,6 +54,9 @@ fun BluetoothChatScreen(application: Application) {
     val readMessages by viewModel.readMessages.observeAsState()
     val writeMessages by viewModel.writeMessages.observeAsState()
     val toastMessages by viewModel.toastMessages.observeAsState()
+    val isConnected by viewModel.isConnected.observeAsState()
+
+    val mode = remember { mutableIntStateOf(0) }    // 0 - no mode
 
     var inputText by remember { mutableStateOf("") }
 
@@ -74,6 +69,8 @@ fun BluetoothChatScreen(application: Application) {
 
         // Display the latest toast message
         Text("Status: $toastMessages")
+
+        Text(text = "Mode: ${mode.intValue}")
 
         TextField(
             value = inputText,
@@ -90,7 +87,10 @@ fun BluetoothChatScreen(application: Application) {
 
         val discoveredDevices by viewModel.discoveredDevices.observeAsState(initial = emptyList())
 
-        Button(onClick = { viewModel.startDiscovery() }) {
+        Button(onClick = {
+            viewModel.startDiscovery()
+            mode.intValue = 1
+        }) {
             Text("Discover Devices")
         }
 
@@ -110,22 +110,36 @@ fun BluetoothChatScreen(application: Application) {
             }
         }
 
-        Button(onClick = {viewModel.enableDiscoverability(discoverableLauncher) }) {
+        Button(onClick = {
+            viewModel.enableDiscoverability(discoverableLauncher)
+            mode.intValue = 2
+        }) {
             Text("Start Server")
         }
 
-        Column {
-            Text("Discovered Devices")
-            LazyColumn {
-                items(discoveredDevices) { device ->
-                    DeviceItem(device) { selectedDevice ->
-                        viewModel.connectToDevice(selectedDevice)
+        if (isConnected == true) {
+            Button(onClick = {
+                viewModel.disconnect()
+                mode.intValue = 0
+            }) {
+                Text("Disconnect")
+            }
+        }
+
+        if (mode.intValue == 1 && isConnected == false) {
+            Column {
+                Text("Discovered Devices")
+                LazyColumn {
+                    items(discoveredDevices) { device ->
+                        DeviceItem(device) { selectedDevice ->
+                            viewModel.connectToDevice(selectedDevice)
+                        }
                     }
                 }
             }
         }
     }
-}
+}*/
 
 @Composable
 fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Unit) {
@@ -164,7 +178,6 @@ fun ObserveBluetoothStateChanges(viewModel: BluetoothViewModel, context: Context
     bluetoothStateChangeEvent?.getContentIfNotHandled()?.let { state ->
         when (state) {
             BluetoothAdapter.STATE_OFF -> ShowEnableBluetoothDialog(context)
-            // Handle other states if necessary.
         }
     }
 }

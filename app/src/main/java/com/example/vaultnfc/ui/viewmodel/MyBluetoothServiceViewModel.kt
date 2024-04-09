@@ -1,6 +1,5 @@
 package com.example.vaultnfc.ui.viewmodel
 
-import PasswordsViewModel
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -13,6 +12,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
@@ -33,15 +33,13 @@ import java.util.UUID
 class MyBluetoothServiceViewModel(private val application: Application) : ViewModel() {
 
 
-
-    private val _readMessages = MutableLiveData<ByteArray>()
-    val readMessages: LiveData<ByteArray> = _readMessages
-
-    private val _writeMessages = MutableLiveData<String>()
-    val writeMessages: LiveData<String> = _writeMessages
+    val passwordItem = MutableLiveData<PasswordItem>()
 
     private val _toastMessages = MutableLiveData<String>()
     val toastMessages: LiveData<String> = _toastMessages
+
+    private val _isConnected = MutableLiveData(false)
+    val isConnected: LiveData<Boolean> = _isConnected
 
     private var connectedThread: ConnectedThread? = null
 
@@ -55,6 +53,9 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
 
 
     fun startServer() {
+
+        if (inInvalidState()) return
+
         viewModelScope.launch(Dispatchers.IO) {
 
             _toastMessages.postValue("Starting server")
@@ -74,21 +75,40 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                     }
                     socket?.also {
                         // Manage the connected socket
-                        val passwordsViewModel = PasswordsViewModel()
-                        connectedThread = ConnectedThread(socket, passwordsViewModel)
+                        connectedThread = ConnectedThread(socket)
                         connectedThread!!.start()
                         _toastMessages.postValue("Connected to device")
 
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 Log.e(TAG, "Server socket's listen() method failed", e)
             }
         }
     }
 
+    private fun inInvalidState(): Boolean {
+        if (connectedThread != null) {
+            Toast.makeText(application, "Already connected to a device", Toast.LENGTH_SHORT).show()
+            return true
+        }
 
+        if (bluetoothAdapter == null) {
+            Toast.makeText(application, "Bluetooth is not available", Toast.LENGTH_SHORT).show()
+            return true
+        }
 
+        if (!bluetoothAdapter!!.isEnabled) {
+            Toast.makeText(application, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show()
+            return true
+        }
+
+        if (isDiscovering.value == true) {
+            Toast.makeText(application, "Already discovering devices", Toast.LENGTH_SHORT).show()
+            return true
+        }
+        return false
+    }
 
 
     fun connectToDevice(device: BluetoothDevice) {
@@ -109,8 +129,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                 }
 
                 socket?.also {
-                    val passwordsViewModel = PasswordsViewModel()
-                    connectedThread = ConnectedThread(socket, passwordsViewModel)
+                    connectedThread = ConnectedThread(socket)
                     connectedThread?.start()
                     _toastMessages.postValue("Connected to device")
                 }
@@ -133,7 +152,8 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         bluetoothManager.adapter
     }
 
-    private val _isDiscovering = MutableLiveData<Boolean>()
+    private val _isDiscovering = MutableLiveData<Boolean>(false)
+    val isDiscovering: LiveData<Boolean> = _isDiscovering
 
     val discoveredDevices = MutableLiveData<List<BluetoothDevice>>()
 
@@ -158,6 +178,9 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     }
 
     fun startDiscovery() {
+        if (inInvalidState()) return
+
+
         this.discoveredDevices.value = emptyList() // Reset the list on new discovery
         // Register for broadcasts when a device is discovered
         _toastMessages.postValue("Starting discovery")
@@ -179,64 +202,61 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
     }
 
-    inner class ConnectedThread(private val mmSocket: BluetoothSocket, private val passwordsViewModel: PasswordsViewModel) : Thread() {
+    inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
         private val mmInStream: InputStream = mmSocket.inputStream
         private val mmOutStream: OutputStream = mmSocket.outputStream
         private val mmBuffer: ByteArray = ByteArray(1024)
 
         override fun run() {
-            var numBytes: Int // bytes returned from read()
-            // Keep listening to the InputStream until an exception occurs
-            while (true) {
-                numBytes = try {
-                    // Read from the InputStream
-                    mmInStream.read(mmBuffer)
-                } catch (e: IOException) {
-                    Log.d(TAG, "Input stream was disconnected", e)
-                    break
+            _isConnected.postValue(true)
+
+            try {
+                while (!isInterrupted) {
+                    val bytes = mmInStream.read(mmBuffer)
+                    // Assuming you're using some form of serialization, you'd deserialize here
+                    val passwordItemReceived = deserializePasswordItem(mmBuffer.copyOf(bytes).toString())
+                    passwordItem.postValue(passwordItemReceived)
                 }
-
-                // Send the obtained bytes to the UI
-                val readMessage = mmBuffer.toString()
-                val passwordItem = deserializePasswordItem(readMessage)
-
-                passwordsViewModel.addPassword(
-                    passwordItem.title,
-                    passwordItem.username,
-                    passwordItem.encryptedPassword,
-                    passwordItem.uri,
-                    passwordItem.notes
-                )
-                // Now you can use passwordItem as needed
+            } catch (e: IOException) {
+                Log.d(TAG, "Input stream was disconnected", e)
+                _toastMessages.postValue("Connection lost: ${e.message}")
+            } finally {
+                cleanupResources()
             }
         }
 
-
-        fun write(bytes: ByteArray) {
-            val item = PasswordItem(
-                title = "Title",
-                username = "Username",
-                encryptedPassword = "EncryptedPassword",
-                uri = "Uri",
-                notes = "Notes"
-            )
-            val json = serializePasswordItem(item)
-            val bytes1 = json.toByteArray(Charsets.UTF_8)
+        fun write(passwordItem: PasswordItem) {
             try {
-                mmOutStream.write(bytes1)
+                // Serialize your PasswordItem into bytes
+                val bytes = serializePasswordItem(passwordItem).toByteArray()
+                mmOutStream.write(bytes)
+                _toastMessages.postValue("Sent ${passwordItem.title}")
             } catch (e: IOException) {
                 Log.e(TAG, "Error occurred when sending data", e)
                 _toastMessages.postValue("Couldn't send data to the other device")
             }
         }
 
-
         fun cancel() {
+            interrupt()
+        }
+
+        private fun cleanupResources() {
             try {
+                mmInStream.close()
+                mmOutStream.close()
                 mmSocket.close()
+                connectedThread = null
+                _isConnected.postValue(false)
+
             } catch (e: IOException) {
-                Log.e(TAG, "Could not close the connect socket", e)
+                Log.e(TAG, "Could not close the connected socket", e)
             }
+        }
+
+        override fun interrupt() {
+            super.interrupt() // This ensures the thread's interrupted status is set
+            cleanupResources() // Close the socket and clean up resources
         }
     }
 
@@ -254,18 +274,31 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
     }
 
-    fun write(bytes: ByteArray) {
-        connectedThread?.write(bytes)
+    fun send() {
+        if(isConnected.value == false) {
+            Toast.makeText(application, "Not connected to a device", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (passwordItem.value == null) {
+            Toast.makeText(application, "No password item to send", Toast.LENGTH_SHORT).show()
+            return
+        }
+        connectedThread?.write(passwordItem.value!!)
     }
 
-    private fun cancel() {
+
+    /**
+     * Disconnects from the connected Bluetooth device and cleans up resources.
+     */
+    fun disconnect() {
         connectedThread?.cancel()
+        _toastMessages.postValue("Disconnected from device")
     }
 
     override fun onCleared() {
         super.onCleared()
         application.unregisterReceiver(discoveryBroadcastReceiver)
-        cancel() // Call your cancel method to close the Bluetooth connection
+        disconnect() // Ensure Bluetooth connection is closed and resources are cleaned up
     }
 
 
