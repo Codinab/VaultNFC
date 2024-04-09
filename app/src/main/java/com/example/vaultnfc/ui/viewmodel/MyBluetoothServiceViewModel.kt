@@ -1,5 +1,6 @@
 package com.example.vaultnfc.ui.viewmodel
 
+import PasswordsViewModel
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -19,6 +20,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.vaultnfc.model.PasswordItem
+import com.example.vaultnfc.model.deserializePasswordItem
+import com.example.vaultnfc.model.serializePasswordItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -70,13 +74,14 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                     }
                     socket?.also {
                         // Manage the connected socket
-                        connectedThread = ConnectedThread(socket)
+                        val passwordsViewModel = PasswordsViewModel()
+                        connectedThread = ConnectedThread(socket, passwordsViewModel)
                         connectedThread!!.start()
                         _toastMessages.postValue("Connected to device")
 
                     }
                 }
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 Log.e(TAG, "Server socket's listen() method failed", e)
             }
         }
@@ -104,7 +109,8 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                 }
 
                 socket?.also {
-                    connectedThread = ConnectedThread(socket)
+                    val passwordsViewModel = PasswordsViewModel()
+                    connectedThread = ConnectedThread(socket, passwordsViewModel)
                     connectedThread?.start()
                     _toastMessages.postValue("Connected to device")
                 }
@@ -128,7 +134,6 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     }
 
     private val _isDiscovering = MutableLiveData<Boolean>()
-    val isDiscovering: LiveData<Boolean> = _isDiscovering
 
     val discoveredDevices = MutableLiveData<List<BluetoothDevice>>()
 
@@ -174,34 +179,57 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
     }
 
-    inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
+    inner class ConnectedThread(private val mmSocket: BluetoothSocket, private val passwordsViewModel: PasswordsViewModel) : Thread() {
         private val mmInStream: InputStream = mmSocket.inputStream
         private val mmOutStream: OutputStream = mmSocket.outputStream
         private val mmBuffer: ByteArray = ByteArray(1024)
 
         override fun run() {
-            var numBytes: Int
+            var numBytes: Int // bytes returned from read()
+            // Keep listening to the InputStream until an exception occurs
             while (true) {
                 numBytes = try {
+                    // Read from the InputStream
                     mmInStream.read(mmBuffer)
                 } catch (e: IOException) {
                     Log.d(TAG, "Input stream was disconnected", e)
                     break
                 }
-                // Handle the read bytes (e.g., update UI or process data)
-                _readMessages.postValue(mmBuffer.copyOf(numBytes))
+
+                // Send the obtained bytes to the UI
+                val readMessage = mmBuffer.toString()
+                val passwordItem = deserializePasswordItem(readMessage)
+
+                passwordsViewModel.addPassword(
+                    passwordItem.title,
+                    passwordItem.username,
+                    passwordItem.encryptedPassword,
+                    passwordItem.uri,
+                    passwordItem.notes
+                )
+                // Now you can use passwordItem as needed
             }
         }
 
+
         fun write(bytes: ByteArray) {
+            val item = PasswordItem(
+                title = "Title",
+                username = "Username",
+                encryptedPassword = "EncryptedPassword",
+                uri = "Uri",
+                notes = "Notes"
+            )
+            val json = serializePasswordItem(item)
+            val bytes1 = json.toByteArray(Charsets.UTF_8)
             try {
-                mmOutStream.write(bytes)
-                // Optionally handle acknowledgment or UI update
+                mmOutStream.write(bytes1)
             } catch (e: IOException) {
                 Log.e(TAG, "Error occurred when sending data", e)
                 _toastMessages.postValue("Couldn't send data to the other device")
             }
         }
+
 
         fun cancel() {
             try {
@@ -230,7 +258,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         connectedThread?.write(bytes)
     }
 
-    fun cancel() {
+    private fun cancel() {
         connectedThread?.cancel()
     }
 

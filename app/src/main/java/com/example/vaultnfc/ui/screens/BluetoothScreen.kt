@@ -79,10 +79,6 @@ fun BluetoothChatScreen(application: Application) {
             value = inputText,
             onValueChange = { inputText = it },
             label = { Text("Type your message here") },
-            keyboardActions = KeyboardActions(onDone = {
-                viewModel.write(inputText.toByteArray())
-                inputText = "" // Clear the input field after sending the message
-            })
         )
 
         Button(onClick = {
