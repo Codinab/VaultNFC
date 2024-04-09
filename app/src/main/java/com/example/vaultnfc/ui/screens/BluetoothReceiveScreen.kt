@@ -4,9 +4,11 @@ package com.example.vaultnfc.ui.screens
 import PasswordsViewModel
 import android.app.Activity
 import android.app.Application
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
@@ -18,9 +20,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
+import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BluetoothServerScreen(application: Application, navController: NavController) {
+
+    PermissionsAndFeaturesSetup(viewModel = PermissionViewModel(application))
+
     val viewModel: MyBluetoothServiceViewModel = viewModel(
         factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
     )
