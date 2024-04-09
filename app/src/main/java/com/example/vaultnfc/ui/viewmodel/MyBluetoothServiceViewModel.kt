@@ -20,6 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
 import com.example.vaultnfc.model.PasswordItem
 import com.example.vaultnfc.model.deserializePasswordItem
 import com.example.vaultnfc.model.serializePasswordItem
@@ -279,11 +280,11 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
             Toast.makeText(application, "Not connected to a device", Toast.LENGTH_SHORT).show()
             return
         }
-        if (passwordItem.value == null) {
+        if (passwordItemSelected.value == null) {
             Toast.makeText(application, "No password item to send", Toast.LENGTH_SHORT).show()
             return
         }
-        connectedThread?.write(passwordItem.value!!)
+        connectedThread?.write(passwordItemSelected.value!!)
     }
 
 

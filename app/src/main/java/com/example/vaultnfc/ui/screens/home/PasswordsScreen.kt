@@ -3,7 +3,6 @@ package com.example.vaultnfc.ui.screens.home
 import PasswordsViewModel
 import android.annotation.SuppressLint
 import android.app.Application
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vaultnfc.R
+import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.ButtonRed
@@ -138,7 +138,10 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp)
                             .background(color = backgroundColor)
-                            .clickable { navController.navigate(Screen.PasswordDetails.route) }
+                            .clickable {
+                                passwordItemSelected.postValue(password)
+                                navController.navigate(Screen.BluetoothClient.route)
+                            }
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp)
@@ -197,8 +200,8 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                 // Option to receive a password via Bluetooth
                 DropdownMenuItem(text = { Text("Receive via Bluetooth", fontWeight = FontWeight.Bold)}, onClick = {
                     showMenu = false // Dismiss the menu
-                    // Implement your logic to start receiving a password via Bluetooth
-                    // This might involve navigating to another screen or opening a dialog
+
+                    navController.navigate(Screen.BluetoothServer.route)
                 })
             }
         }
