@@ -1,11 +1,12 @@
 package com.example.vaultnfc.ui.screens
 
+import android.app.Activity
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -54,7 +55,9 @@ fun BluetoothScreen(application: Application, viewModel: BluetoothViewModel) {
 @Composable
 fun BluetoothChatScreen(application: Application) {
     //init viewmodel with application
-    val viewModel: MyBluetoothServiceViewModel = viewModel(factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application))
+    val viewModel: MyBluetoothServiceViewModel = viewModel(
+        factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
+    )
     // Observe LiveData objects
     val readMessages by viewModel.readMessages.observeAsState()
     val writeMessages by viewModel.writeMessages.observeAsState()
@@ -95,7 +98,23 @@ fun BluetoothChatScreen(application: Application) {
             Text("Discover Devices")
         }
 
-        Button(onClick = { viewModel.startServer() }) {
+        val discoverableLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_CANCELED) {
+                // Discoverability was not allowed by the user
+                Log.d("BluetoothDiscoverable", "Discoverability denied.")
+            } else {
+                // Device is now discoverable
+                Log.d(
+                    "BluetoothDiscoverable",
+                    "Device is discoverable for ${result.resultCode} seconds."
+                )
+                viewModel.startServer()
+            }
+        }
+
+        Button(onClick = {viewModel.enableDiscoverability(discoverableLauncher) }) {
             Text("Start Server")
         }
 
@@ -126,9 +145,6 @@ fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Un
         }
     )
 }
-
-
-
 
 
 @Composable
@@ -182,6 +198,7 @@ fun ShowEnableBluetoothDialog(context: Context) {
         )
     }
 }
+
 
 
 

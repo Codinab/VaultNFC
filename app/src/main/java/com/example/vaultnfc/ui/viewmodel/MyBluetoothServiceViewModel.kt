@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -41,24 +42,38 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     private var connectedThread: ConnectedThread? = null
 
 
+    fun enableDiscoverability(launcher: ActivityResultLauncher<Intent>) {
+        val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+        }
+        launcher.launch(discoverableIntent)
+    }
+
+
     fun startServer() {
         viewModelScope.launch(Dispatchers.IO) {
+
+            _toastMessages.postValue("Starting server")
+
             val serverUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // Example UUID
             try {
                 bluetoothAdapter?.listenUsingRfcommWithServiceRecord(
                     "MyBluetoothService",
                     serverUUID
                 ).use { serverSocket ->
-                    val socket = try {
-                        serverSocket?.accept() // This call blocks until a connection is accepted
+                    var socket: BluetoothSocket? = null
+                    try {
+                        socket = serverSocket?.accept() // This call blocks until a connection is accepted
+                        _toastMessages.postValue("Connection accepted")
                     } catch (e: IOException) {
                         Log.e(TAG, "Socket's accept method failed", e)
-                        null
                     }
                     socket?.also {
                         // Manage the connected socket
-                        val connectedThread = ConnectedThread(socket)
-                        connectedThread.start()
+                        connectedThread = ConnectedThread(socket)
+                        connectedThread!!.start()
+                        _toastMessages.postValue("Connected to device")
+
                     }
                 }
             } catch (e: IOException) {
@@ -73,15 +88,28 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
 
     fun connectToDevice(device: BluetoothDevice) {
         viewModelScope.launch(Dispatchers.IO) {
-            bluetoothAdapter?.cancelDiscovery() // Always cancel discovery because it's resource-intensive
-
+            bluetoothAdapter?.cancelDiscovery()
+            _toastMessages.postValue("Connecting to device")
             try {
                 // Standard SerialPortServiceID UUID
                 val uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-                val socket = device.createRfcommSocketToServiceRecord(uuid)
+
+                var socket: BluetoothSocket? = null
+                try {
+                    socket = device.createRfcommSocketToServiceRecord(uuid)
+                    socket.connect()
+                } catch (e: IOException) {
+                    Log.e(TAG, "Socket's create() method failed", e)
+                    _toastMessages.postValue("Couldn't create socket")
+                }
+
+                socket?.also {
+                    connectedThread = ConnectedThread(socket)
+                    connectedThread?.start()
+                    _toastMessages.postValue("Connected to device")
+                }
 
                 // Connect to the remote device through the socket. This call blocks until it succeeds or throws an exception
-                socket.connect()
 
                 // Manage the connected socket (e.g., start thread to manage the connection)
             } catch (e: IOException) {
@@ -127,6 +155,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     fun startDiscovery() {
         this.discoveredDevices.value = emptyList() // Reset the list on new discovery
         // Register for broadcasts when a device is discovered
+        _toastMessages.postValue("Starting discovery")
 
         val filter = IntentFilter().apply {
             addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
@@ -138,8 +167,10 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
 
         try {
             bluetoothAdapter?.startDiscovery()
+            _toastMessages.postValue("Discovering devices")
         } catch (e: Exception) {
             Log.e(TAG, "Error cancelling discovery", e)
+            _toastMessages.postValue("Couldn't start discovery")
         }
     }
 
