@@ -115,6 +115,18 @@ class PasswordsViewModel : ViewModel() {
         }
     }
 
+    fun addPasswordItem(passwordItem: PasswordItem) {
+        viewModelScope.launch {
+            try {
+                passwordItem.userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                passwordsRepository.addPassword(passwordItem)
+                fetchPasswords()
+            } catch (e: Exception) {
+                Log.e("PasswordsViewModel", "Error adding password", e)
+            }
+        }
+    }
+
 
     // SecureRandom for IV generation
     private val secureRandom = SecureRandom()

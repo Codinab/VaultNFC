@@ -11,6 +11,8 @@ import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -34,7 +36,7 @@ import java.util.UUID
 class MyBluetoothServiceViewModel(private val application: Application) : ViewModel() {
 
 
-    val passwordItem = MutableLiveData<PasswordItem>()
+    val passwordItemToSave = MutableLiveData<PasswordItem>()
 
     private val _toastMessages = MutableLiveData<String>()
     val toastMessages: LiveData<String> = _toastMessages
@@ -69,7 +71,8 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                 ).use { serverSocket ->
                     var socket: BluetoothSocket? = null
                     try {
-                        socket = serverSocket?.accept() // This call blocks until a connection is accepted
+                        socket =
+                            serverSocket?.accept() // This call blocks until a connection is accepted
                         _toastMessages.postValue("Connection accepted")
                     } catch (e: IOException) {
                         Log.e(TAG, "Socket's accept method failed", e)
@@ -84,6 +87,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                 }
             } catch (e: IOException) {
                 Log.e(TAG, "Server socket's listen() method failed", e)
+
             }
         }
     }
@@ -145,9 +149,6 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     }
 
 
-
-
-
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
         val bluetoothManager = application.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
@@ -164,13 +165,20 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
             when (intent?.action) {
                 BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
                     _isDiscovering.value = true
-                    this@MyBluetoothServiceViewModel.discoveredDevices.value = emptyList() // Optional: Clear the list at the start
+                    this@MyBluetoothServiceViewModel.discoveredDevices.value =
+                        emptyList() // Optional: Clear the list at the start
                 }
+
                 BluetoothDevice.ACTION_FOUND -> {
-                    val device: BluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)!!
-                    val currentList = this@MyBluetoothServiceViewModel.discoveredDevices.value ?: emptyList()
+                    val device: BluetoothDevice = intent.getParcelableExtra(
+                        BluetoothDevice.EXTRA_DEVICE,
+                        BluetoothDevice::class.java
+                    )!!
+                    val currentList =
+                        this@MyBluetoothServiceViewModel.discoveredDevices.value ?: emptyList()
                     this@MyBluetoothServiceViewModel.discoveredDevices.value = currentList + device
                 }
+
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
                     _isDiscovering.value = false
                 }
@@ -193,6 +201,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
 
         application.registerReceiver(discoveryBroadcastReceiver, filter)
+        isReceiverRegistered = true
 
         try {
             bluetoothAdapter?.startDiscovery()
@@ -206,37 +215,68 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
         private val mmInStream: InputStream = mmSocket.inputStream
         private val mmOutStream: OutputStream = mmSocket.outputStream
-        private val mmBuffer: ByteArray = ByteArray(1024)
+        //private val mmBuffer: ByteArray = ByteArray(1024 * 1024)
 
         override fun run() {
             _isConnected.postValue(true)
 
             try {
+                val reader = mmInStream.bufferedReader() // Create a BufferedReader
+
                 while (!isInterrupted) {
-                    val bytes = mmInStream.read(mmBuffer)
-                    // Assuming you're using some form of serialization, you'd deserialize here
-                    val passwordItemReceived = deserializePasswordItem(mmBuffer.copyOf(bytes).toString())
-                    passwordItem.postValue(passwordItemReceived)
+                    val inputString = try {
+                        reader.readLine() // Read a line up to the newline character
+                    } catch (e: IOException) {
+                        Log.d(TAG, "Input stream was disconnected", e)
+                        break // Exit the loop if an IOException occurs
+                    }
+
+                    // If readLine returns null, it means the end of the stream has been reached
+                    if (inputString == null) {
+                        Log.d(TAG, "End of stream reached")
+                        continue // Exit the loop
+                    }
+
+                    // Process the received line (a complete message)
+                    val handler = Handler(Looper.getMainLooper())
+                    handler.post {
+                        Toast.makeText(application, inputString, Toast.LENGTH_SHORT).show()
+                    }
+
+                    val passwordItem = deserializePasswordItem(inputString)
+
+                    passwordItemToSave.postValue(passwordItem)
+
+
+
+                    // Use the deserialized passwordItem as needed
                 }
             } catch (e: IOException) {
                 Log.d(TAG, "Input stream was disconnected", e)
-                _toastMessages.postValue("Connection lost: ${e.message}")
+                _toastMessages.postValue("Connection lost")
+            }catch (e: Exception) {
+                Log.d(TAG, "Error", e)
+                _toastMessages.postValue("Error")
             } finally {
                 cleanupResources()
             }
         }
 
+
         fun write(passwordItem: PasswordItem) {
             try {
-                // Serialize your PasswordItem into bytes
-                val bytes = serializePasswordItem(passwordItem).toByteArray()
+                // Serialize your PasswordItem and append a newline character
+                val message = serializePasswordItem(passwordItem) + "\n"
+                val bytes = message.toByteArray()
                 mmOutStream.write(bytes)
+                mmOutStream.flush() // Ensure the data is sent immediately
                 _toastMessages.postValue("Sent ${passwordItem.title}")
             } catch (e: IOException) {
                 Log.e(TAG, "Error occurred when sending data", e)
                 _toastMessages.postValue("Couldn't send data to the other device")
             }
         }
+
 
         fun cancel() {
             interrupt()
@@ -276,15 +316,11 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     }
 
     fun send() {
-        if(isConnected.value == false) {
+        if (isConnected.value == false) {
             Toast.makeText(application, "Not connected to a device", Toast.LENGTH_SHORT).show()
             return
         }
-        if (passwordItemSelected.value == null) {
-            Toast.makeText(application, "No password item to send", Toast.LENGTH_SHORT).show()
-            return
-        }
-        connectedThread?.write(passwordItemSelected.value!!)
+        connectedThread?.write(passwordItemSelected)
     }
 
 
@@ -292,13 +328,24 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
      * Disconnects from the connected Bluetooth device and cleans up resources.
      */
     fun disconnect() {
-        connectedThread?.cancel()
-        _toastMessages.postValue("Disconnected from device")
+        try {
+            connectedThread?.cancel()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error disconnecting", e)
+            _toastMessages.postValue("Disconnected from device")
+        }
     }
 
+
+    private var isReceiverRegistered = false
     override fun onCleared() {
         super.onCleared()
-        application.unregisterReceiver(discoveryBroadcastReceiver)
+        // Check the flag before trying to unregister the receiver
+        if (isReceiverRegistered) {
+            application.unregisterReceiver(discoveryBroadcastReceiver)
+            // Reset the flag as the receiver is now unregistered
+            isReceiverRegistered = false
+        }
         disconnect() // Ensure Bluetooth connection is closed and resources are cleaned up
     }
 

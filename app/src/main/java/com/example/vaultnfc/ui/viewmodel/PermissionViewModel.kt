@@ -12,7 +12,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.vaultnfc.util.Event
 
-class BluetoothViewModel(application: Application) : AndroidViewModel(application) {
+class PermissionViewModel(application: Application) : AndroidViewModel(application) {
     private val _bluetoothEnableEvent = MutableLiveData<Event<Unit>>()
     val bluetoothEnableEvent: LiveData<Event<Unit>> = _bluetoothEnableEvent
 

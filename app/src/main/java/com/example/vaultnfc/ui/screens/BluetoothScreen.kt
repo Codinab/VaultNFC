@@ -22,11 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.example.vaultnfc.ui.viewmodel.BluetoothViewModel
+import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 
 @Deprecated("This function is deprecated")
 @Composable
-fun BluetoothScreen(application: Application, viewModel: BluetoothViewModel) {
+fun BluetoothScreen(application: Application, viewModel: PermissionViewModel) {
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
@@ -158,7 +158,7 @@ fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Un
 
 
 @Composable
-fun SetupBluetoothPermissionHandling(viewModel: BluetoothViewModel, context: Context) {
+fun SetupBluetoothPermissionHandling(viewModel: PermissionViewModel, context: Context) {
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -172,7 +172,7 @@ fun SetupBluetoothPermissionHandling(viewModel: BluetoothViewModel, context: Con
 }
 
 @Composable
-fun ObserveBluetoothStateChanges(viewModel: BluetoothViewModel, context: Context) {
+fun ObserveBluetoothStateChanges(viewModel: PermissionViewModel, context: Context) {
     // Observe Bluetooth state change event.
     val bluetoothStateChangeEvent by viewModel.bluetoothStateChangeEvent.observeAsState()
     bluetoothStateChangeEvent?.getContentIfNotHandled()?.let { state ->

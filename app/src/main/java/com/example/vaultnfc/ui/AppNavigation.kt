@@ -18,7 +18,6 @@ import com.example.vaultnfc.ui.screens.home.passwordview.PasswordsListScreen
 import com.example.vaultnfc.ui.screens.starting.LoginScreen
 import com.example.vaultnfc.ui.screens.starting.OpeningScreen
 import com.example.vaultnfc.ui.screens.starting.RegisterScreen
-import com.example.vaultnfc.ui.viewmodel.BluetoothViewModel
 
 @Composable
 fun AppNavigation(application: Application) {
@@ -44,8 +43,8 @@ fun AppNavigation(application: Application) {
 
         //Bluetooth
         //composable(Screen.Bluetooth.route) { BluetoothScreen(application, bluetoothViewModel) }
-        composable(Screen.BluetoothClient.route) { BluetoothClientScreen(application) }
-        composable(Screen.BluetoothServer.route) { BluetoothServerScreen(application) }
+        composable(Screen.BluetoothClient.route) { BluetoothClientScreen(application, navController) }
+        composable(Screen.BluetoothServer.route) { BluetoothServerScreen(application, navController) }
     }
 
 }

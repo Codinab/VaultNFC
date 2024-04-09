@@ -11,10 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 
 @Composable
-fun BluetoothClientScreen(application: Application) {
+fun BluetoothClientScreen(application: Application, navController: NavController) {
     val viewModel: MyBluetoothServiceViewModel = viewModel(
         factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
     )
@@ -32,7 +33,10 @@ fun BluetoothClientScreen(application: Application) {
             Text("Discover Devices")
         }
 
-        Button(onClick = { viewModel.disconnect() }) {
+        Button(onClick = {
+            viewModel.disconnect()
+            navController.popBackStack()
+        }) {
             Text("Cancel")
         }
 
