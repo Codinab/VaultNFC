@@ -140,7 +140,7 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                             .background(color = backgroundColor)
                             .clickable {
                                 passwordItemSelected.postValue(password)
-                                navController.navigate(Screen.BluetoothClient.route)
+                                navController.navigate(Screen.PasswordDetails.route)
                             }
                     ) {
                         Column(
