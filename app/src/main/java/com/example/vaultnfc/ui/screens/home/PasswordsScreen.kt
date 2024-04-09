@@ -2,6 +2,8 @@ package com.example.vaultnfc.ui.screens.home
 
 import PasswordsViewModel
 import android.annotation.SuppressLint
+import android.app.Application
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,10 +59,11 @@ import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
+import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun PasswordsScreen(navController: NavController) {
+fun PasswordsScreen(navController: NavController, application: Application) {
     var isSidebarOpen by remember { mutableStateOf(false) }
 
     val passwordsViewModel: PasswordsViewModel = viewModel()
@@ -70,6 +73,11 @@ fun PasswordsScreen(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     var showMenu by remember { mutableStateOf(false) }
+
+    val myBluetoothServiceViewModel: MyBluetoothServiceViewModel = viewModel(
+        factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
+    )
+
 
     DisposableEffect(currentRoute) {
         if (currentRoute == Screen.Home.route) {

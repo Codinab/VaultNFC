@@ -1,4 +1,4 @@
-package com.example.vaultnfc.ui.screens
+package com.example.vaultnfc.ui.screens.starting
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VaultNFCTheme {
-                AppNavigation(baseContext)
+                AppNavigation(this.application)
             }
         }
     }
