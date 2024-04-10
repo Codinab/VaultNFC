@@ -1,5 +1,6 @@
 package com.example.vaultnfc.ui.screens
 
+import android.app.Application
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,7 +42,7 @@ import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController, application: Application) {
     val settingsViewModel: SettingsViewModel = viewModel()
     val isDarkThemeEnabled by settingsViewModel.darkThemeEnabled.collectAsState(initial = false)
 
@@ -77,9 +78,9 @@ fun SettingsScreen(navController: NavController) {
         NightMode(isDarkThemeEnabled, settingsViewModel)
         LogoutTimerOption(settingsViewModel)
 
-        SettingsOption("Change Account Password", "Change your account password")
-        SettingsOption("Notification Settings", "Configure notification preferences")
-        SettingsOption("Language", "Change the language of the app")
+        SettingsOption("Change Account Password", "Change your account password", application)
+        SettingsOption("Notification Settings", "Configure notification preferences", application)
+        SettingsOption("Language", "Change the language of the app", application)
     }
 }
 
@@ -184,6 +185,7 @@ fun LogoutTimerDialog(
 fun SettingsOption(
     label: String,
     description: String,
+    application: Application
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -191,7 +193,7 @@ fun SettingsOption(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                Toast.makeText(null, "Not implemented", Toast.LENGTH_SHORT).show()
+                Toast.makeText(application, "Not implemented", Toast.LENGTH_SHORT).show()
             }
     ) {
         Column(

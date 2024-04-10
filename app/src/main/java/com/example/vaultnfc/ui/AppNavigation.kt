@@ -28,7 +28,7 @@ fun AppNavigation(application: Application) {
     NavHost(navController = navController, startDestination = Screen.Opening.route) {
         // Starting
         composable(Screen.Home.route) { PasswordsScreen(navController, application) }
-        composable(Screen.Settings.route) { SettingsScreen(navController) }
+        composable(Screen.Settings.route) { SettingsScreen(navController, application) }
         composable(Screen.Login.route) { LoginScreen(navController) }
         composable(Screen.Register.route) { RegisterScreen(navController) }
         composable(Screen.Opening.route) { OpeningScreen(navController) }
