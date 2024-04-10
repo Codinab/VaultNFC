@@ -32,9 +32,15 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
 
+/**
+ * ViewModel to handle Bluetooth service operations including discovering devices,
+ * connecting to a device, and managing Bluetooth data transmission.
+ *
+ * @param application The context used for accessing system Bluetooth services.
+ */
 class MyBluetoothServiceViewModel(private val application: Application) : ViewModel() {
 
-
+    // LiveData to communicate with UI components.
     val passwordItemToSave = MutableLiveData<PasswordItem>()
 
     private val _toastMessages = MutableLiveData<String>()
@@ -45,7 +51,10 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
 
     private var connectedThread: ConnectedThread? = null
 
-
+    /**
+     * Initiates the device discoverability making the device visible to other Bluetooth devices.
+     * @param launcher The ActivityResultLauncher to handle the discoverability request.
+     */
     fun enableDiscoverability(launcher: ActivityResultLauncher<Intent>) {
         val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
             putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
@@ -53,7 +62,9 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         launcher.launch(discoverableIntent)
     }
 
-
+    /**
+     * Starts the Bluetooth server to listen for incoming connections.
+     */
     @SuppressLint("MissingPermission")
     fun startServer() {
 
@@ -115,7 +126,10 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         return false
     }
 
-
+    /**
+     * Connects to a given Bluetooth device.
+     * @param device The BluetoothDevice to connect to.
+     */
     @SuppressLint("MissingPermission")
     fun connectToDevice(device: BluetoothDevice) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -187,6 +201,9 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
     }
 
+    /**
+     * Starts discovering nearby Bluetooth devices.
+     */
     @SuppressLint("MissingPermission")
     fun startDiscovery() {
         if (inInvalidState()) return
@@ -214,6 +231,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
     }
 
+    // Internal functions and class handling Bluetooth data transmission and connection management.
     inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
         private val mmInStream: InputStream = mmSocket.inputStream
         private val mmOutStream: OutputStream = mmSocket.outputStream
@@ -311,6 +329,9 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
     }
 
+    /**
+     * Sends a PasswordItem to the connected device.
+     */
     fun send() {
         if (isConnected.value == false) {
             Toast.makeText(application, "Not connected to a device", Toast.LENGTH_SHORT).show()
@@ -347,6 +368,6 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
 
 
     companion object {
-        private const val TAG = "MyBluetoothServiceVM"
+        private const val TAG = "MyBluetoothServiceVaultNFC"
     }
 }

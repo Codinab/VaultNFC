@@ -1,6 +1,13 @@
 import androidx.lifecycle.ViewModel
 import java.security.SecureRandom
 
+/**
+ * ViewModel for generating random passwords with customizable options.
+ *
+ * This ViewModel utilizes a secure random number generator to create passwords that can include
+ * uppercase letters, lowercase letters, numbers, and symbols. The probabilities of each character type
+ * being included in the password can be adjusted.
+ */
 class PasswordGeneratorViewModel : ViewModel() {
 
     private val symbols = "!@#$%^&*()_+-=[]{}|;:'\",.<>/?"
@@ -15,6 +22,16 @@ class PasswordGeneratorViewModel : ViewModel() {
     val defaultProbabilityUppercase = 1
     val defaultProbabilityLowercase = 1
 
+    /**
+     * Generates a password based on specified criteria.
+     *
+     * @param length The desired length of the password. Defaults to [defaultLength].
+     * @param probabilityNumbers Probability of including numbers. Defaults to [defaultProbabilityNumbers].
+     * @param probabilitySymbols Probability of including symbols. Defaults to [defaultProbabilitySymbols].
+     * @param probabilityUppercase Probability of including uppercase letters. Defaults to [defaultProbabilityUppercase].
+     * @param probabilityLowercase Probability of including lowercase letters. Defaults to [defaultProbabilityLowercase].
+     * @return A string containing the generated password.
+     */
     fun generatePassword(
         length: Int = defaultLength,
         probabilityNumbers: Int = defaultProbabilityNumbers,
@@ -44,6 +61,15 @@ class PasswordGeneratorViewModel : ViewModel() {
         return String(passwordChars)
     }
 
+    /**
+     * Builds a pool of characters based on the specified probabilities for each character type.
+     *
+     * @param probabilityNumbers Probability of including numbers.
+     * @param probabilitySymbols Probability of including symbols.
+     * @param probabilityUppercase Probability of including uppercase letters.
+     * @param probabilityLowercase Probability of including lowercase letters.
+     * @return A string containing the characters in the pool.
+     */
     private fun buildCharPool(
         probabilityNumbers: Int,
         probabilitySymbols: Int,

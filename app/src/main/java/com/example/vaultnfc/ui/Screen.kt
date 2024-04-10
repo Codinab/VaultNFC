@@ -10,19 +10,8 @@ sealed class Screen(val route: String) {
     data object PasswordGenerator : Screen("password_generator_screen")
     data object EditPassword : Screen("edit_password_screen")
     data object PasswordDetails : Screen("password_details_screen")
-    data object NFCSharePopup : Screen("nfc_share_popup_screen")
-    data object NFCReceivePopup : Screen("nfc_receive_popup_screen")
-
     data object Opening : Screen("opening_screen")
-
-    data object Bluetooth : Screen("bluetooth_screen")
-
     data object BluetoothClient : Screen("bluetooth_client_screen")
     data object BluetoothServer : Screen("bluetooth_server_screen")
-
-
-
-
-
 }
 

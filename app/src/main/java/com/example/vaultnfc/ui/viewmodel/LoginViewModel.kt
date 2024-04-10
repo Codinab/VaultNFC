@@ -34,6 +34,14 @@ class LoginViewModel : ViewModel() {
         isLoggedIn.postValue(false)
     }
 
+    /**
+     * Registers a new user with an email and password.
+     *
+     * @param email The email address to be used for registration.
+     * @param password The password for the new account.
+     * @param context The context used for saving login details securely upon successful registration.
+     * @param onSuccess A callback to be invoked upon successful registration.
+     */
     fun register(email: String, password: String, context: Context, onSuccess: () -> Unit) {
         if (checkUserParameters(email, password, registrationError)) return
 

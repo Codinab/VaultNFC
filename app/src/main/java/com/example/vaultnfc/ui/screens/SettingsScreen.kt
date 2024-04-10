@@ -120,7 +120,7 @@ private fun NightMode(
 
 @Composable
 fun LogoutTimerOption(settingsViewModel: SettingsViewModel) {
-    val options = listOf("Never", "Closing app", "15 minutes", "1 day", "1 week")
+    val options = SettingsViewModel.LOGIN_TIMEOUT_MODE
     var showDialog by remember { mutableStateOf(false) }
     val selectedOption by settingsViewModel.logoutTimerOption.collectAsState(initial = "Never")
 

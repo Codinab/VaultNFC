@@ -5,11 +5,19 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Repository class for managing password items in Firestore.
+ */
 class PasswordsRepository {
     private val db = FirebaseFirestore.getInstance()
     private val collectionRef = db.collection("passwords")
     private val auth = FirebaseAuth.getInstance()
 
+    /**
+     * Adds a password item to the Firestore collection.
+     *
+     * @param passwordItem The password item to be added.
+     */
     suspend fun addPassword(passwordItem: PasswordItem) {
         // Ensure there's a user signed in before attempting to add a password
         val currentUser = auth.currentUser
@@ -20,6 +28,11 @@ class PasswordsRepository {
         }
     }
 
+    /**
+     * Removes a password item from the Firestore collection.
+     *
+     * @param passwordId The ID of the password item to be removed.
+     */
     suspend fun removePassword(passwordId: String) {
         // Additional logic may be needed to ensure only the owner can delete a password.
         val document = collectionRef.document(passwordId).get().await()
@@ -30,6 +43,11 @@ class PasswordsRepository {
         }
     }
 
+    /**
+     * Retrieves all password items from the Firestore collection.
+     *
+     * @return A list of all password items in the collection.
+     */
     suspend fun getAllPasswords(): List<PasswordItem> {
         val currentUserUID = auth.currentUser?.uid
         if (currentUserUID != null) {

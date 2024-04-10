@@ -36,7 +36,6 @@ fun AppNavigation(application: Application) {
         // Old
         composable(Screen.PasswordsList.route) { PasswordsListScreen(navController) }
 
-
         composable(Screen.AddPassword.route) { AddPasswordScreen(navController) }
         composable(Screen.PasswordGenerator.route) { PasswordGeneratorScreen(navController) }
         composable(Screen.EditPassword.route) { EditPasswordScreen(navController) }

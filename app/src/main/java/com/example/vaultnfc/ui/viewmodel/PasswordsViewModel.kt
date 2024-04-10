@@ -18,7 +18,13 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * ViewModel for handling password-related operations including encryption,
+ * decryption, and managing password items.
+ */
 class PasswordsViewModel : ViewModel() {
+
+    // LiveData for passwords and folders list.
     private val _passwordsList = MutableLiveData<List<PasswordItem>>()
     val passwordsList: LiveData<List<PasswordItem>> = _passwordsList
 
@@ -29,7 +35,7 @@ class PasswordsViewModel : ViewModel() {
     val foldersList: LiveData<List<Folder>> = _foldersList
 
 
-
+    // Initialization block to fetch passwords and optionally folders.
     init {
         //addTestFolders()
         fetchPasswords()
@@ -48,6 +54,9 @@ class PasswordsViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Fetches passwords from the repository and updates the LiveData.
+     */
     fun fetch() {
         fetchPasswords()
         //fetchFolders()
@@ -81,6 +90,16 @@ class PasswordsViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Adds a password item to the repository and refreshes the list of passwords.
+     * The password is encrypted before being stored.
+     *
+     * @param title Title of the password item.
+     * @param username Username associated with the password item.
+     * @param rawPassword The plaintext password to be encrypted.
+     * @param uri URI associated with the password item.
+     * @param notes Additional notes about the password item.
+     */
     fun addPassword(
         title: String,
         username: String,
@@ -115,6 +134,11 @@ class PasswordsViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Adds a password item to the repository and refreshes the list of passwords.
+     *
+     * @param passwordItem The password item to be added.
+     */
     fun addPasswordItem(passwordItem: PasswordItem) {
         viewModelScope.launch {
             try {
@@ -131,6 +155,14 @@ class PasswordsViewModel : ViewModel() {
     // SecureRandom for IV generation
     private val secureRandom = SecureRandom()
 
+    /**
+     * Encrypts a plaintext password using AES encryption with CTR mode and no padding.
+     * A new salt and IV are generated for each encryption process.
+     *
+     * @param data The plaintext data to be encrypted.
+     * @param password The password used to generate the encryption key.
+     * @return The encrypted data, encoded as a Base64 string.
+     */
     fun encryptPassword(data: String, password: String): String {
         val salt = ByteArray(16) // Generate a new salt for each encryption
         secureRandom.nextBytes(salt)
@@ -145,6 +177,13 @@ class PasswordsViewModel : ViewModel() {
         return Base64.getEncoder().encodeToString(salt + ivBytes + encryptedData)
     }
 
+    /**
+     * Decrypts an encrypted string using AES encryption with CTR mode and no padding.
+     *
+     * @param encrypted The encrypted data, encoded as a Base64 string.
+     * @param password The password used to generate the decryption key.
+     * @return The decrypted plaintext data.
+     */
     fun decryptPassword(encrypted: String, password: String): String {
         val decoded = Base64.getDecoder().decode(encrypted)
         val salt = decoded.copyOfRange(0, 16)
@@ -165,21 +204,22 @@ class PasswordsViewModel : ViewModel() {
     }
 
 
-    // Placeholder for your method to generate an IV
     private fun generateEncryptionIV(): String {
         // Implement IV generation logic here
         return "IV" // Return the generated IV
     }
 
+    /**
+     * Removes a password item from the repository and refreshes the list of passwords.
+     *
+     * @param passwordItem The password item to be removed.
+     */
     fun removePassword(passwordItem: PasswordItem) {
         viewModelScope.launch {
             try {
                 passwordsRepository.removePassword(passwordItem.id)
                 // Refresh the list after removal
                 fetchPasswords()
-                //
-                // fetchFolders()
-
 
                 Log.d("PasswordsViewModel", "Removed password: ${passwordItem.title}")
             } catch (e: Exception) {
@@ -187,6 +227,4 @@ class PasswordsViewModel : ViewModel() {
             }
         }
     }
-
-
 }

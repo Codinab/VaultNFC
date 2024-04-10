@@ -37,24 +37,35 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
     val navigateToSettingsEvent: LiveData<Event<Unit>> = _navigateToSettingsEvent
 
 
+    /**
+     * Lazily initialized BluetoothAdapter instance.
+     */
     val bluetoothAdapter: BluetoothAdapter? by lazy {
         val bluetoothManager = application.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
 
-
+    /**
+     * Checks the device's Bluetooth status and triggers an event to enable Bluetooth if it is disabled.
+     */
     fun checkAndEnableBluetooth() {
         if (bluetoothAdapter != null && !bluetoothAdapter!!.isEnabled) {
             _bluetoothEnableEvent.value = Event(Unit)
         }
     }
 
+    /**
+     * Checks the GPS status of the device and posts the result as an event.
+     */
     fun checkGpsStatus() {
         val locationManager = application.getSystemService(LOCATION_SERVICE) as LocationManager
         val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         _gpsEnabledEvent.value = Event(isGpsEnabled)
     }
 
+    /**
+     * Requests necessary permissions for Bluetooth operation on devices running Android 12 (API level 31) or higher.
+     */
     @RequiresApi(Build.VERSION_CODES.S)
     fun requestBluetoothPermissions() {
         _bluetoothPermissionRequestEvent.value = Event(
@@ -68,17 +79,13 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
         )
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        // Unregister receiver to avoid memory leaks
-    }
-
-
+    /**
+     * Handles the scenario when permissions are denied by the user.
+     *
+     * This function sets an event to navigate to the app settings, allowing the user to manually enable permissions.
+     */
     fun handlePermissionDenied() {
-        // This method would be called if permissions are denied.
-        // It sets the event to navigate to the app settings.
         _navigateToSettingsEvent.value = Event(Unit)
     }
-
 }
 
