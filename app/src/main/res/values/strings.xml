@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">VaultNFC</string>
     <string name="welcome_to_vaultnfc">Welcome to VaultNFC</string>
+    <string name="set_the_title">Set the title</string>
+    <string name="enter_the_title">Enter the Title</string>
+    <string name="enter_the_username">Enter the username</string>
+    <string name="enter_the_password">Enter the Password</string>
+    <string name="enter_the_uri">Enter the URI</string>
+    <string name="enter_the_notes">Enter the Notes</string>
+    <string name="start_receiving">Start Receiving</string>
 </resources>

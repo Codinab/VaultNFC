@@ -38,10 +38,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.theme.RedEnd
+
+private const val s = "Password added successfully"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,9 +78,9 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             OutlinedTextField(
                 value = title,
                 onValueChange = {title = it},
-                label = {Text(text = "Enter the Title", color = Color.Black)},
+                label = {Text(text = stringResource(R.string.enter_the_title), color = Color.Black)},
                 leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Title, contentDescription ="Set the title")
+                    Icon(imageVector = Icons.Outlined.Title, contentDescription = stringResource(R.string.set_the_title))
                 },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color.Red,
@@ -93,9 +97,9 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             OutlinedTextField(
                 value = username,
                 onValueChange = {username = it},
-                label = {Text(text = "Enter the username", color = Color.Black)},
+                label = {Text(text = stringResource(R.string.enter_the_username), color = Color.Black)},
                 leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Person, contentDescription ="Set the title")
+                    Icon(imageVector = Icons.Outlined.Person, contentDescription = stringResource(R.string.set_the_title))
                 },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color.Red,
@@ -112,7 +116,7 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             OutlinedTextField(
                 value = password,
                 onValueChange = {password = it},
-                label = {Text(text = "Enter the Password", color = Color.Black)},
+                label = {Text(text = stringResource(R.string.enter_the_password), color = Color.Black)},
                 leadingIcon = {
                     Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
                 },
@@ -131,7 +135,7 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             OutlinedTextField(
                 value = uri,
                 onValueChange = {uri = it},
-                label = {Text(text = "Enter the URI", color = Color.Black)},
+                label = {Text(text = stringResource(R.string.enter_the_uri), color = Color.Black)},
                 leadingIcon = {
                     Icon(imageVector = Icons.Outlined.FindInPage, contentDescription ="Set the title")
                 },
@@ -150,7 +154,7 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
             OutlinedTextField(
                 value = notes,
                 onValueChange = {notes = it},
-                label = {Text(text = "Enter the Notes", color = Color.Black)},
+                label = {Text(text = stringResource(R.string.enter_the_notes), color = Color.Black)},
                 leadingIcon = {
                     Icon(imageVector = Icons.Outlined.NoteAlt, contentDescription ="Set the title")
                 },
