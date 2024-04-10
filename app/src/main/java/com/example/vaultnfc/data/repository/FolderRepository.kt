@@ -1,7 +1,6 @@
 package com.example.vaultnfc.data.repository
 
 import com.example.vaultnfc.model.Folder
-import com.example.vaultnfc.model.PasswordItem
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -23,8 +22,5 @@ class FolderRepository {
             document.toObject(Folder::class.java)
         }
     }
-
-    // Additional methods for removing or updating folders can be implemented here,
-    // following the same pattern used in the PasswordsRepository for consistency.
 }
 

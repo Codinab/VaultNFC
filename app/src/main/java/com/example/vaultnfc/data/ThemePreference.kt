@@ -1,4 +1,4 @@
-package com.example.vaultnfc.ui.theme
+package com.example.vaultnfc.data
 
 import android.app.Application
 import android.content.Context

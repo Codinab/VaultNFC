@@ -1,5 +1,6 @@
 package com.example.vaultnfc.ui.viewmodel
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -11,8 +12,6 @@ import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -55,6 +54,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     }
 
 
+    @SuppressLint("MissingPermission")
     fun startServer() {
 
         if (inInvalidState()) return
@@ -116,6 +116,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     }
 
 
+    @SuppressLint("MissingPermission")
     fun connectToDevice(device: BluetoothDevice) {
         viewModelScope.launch(Dispatchers.IO) {
             bluetoothAdapter?.cancelDiscovery()
@@ -186,6 +187,7 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun startDiscovery() {
         if (inInvalidState()) return
 
@@ -235,12 +237,6 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                     if (inputString == null) {
                         Log.d(TAG, "End of stream reached")
                         continue // Exit the loop
-                    }
-
-                    // Process the received line (a complete message)
-                    val handler = Handler(Looper.getMainLooper())
-                    handler.post {
-                        Toast.makeText(application, inputString, Toast.LENGTH_SHORT).show()
                     }
 
                     val passwordItem = deserializePasswordItem(inputString)

@@ -10,19 +10,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import com.example.vaultnfc.ui.AppNavigation
 import com.example.vaultnfc.ui.theme.VaultNFCTheme
+import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 import com.example.vaultnfc.ui.viewmodel.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel: SignInViewModel
+    private lateinit var viewModelProvider: SignInViewModel
+    private lateinit var loginViewModel: LoginViewModel
+
+    private var currentLogoutOption: String = "Closing app"
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = ViewModelProvider(this)[SignInViewModel::class.java]
+        viewModelProvider = ViewModelProvider(this)[SignInViewModel::class.java]
+        loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+
 
 
         //Not implemented
@@ -31,11 +37,11 @@ class MainActivity : ComponentActivity() {
                 if (result.resultCode == Activity.RESULT_OK) {
                     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                     try {
-                        viewModel.signInSuccess()
+                        viewModelProvider.signInSuccess()
                     } catch (e: ApiException) {
                         // The ApiException status code indicates the detailed failure reason.
                         // Handle sign-in failure
-                        viewModel.signInFailure()
+                        viewModelProvider.signInFailure()
                     }
                 }
             }
@@ -55,11 +61,15 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
 
-    fun signInWithGoogle() {
-        val signInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
-        val signInIntent = signInClient.signInIntent
-        googleSignInLauncher.launch(signInIntent)
+
+
+    // Inside your main activity or wherever appropriate
+    override fun onStop() {
+        super.onStop()
+
+        if (currentLogoutOption == "Closing app") {
+            loginViewModel.logout(this)
+        }
     }
+
 }
-
-
