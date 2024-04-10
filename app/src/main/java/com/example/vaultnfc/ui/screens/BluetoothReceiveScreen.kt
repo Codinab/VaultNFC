@@ -6,6 +6,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Build
 import android.widget.Toast
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -121,7 +122,6 @@ fun BluetoothServerScreen(application: Application, navController: NavController
                 }
 
                 // Display the latest toast message
-
 
                 if (passwordItem != null) {
                     val passwordItemName = passwordItem!!.title

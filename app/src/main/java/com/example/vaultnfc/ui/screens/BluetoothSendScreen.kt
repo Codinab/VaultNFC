@@ -9,13 +9,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,10 +31,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 
@@ -46,31 +55,74 @@ fun BluetoothClientScreen(application: Application, navController: NavController
     val isConnected by viewModel.isConnected.observeAsState()
     val toastMessages by viewModel.toastMessages.observeAsState()
 
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp)
+    ) {
         Text("Client Screen")
         Text("Status: $toastMessages")
 
-
-        Button(onClick = { viewModel.startDiscovery() }) {
+        Button(
+            onClick = { viewModel.startDiscovery() },
+            colors = ButtonDefaults.buttonColors(RedEnd),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 30.dp)
+                .heightIn(min = 36.dp)
+                .widthIn(min = 100.dp)
+                .shadow(18.dp, RoundedCornerShape(1.dp)),
+            shape = RoundedCornerShape(1.dp)
+        ) {
             Text("Discover Devices")
         }
 
-        Button(onClick = {
-            viewModel.disconnect()
-            navController.popBackStack()
-        }) {
+        Button(
+            onClick = {
+                viewModel.disconnect()
+                navController.popBackStack()
+            },
+            colors = ButtonDefaults.buttonColors(RedEnd),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 4.dp, bottom = 14.dp)
+                .heightIn(min = 36.dp)
+                .widthIn(min = 100.dp)
+                .shadow(18.dp, RoundedCornerShape(1.dp)),
+            shape = RoundedCornerShape(1.dp)
+        ) {
             Text("Cancel")
         }
 
-        HorizontalDivider()
+        HorizontalDivider(
+            color = Color.Red
+        )
 
-        Button(onClick = { viewModel.send() }, enabled = isConnected == true){
+        Button(
+            onClick = { viewModel.send() },
+            enabled = isConnected == true,
+            colors = ButtonDefaults.buttonColors(RedEnd),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 4.dp, bottom = 14.dp)
+                .heightIn(min = 36.dp)
+                .widthIn(min = 100.dp)
+                .shadow(18.dp, RoundedCornerShape(1.dp)),
+            shape = RoundedCornerShape(1.dp)
+        ) {
             Text("Send Password")
         }
 
         if (isConnected == false) {
-            Column {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(vertical = 16.dp)
+            ) {
                 Text("Discovered Devices")
+                Spacer(modifier = Modifier.padding(bottom = 8.dp))
                 LazyColumn {
                     items(discoveredDevices) { device ->
                         DeviceItem(device) { selectedDevice ->

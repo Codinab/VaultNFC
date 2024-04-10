@@ -4,18 +4,18 @@
     <value>
       <entry key="MainActivity">
         <State>
-          <targetSelectedWithDropDown>
+          <runningDeviceTargetSelectedWithDropDown>
             <Target>
-              <type value="QUICK_BOOT_TARGET" />
+              <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\alexc\.android\avd\Copy_of_Medium_Phone_API_33.avd" />
+                  <type value="SERIAL_NUMBER" />
+                  <value value="89DUUWUGHEOV7TOF" />
                 </Key>
               </deviceKey>
             </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-09T15:53:09.853171Z" />
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-04-10T16:16:20.609285300Z" />
         </State>
       </entry>
     </value>
