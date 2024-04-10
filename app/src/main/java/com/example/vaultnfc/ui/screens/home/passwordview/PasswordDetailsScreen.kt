@@ -209,7 +209,10 @@ fun PasswordDetailsScreen(navController: NavController) {
 
                     Button(
                         colors = ButtonDefaults.buttonColors(RedEnd),
-                        onClick = { /* Handle remove action */ },
+                        onClick = {
+                            passwordsViewModel.removePassword(password)
+                            navController.popBackStack()
+                        },
                         modifier = Modifier
                             .width(100.dp)
                             .height(45.dp)

@@ -3,6 +3,7 @@ package com.example.vaultnfc.ui
 
 import PasswordGeneratorScreen
 import android.app.Application
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,8 +44,20 @@ fun AppNavigation(application: Application) {
 
         //Bluetooth
         //composable(Screen.Bluetooth.route) { BluetoothScreen(application, bluetoothViewModel) }
-        composable(Screen.BluetoothClient.route) { BluetoothClientScreen(application, navController) }
-        composable(Screen.BluetoothServer.route) { BluetoothServerScreen(application, navController) }
+        composable(Screen.BluetoothClient.route) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                BluetoothClientScreen(application, navController)
+            } else {
+                navController.popBackStack()
+            }
+        }
+        composable(Screen.BluetoothServer.route) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                BluetoothServerScreen(application, navController)
+            } else {
+                navController.popBackStack()
+            }
+        }
     }
 
 }
