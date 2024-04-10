@@ -50,10 +50,7 @@ import com.example.vaultnfc.ui.theme.RedEnd
 @Composable
 fun PasswordDetailsScreen(navController: NavController) {
 
-    if (passwordItemSelected.value ==null){
-        navController.navigateUp()
-    }
-    val password = passwordItemSelected.value!!
+    val password = passwordItemSelected
 
     var isPasswordVisible by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
