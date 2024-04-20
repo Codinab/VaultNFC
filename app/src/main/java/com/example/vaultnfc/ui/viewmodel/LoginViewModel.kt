@@ -1,6 +1,7 @@
 package com.example.vaultnfc.ui.viewmodel
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.vaultnfc.data.repository.SecureStorage
@@ -55,6 +56,22 @@ class LoginViewModel : ViewModel() {
                 registrationError.postValue(task.exception?.message ?: "Registration failed")
             }
         }
+    }
+
+    fun resetPassword(email: String, context: Context) {
+        if (email.isBlank()) {
+            loginError.postValue("Please enter your email address to reset your password.")
+            return
+        }
+
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(context, "Password reset link sent to your email address", Toast.LENGTH_LONG).show()
+                } else {
+                    loginError.postValue(task.exception?.message ?: "Failed to send reset email")
+                }
+            }
     }
 
     private fun checkUserParameters(email: String, password: String, error: MutableLiveData<String?>): Boolean {

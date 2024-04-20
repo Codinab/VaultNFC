@@ -16,6 +16,7 @@ import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.EditPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.PasswordDetailsScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.PasswordsListScreen
+import com.example.vaultnfc.ui.screens.starting.ForgotPasswordScreen
 import com.example.vaultnfc.ui.screens.starting.LoginScreen
 import com.example.vaultnfc.ui.screens.starting.OpeningScreen
 import com.example.vaultnfc.ui.screens.starting.RegisterScreen
@@ -30,6 +31,7 @@ fun AppNavigation(application: Application) {
         composable(Screen.Home.route) { PasswordsScreen(navController, application) }
         composable(Screen.Settings.route) { SettingsScreen(navController, application) }
         composable(Screen.Login.route) { LoginScreen(navController) }
+        composable(Screen.ForgotPassword.route) { ForgotPasswordScreen(navController) }
         composable(Screen.Register.route) { RegisterScreen(navController) }
         composable(Screen.Opening.route) { OpeningScreen(navController) }
 

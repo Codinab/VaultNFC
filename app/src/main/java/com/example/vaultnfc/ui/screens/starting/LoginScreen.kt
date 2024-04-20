@@ -146,6 +146,17 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
             Text("Login")
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Forgot Password Button
+        TextButton(
+            onClick = {
+                navController.navigate(Screen.ForgotPassword.route)
+            }
+        ) {
+            Text("Forgot Password?")
+        }
+
         // Handle login errors
         loginError?.let {
             Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
