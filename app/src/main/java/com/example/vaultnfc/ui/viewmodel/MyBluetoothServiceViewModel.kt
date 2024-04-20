@@ -208,7 +208,6 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     fun startDiscovery() {
         if (inInvalidState()) return
 
-
         this.discoveredDevices.value = emptyList() // Reset the list on new discovery
         // Register for broadcasts when a device is discovered
         _toastMessages.postValue("Starting discovery")
@@ -220,13 +219,12 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
         }
 
         application.registerReceiver(discoveryBroadcastReceiver, filter)
-        isReceiverRegistered = true
 
         try {
             bluetoothAdapter?.startDiscovery()
             _toastMessages.postValue("Discovering devices")
         } catch (e: Exception) {
-            Log.e(TAG, "Error cancelling discovery", e)
+            Log.e(TAG, "Error starting discovery", e)
             _toastMessages.postValue("Couldn't start discovery")
         }
     }
@@ -354,14 +352,12 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
     }
 
 
-    private var isReceiverRegistered = false
     override fun onCleared() {
         super.onCleared()
-        // Check the flag before trying to unregister the receiver
-        if (isReceiverRegistered) {
+        try {
             application.unregisterReceiver(discoveryBroadcastReceiver)
-            // Reset the flag as the receiver is now unregistered
-            isReceiverRegistered = false
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "Receiver was not registered.", e)
         }
         disconnect() // Ensure Bluetooth connection is closed and resources are cleaned up
     }
