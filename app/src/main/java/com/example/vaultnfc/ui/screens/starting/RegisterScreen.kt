@@ -1,5 +1,6 @@
 package com.example.vaultnfc.ui.screens.starting
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,11 +35,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
@@ -52,7 +56,6 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
     val registrationError by loginViewModel.registrationError.observeAsState()
     val context = LocalContext.current
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,10 +63,20 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.logo_menu),
+            contentDescription = null,
+            modifier = Modifier
+                .size(200.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email", color = Color.Black) },
+            label = { Text("Email") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -72,16 +85,16 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                 unfocusedBorderColor = RedEnd,
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Mail, contentDescription ="Set the title")
+                Icon(imageVector = Icons.Outlined.Mail, contentDescription = "Email Icon")
             }
-
         )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password", color = Color.Black) },
+            label = { Text("Password") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -91,15 +104,16 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                 unfocusedBorderColor = RedEnd,
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
+                Icon(imageVector = Icons.Outlined.Password, contentDescription = "Password Icon")
             }
         )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password", color = Color.Black) },
+            label = { Text("Confirm Password") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -109,9 +123,10 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                 unfocusedBorderColor = RedEnd,
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
+                Icon(imageVector = Icons.Outlined.Password, contentDescription = "Confirm Password Icon")
             }
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
@@ -130,18 +145,17 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                 .width(IntrinsicSize.Max)
                 .shadow(3.dp, RoundedCornerShape(1.dp)),
             colors = ButtonDefaults.buttonColors(RedEnd),
-            shape = RoundedCornerShape(1.dp),
-
+            shape = RoundedCornerShape(1.dp)
         ) {
             Text("Register")
         }
 
-        // Handle registration errors
         registrationError?.let {
             Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
         }
 
-        // Navigation to login screen
+        Spacer(modifier = Modifier.height(8.dp))
+
         TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
             Text("Already have an account? Login")
         }

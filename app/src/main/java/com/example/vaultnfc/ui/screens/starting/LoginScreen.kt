@@ -146,6 +146,10 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
             Text("Login")
         }
 
+        loginError?.let {
+            Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
 
         // Forgot Password Button
@@ -156,11 +160,8 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         ) {
             Text("Forgot Password?")
         }
-
         // Handle login errors
-        loginError?.let {
-            Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
-        }
+
 
         // Navigation to registration screen
         TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
