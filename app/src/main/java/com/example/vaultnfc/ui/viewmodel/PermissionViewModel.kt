@@ -10,7 +10,6 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Context.LOCATION_SERVICE
-import android.location.LocationManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
@@ -52,15 +51,6 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
         if (bluetoothAdapter != null && !bluetoothAdapter!!.isEnabled) {
             _bluetoothEnableEvent.value = Event(Unit)
         }
-    }
-
-    /**
-     * Checks the GPS status of the device and posts the result as an event.
-     */
-    fun checkGpsStatus() {
-        val locationManager = application.getSystemService(LOCATION_SERVICE) as LocationManager
-        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        _gpsEnabledEvent.value = Event(isGpsEnabled)
     }
 
     /**

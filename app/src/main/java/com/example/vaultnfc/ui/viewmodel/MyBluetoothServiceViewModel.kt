@@ -260,10 +260,6 @@ class MyBluetoothServiceViewModel(private val application: Application) : ViewMo
                     val passwordItem = deserializePasswordItem(inputString)
 
                     passwordItemToSave.postValue(passwordItem)
-
-
-
-                    // Use the deserialized passwordItem as needed
                 }
             } catch (e: IOException) {
                 Log.d(TAG, "Input stream was disconnected", e)
