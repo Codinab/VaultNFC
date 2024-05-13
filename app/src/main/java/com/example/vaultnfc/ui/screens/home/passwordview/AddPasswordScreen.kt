@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,17 +47,18 @@ import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.theme.RedEnd
 
 private const val s = "Password added successfully"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPasswordScreen(navController: NavController, passwordsViewModel: PasswordsViewModel = viewModel()) {
+fun AddPasswordScreen(
+    navController: NavController,
+    passwordsViewModel: PasswordsViewModel = viewModel()
+) {
     val context = LocalContext.current
     var title by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var uri by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-
     passwordsViewModel.fetch()
 
     var selectedFolder by remember { mutableStateOf<String?>(null) }
@@ -70,128 +72,49 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Label and field for Title
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = title,
-                onValueChange = {title = it},
-                label = {Text(text = stringResource(R.string.enter_the_title), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Title, contentDescription = stringResource(R.string.set_the_title))
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                    )
+        val textFieldModifier = Modifier.padding(vertical = 16.dp)
+        val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Red,
+            unfocusedBorderColor = RedEnd
+        )
 
-            )
-        }
-        // Label and field for Username
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = username,
-                onValueChange = {username = it},
-                label = {Text(text = stringResource(R.string.enter_the_username), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Person, contentDescription = stringResource(R.string.set_the_title))
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
+        val textField = @Composable { label: String, value: String, onValueChange: (String) -> Unit, icon: ImageVector ->
+            Column(
+                modifier = textFieldModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    label = { Text(text = label, color = Color.Black) },
+                    leadingIcon = { Icon(imageVector = icon, contentDescription = label) },
+                    colors = textFieldColors
                 )
-
-            )
+            }
         }
-        // Label and field for Password
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = password,
-                onValueChange = {password = it},
-                label = {Text(text = stringResource(R.string.enter_the_password), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                )
 
-            )
-        }
-        // Label and field for URI
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = uri,
-                onValueChange = {uri = it},
-                label = {Text(text = stringResource(R.string.enter_the_uri), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.FindInPage, contentDescription ="Set the title")
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                )
+        textField(stringResource(R.string.enter_the_title), title, { title = it }, Icons.Outlined.Title)
+        textField(stringResource(R.string.enter_the_username), username, { username = it }, Icons.Outlined.Person)
+        textField(stringResource(R.string.enter_the_password), password, { password = it }, Icons.Outlined.Password)
+        textField(stringResource(R.string.enter_the_uri), uri, { uri = it }, Icons.Outlined.FindInPage)
+        textField(stringResource(R.string.enter_the_notes), notes, { notes = it }, Icons.Outlined.NoteAlt)
 
-            )
-        }
-        // Label and field for Notes
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = notes,
-                onValueChange = {notes = it},
-                label = {Text(text = stringResource(R.string.enter_the_notes), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.NoteAlt, contentDescription ="Set the title")
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                )
-
-            )
-        }
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            }
+            onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
                 readOnly = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                ),
+                colors = textFieldColors,
                 value = selectedFolder ?: "No Folder",
                 onValueChange = {},
                 label = { Text("Folder", color = Color.Black) },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                }
+                onDismissRequest = { expanded = false }
             ) {
                 DropdownMenuItem(
                     text = { Text("No Folder") },
@@ -211,29 +134,28 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
                 }
             }
         }
+
         Row(
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val buttonModifier = Modifier
+                .heightIn(min = 36.dp)
+                .shadow(18.dp, RoundedCornerShape(1.dp))
+
             Button(
                 onClick = { navController.navigateUp() },
                 colors = ButtonDefaults.buttonColors(RedEnd),
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .heightIn(min = 36.dp)
-                    .shadow(18.dp, RoundedCornerShape(1.dp)),
+                modifier = buttonModifier.padding(end = 16.dp),
                 shape = RoundedCornerShape(1.dp)
-            ) {
-                Text("Back", color = Color.White)
-            }
+            ) { Text("Back", color = Color.White) }
+
             Button(
                 onClick = {
                     if (title.isNotEmpty()) {
                         passwordsViewModel.addPassword(title, username, password, uri, notes).also {
-                            Toast.makeText(context, "Password added successfully", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
                             navController.navigateUp()
                         }
                     } else {
@@ -241,13 +163,9 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
                     }
                 },
                 colors = ButtonDefaults.buttonColors(RedEnd),
-                modifier = Modifier
-                    .heightIn(min = 36.dp)
-                    .shadow(18.dp, RoundedCornerShape(1.dp)),
+                modifier = buttonModifier,
                 shape = RoundedCornerShape(1.dp)
-            ) {
-                Text("Add", color = Color.White)
-            }
+            ) { Text("Add", color = Color.White) }
         }
     }
 }
