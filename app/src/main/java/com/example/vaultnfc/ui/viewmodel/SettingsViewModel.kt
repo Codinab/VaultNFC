@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vaultnfc.data.LogoutTimerPreference
+import com.example.vaultnfc.data.MasterKeyTimerPreference
 import com.example.vaultnfc.data.ThemePreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -46,10 +47,26 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         logoutTimerPreference.setLogoutTimerOption(option)
     }
 
+    private val masterKeyTimerPreference = MasterKeyTimerPreference(application)
+
+    /**
+     * A Flow that emits the current MasterKey timer option.
+     */
+    val masterKeyTimerOption: Flow<String> = masterKeyTimerPreference.masterKeyTimerOption
+
+    /**
+     * Sets the MasterKey timer option.
+     *
+     * @param option The selected MasterKey timer option.
+     */
+    fun setMasterKeyTimerOption(option: String) = viewModelScope.launch {
+        masterKeyTimerPreference.setMasterKeyTimerOption(option)
+    }
+
     /**
      * A list of available logout timer options.
      */
     companion object {
-        val LOGIN_TIMEOUT_MODE = listOf("Never", "Closing app", "15 minutes", "1 day", "1 week")
+        val TIMEOUT_MODE = listOf("Never", "Closing app", "15 minutes", "1 day", "1 week")
     }
 }

@@ -77,10 +77,13 @@ fun SettingsScreen(navController: NavController, application: Application) {
 
         NightMode(isDarkThemeEnabled, settingsViewModel)
         LogoutTimerOption(settingsViewModel)
+        MasterKeyTimerOption(settingsViewModel)
+
 
         SettingsOption("Change Account Password", "Change your account password", application)
         SettingsOption("Notification Settings", "Configure notification preferences", application)
         SettingsOption("Language", "Change the language of the app", application)
+
     }
 }
 
@@ -120,7 +123,7 @@ private fun NightMode(
 
 @Composable
 fun LogoutTimerOption(settingsViewModel: SettingsViewModel) {
-    val options = SettingsViewModel.LOGIN_TIMEOUT_MODE
+    val options = SettingsViewModel.TIMEOUT_MODE
     var showDialog by remember { mutableStateOf(false) }
     val selectedOption by settingsViewModel.logoutTimerOption.collectAsState(initial = "Never")
 
@@ -176,6 +179,66 @@ fun LogoutTimerDialog(
         },
         confirmButton = {
             settingsViewModel.setLogoutTimerOption(currentSelection)
+        },
+    )
+}
+
+@Composable
+fun MasterKeyTimerOption(settingsViewModel: SettingsViewModel) {
+    val options = SettingsViewModel.TIMEOUT_MODE
+    var showDialog by remember { mutableStateOf(false) }
+    val selectedOption by settingsViewModel.masterKeyTimerOption.collectAsState(initial = "Never")
+
+    if (showDialog) {
+        MasterKeyTimerDialog(options, selectedOption, settingsViewModel) { selected ->
+            settingsViewModel.setMasterKeyTimerOption(selected)
+            showDialog = false
+        }
+    }
+
+    LogoutOption(
+        label = "MasterKey Expiry Preference",
+        description = "Set the MasterKey expiry timer",
+        selectedOption = selectedOption
+    ) {
+        showDialog = true
+    }
+}
+
+@Composable
+fun MasterKeyTimerDialog(
+    options: List<String>,
+    currentSelection: String,
+    settingsViewModel: SettingsViewModel,
+    onOptionSelected: (String) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = { /* Handle dismiss */ },
+        title = { Text("Select MasterKey Timer") },
+        text = {
+            Column {
+                options.forEach { option ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { onOptionSelected(option) }
+                            .padding(8.dp)
+                    ) {
+                        RadioButton(
+                            selected = option == currentSelection,
+                            onClick = { onOptionSelected(option) }
+                        )
+                        Text(
+                            text = option,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            settingsViewModel.setMasterKeyTimerOption(currentSelection)
         },
     )
 }

@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
     }
 
-    private var currentLogoutOption = SettingsViewModel.LOGIN_TIMEOUT_MODE[1]
+    private var currentLogoutOption = SettingsViewModel.TIMEOUT_MODE[1]
 
     /**
      * Called when the activity is about to stop.
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
 
-        if (currentLogoutOption == SettingsViewModel.LOGIN_TIMEOUT_MODE[1]) {
+        if (currentLogoutOption == SettingsViewModel.TIMEOUT_MODE[1]) {
             loginViewModel.logout(this)
         }
     }

@@ -6,13 +6,14 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 
 /**
- * Class responsible for securely storing login details using EncryptedSharedPreferences.
+ * Class responsible for securely storing login details and the master key using EncryptedSharedPreferences.
  */
 object SecureStorage {
 
     private const val FILE_NAME = "encrypted_shared_prefs"
     private const val EMAIL_KEY = "email"
     private const val PASSWORD_KEY = "password"
+    private const val MASTER_KEY = "master_key"
 
     private fun getEncryptedPreferences(context: Context): SharedPreferences {
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
@@ -34,6 +35,16 @@ object SecureStorage {
     fun clearLoginDetails(context: Context) {
         val prefs = getEncryptedPreferences(context)
         prefs.edit().remove(EMAIL_KEY).remove(PASSWORD_KEY).apply()
+    }
+
+    /**
+     * Clears the login details and master key stored in the EncryptedSharedPreferences.
+     *
+     * @param context The context used to access the EncryptedSharedPreferences.
+     */
+    fun clearAllDetails(context: Context) {
+        val prefs = getEncryptedPreferences(context)
+        prefs.edit().remove(EMAIL_KEY).remove(PASSWORD_KEY).remove(MASTER_KEY).apply()
     }
 
     /**
@@ -59,5 +70,37 @@ object SecureStorage {
         val email = prefs.getString(EMAIL_KEY, null)
         val password = prefs.getString(PASSWORD_KEY, null)
         return Pair(email, password)
+    }
+
+    /**
+     * Saves the master key securely in the EncryptedSharedPreferences.
+     *
+     * @param context The context used to access the EncryptedSharedPreferences.
+     * @param masterKey The master key to be saved.
+     */
+    fun saveMasterKey(context: Context, masterKey: String) {
+        val prefs = getEncryptedPreferences(context)
+        prefs.edit().putString(MASTER_KEY, masterKey).apply()
+    }
+
+    /**
+     * Retrieves the master key securely from the EncryptedSharedPreferences.
+     *
+     * @param context The context used to access the EncryptedSharedPreferences.
+     * @return The master key retrieved from the EncryptedSharedPreferences.
+     */
+    fun getMasterKey(context: Context): String? {
+        val prefs = getEncryptedPreferences(context)
+        return prefs.getString(MASTER_KEY, null)
+    }
+
+    /**
+     * Clears the master key stored in the EncryptedSharedPreferences.
+     *
+     * @param context The context used to access the EncryptedSharedPreferences.
+     */
+    fun clearMasterKey(context: Context) {
+        val prefs = getEncryptedPreferences(context)
+        prefs.edit().remove(MASTER_KEY).apply()
     }
 }
