@@ -28,7 +28,7 @@ class LogoutTimerPreference(application: Application) {
 
     // Flow representing the current state of the logout timer preference.
     val logoutTimerOption: Flow<String> = dataStore.data.map { preferences ->
-        preferences[LOGOUT_TIMER_KEY] ?: SettingsViewModel.LOGIN_TIMEOUT_MODE[1]
+        preferences[LOGOUT_TIMER_KEY] ?: SettingsViewModel.TIMEOUT_MODE[1]
     }
 
     /**

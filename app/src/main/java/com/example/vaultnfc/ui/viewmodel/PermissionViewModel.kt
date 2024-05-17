@@ -9,6 +9,7 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context.BLUETOOTH_SERVICE
+import android.content.Context.LOCATION_SERVICE
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
