@@ -39,7 +39,7 @@ fun AppNavigation(application: Application) {
         composable(Screen.PasswordsList.route) { PasswordsListScreen(navController) }
 
         composable(Screen.AddPassword.route) { AddPasswordScreen(navController) }
-        composable(Screen.PasswordGenerator.route) { PasswordGeneratorScreen(navController) }
+        composable(Screen.PasswordGenerator.route) { PasswordGeneratorScreen(navController, application) }
         composable(Screen.EditPassword.route) { EditPasswordScreen(navController) }
         composable(Screen.PasswordDetails.route) { PasswordDetailsScreen(navController) }
 

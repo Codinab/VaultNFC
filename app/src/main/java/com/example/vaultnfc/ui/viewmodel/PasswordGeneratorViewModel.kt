@@ -1,4 +1,6 @@
+import android.app.Application
 import androidx.lifecycle.ViewModel
+import com.example.vaultnfc.data.repository.SecureStorage
 import java.security.SecureRandom
 
 /**
@@ -8,7 +10,7 @@ import java.security.SecureRandom
  * uppercase letters, lowercase letters, numbers, and symbols. The probabilities of each character type
  * being included in the password can be adjusted.
  */
-class PasswordGeneratorViewModel : ViewModel() {
+class PasswordGeneratorViewModel(val application: Application) : ViewModel() {
 
     private val symbols = "!@#$%^&*()_+-=[]{}|;:'\",.<>/?"
     private val numbers = "0123456789"
@@ -16,11 +18,36 @@ class PasswordGeneratorViewModel : ViewModel() {
     private val lowercaseLetters = "abcdefghijklmnopqrstuvwxyz"
     private val secureRandom = SecureRandom()
 
-    val defaultLength = 12
-    val defaultProbabilityNumbers = 1
-    val defaultProbabilitySymbols = 1
-    val defaultProbabilityUppercase = 1
-    val defaultProbabilityLowercase = 1
+    // Initial settings fetched from secure storage
+    private val settings = SecureStorage.getGeneratorSettings(application)
+
+    var defaultLength = settings["length"] ?: 12
+    var defaultProbabilityNumbers = settings["numbers_probability"] ?: 1
+    var defaultProbabilitySymbols = settings["symbols_probability"] ?: 1
+    var defaultProbabilityUppercase = settings["uppercase_probability"] ?: 1
+    var defaultProbabilityLowercase = settings["lowercase_probability"] ?: 1
+
+    private fun saveSettings(
+        length: Int,
+        probabilityNumbers: Int,
+        probabilitySymbols: Int,
+        probabilityUppercase: Int,
+        probabilityLowercase: Int,
+    ) {
+        SecureStorage.saveGeneratorSettings(
+            application,
+            length,
+            probabilityNumbers,
+            probabilitySymbols,
+            probabilityUppercase,
+            probabilityLowercase,
+        )
+
+    }
+
+    fun clearSetting(key: SecureStorage.SettingsKey): Int {
+        return SecureStorage.clearSetting(application, key)
+    }
 
     /**
      * Generates a password based on specified criteria.
@@ -57,6 +84,14 @@ class PasswordGeneratorViewModel : ViewModel() {
         val passwordChars = CharArray(length) {
             charPool[secureRandom.nextInt(charPool.length)]
         }
+
+        saveSettings(
+            length,
+            probabilityNumbers,
+            probabilitySymbols,
+            probabilityUppercase,
+            probabilityLowercase
+        )
 
         return String(passwordChars)
     }

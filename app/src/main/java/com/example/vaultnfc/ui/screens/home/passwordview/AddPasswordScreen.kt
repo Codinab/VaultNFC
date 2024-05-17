@@ -1,6 +1,7 @@
 package com.example.vaultnfc.ui.screens.home.passwordview
 
 import PasswordsViewModel
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,17 +38,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
+import com.example.vaultnfc.model.Folder
 import com.example.vaultnfc.ui.theme.RedEnd
 
-private const val s = "Password added successfully"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPasswordScreen(navController: NavController, passwordsViewModel: PasswordsViewModel = viewModel()) {
     val context = LocalContext.current
@@ -61,7 +62,6 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
 
     var selectedFolder by remember { mutableStateOf<String?>(null) }
     val folders by passwordsViewModel.foldersList.observeAsState(emptyList())
-    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -70,184 +70,150 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Label and field for Title
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = title,
-                onValueChange = {title = it},
-                label = {Text(text = stringResource(R.string.enter_the_title), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Title, contentDescription = stringResource(R.string.set_the_title))
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                    )
+        inputField(title, Icons.Outlined.Title, R.string.enter_the_title, R.string.set_the_title) { title = it }
+        inputField(username, Icons.Outlined.Person, R.string.enter_the_username, R.string.set_the_title) { username = it }
+        inputField(password, Icons.Outlined.Password, R.string.enter_the_password, R.string.set_the_title) { password = it }
+        inputField(uri, Icons.Outlined.FindInPage, R.string.enter_the_uri, R.string.set_the_title) { uri = it }
+        inputField(notes, Icons.Outlined.NoteAlt, R.string.enter_the_notes, R.string.set_the_title) { notes = it }
 
-            )
-        }
-        // Label and field for Username
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = username,
-                onValueChange = {username = it},
-                label = {Text(text = stringResource(R.string.enter_the_username), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Person, contentDescription = stringResource(R.string.set_the_title))
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
+        folderDropdownMenu(selectedFolder, folders) { selectedFolder = it }
+
+        actionButtons(navController, context, title, passwordsViewModel, username, password, uri, notes)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun inputField(
+    value: String,
+    icon: ImageVector,
+    labelId: Int,
+    iconDescId: Int,
+    onValueChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.padding(vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(text = stringResource(id = labelId), color = Color.Black) },
+            leadingIcon = {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = stringResource(id = iconDescId)
                 )
-
+            },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = RedEnd,
             )
-        }
-        // Label and field for Password
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = password,
-                onValueChange = {password = it},
-                label = {Text(text = stringResource(R.string.enter_the_password), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                )
+        )
+    }
+}
 
-            )
-        }
-        // Label and field for URI
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = uri,
-                onValueChange = {uri = it},
-                label = {Text(text = stringResource(R.string.enter_the_uri), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.FindInPage, contentDescription ="Set the title")
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                )
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun folderDropdownMenu(
+    selectedFolder: String?,
+    folders: List<Folder>, // Assuming Folder is a data class with a name property
+    onFolderSelected: (String?) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }  // Local mutable state for expanded
 
-            )
-        }
-        // Label and field for Notes
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = notes,
-                onValueChange = {notes = it},
-                label = {Text(text = stringResource(R.string.enter_the_notes), color = Color.Black)},
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.NoteAlt, contentDescription ="Set the title")
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                )
-
-            )
-        }
-        ExposedDropdownMenuBox(
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }  // Directly toggle the expanded state
+    ) {
+        OutlinedTextField(
+            readOnly = true,
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = RedEnd,
+            ),
+            value = selectedFolder ?: "No Folder",
+            onValueChange = {},
+            label = { Text("Folder", color = Color.Black) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+        )
+        DropdownMenu(
             expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            }
+            onDismissRequest = { expanded = false }
         ) {
-            OutlinedTextField(
-                readOnly = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = RedEnd,
-                ),
-                value = selectedFolder ?: "No Folder",
-                onValueChange = {},
-                label = { Text("Folder", color = Color.Black) },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
+            DropdownMenuItem(
+                text = { Text("No Folder") },
+                onClick = {
+                    onFolderSelected(null)
                     expanded = false
                 }
-            ) {
+            )
+            folders.forEach { folder ->
                 DropdownMenuItem(
-                    text = { Text("No Folder") },
+                    text = { Text(folder.name) },
                     onClick = {
-                        selectedFolder = null
+                        onFolderSelected(folder.name)
                         expanded = false
                     }
                 )
-                folders.forEach { folder ->
-                    DropdownMenuItem(
-                        text = { Text(folder.name) },
-                        onClick = {
-                            selectedFolder = folder.name
-                            expanded = false
-                        }
-                    )
-                }
             }
         }
-        Row(
+    }
+}
+
+
+@Composable
+fun actionButtons(
+    navController: NavController,
+    context: Context,
+    title: String,
+    passwordsViewModel: PasswordsViewModel,
+    username: String,
+    password: String,
+    uri: String,
+    notes: String
+) {
+    Row(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Button(
+            onClick = { navController.navigateUp() },
+            colors = ButtonDefaults.buttonColors(RedEnd),
             modifier = Modifier
-                .padding(top = 16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(end = 16.dp)
+                .heightIn(min = 36.dp)
+                .shadow(18.dp, RoundedCornerShape(1.dp)),
+            shape = RoundedCornerShape(1.dp)
         ) {
-            Button(
-                onClick = { navController.navigateUp() },
-                colors = ButtonDefaults.buttonColors(RedEnd),
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .heightIn(min = 36.dp)
-                    .shadow(18.dp, RoundedCornerShape(1.dp)),
-                shape = RoundedCornerShape(1.dp)
-            ) {
-                Text("Back", color = Color.White)
-            }
-            Button(
-                onClick = {
-                    if (title.isNotEmpty()) {
-                        passwordsViewModel.addPassword(title, username, password, uri, notes).also {
-                            Toast.makeText(context, "Password added successfully", Toast.LENGTH_SHORT).show()
-                            navController.navigateUp()
-                        }
-                    } else {
-                        Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT).show()
+            Text("Back", color = Color.White)
+        }
+        Button(
+            onClick = {
+                if (title.isNotEmpty()) {
+                    passwordsViewModel.addPassword(title, username, password, uri, notes).also {
+                        Toast.makeText(context, "Password added successfully", Toast.LENGTH_SHORT).show()
+                        navController.navigateUp()
                     }
-                },
-                colors = ButtonDefaults.buttonColors(RedEnd),
-                modifier = Modifier
-                    .heightIn(min = 36.dp)
-                    .shadow(18.dp, RoundedCornerShape(1.dp)),
-                shape = RoundedCornerShape(1.dp)
-            ) {
-                Text("Add", color = Color.White)
-            }
+                } else {
+                    Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT).show()
+                }
+            },
+            colors = ButtonDefaults.buttonColors(RedEnd),
+            modifier = Modifier
+                .heightIn(min = 36.dp)
+                .shadow(18.dp, RoundedCornerShape(1.dp)),
+            shape = RoundedCornerShape(1.dp)
+        ) {
+            Text("Add", color = Color.White)
         }
     }
 }
