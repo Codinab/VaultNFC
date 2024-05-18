@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
         super.onStop()
 
         if (currentLogoutOption == SettingsViewModel.TIMEOUT_MODE[1]) {
-            loginViewModel.logout(this)
+            loginViewModel.logout()
         }
     }
 }

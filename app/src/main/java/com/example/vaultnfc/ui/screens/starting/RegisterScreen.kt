@@ -119,7 +119,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
         Button(
             onClick = {
                 if (password == confirmPassword) {
-                    loginViewModel.register(email, password, context) {
+                    loginViewModel.register(email, password) {
                         navController.navigate(Screen.Login.route)
                     }
                 } else {

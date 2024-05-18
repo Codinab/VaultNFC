@@ -16,7 +16,7 @@ import java.util.Date
  * @property creationDate The date and time when the password item was created.
  * @property lastModifiedDate The date and time when the password item was last modified.
  * @property encryptionIV The Initialization Vector used for AES encryption of the password.
- * @property folderName The name of the folder or category to which the password item belongs.
+ * @property tag The name of the tag or category to which the password item belongs.
  */
 data class PasswordItem(
     var userId: String = "",
@@ -29,7 +29,7 @@ data class PasswordItem(
     val creationDate: Date = Date(), // Using java.util.Date for creation date
     val lastModifiedDate: Date = Date(), // Using java.util.Date for last modification date
     val encryptionIV: String = "", // Initialization Vector for AES
-    val folderName: String = "",
+    val tag: String = "",
 )
 
 /**

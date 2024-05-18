@@ -8,14 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.vaultnfc.ui.screens.BluetoothClientScreen
-import com.example.vaultnfc.ui.screens.BluetoothServerScreen
 import com.example.vaultnfc.ui.screens.SettingsScreen
+import com.example.vaultnfc.ui.screens.bluetooth.BluetoothClientScreen
+import com.example.vaultnfc.ui.screens.bluetooth.BluetoothServerScreen
 import com.example.vaultnfc.ui.screens.home.PasswordsScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.EditPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.PasswordDetailsScreen
-import com.example.vaultnfc.ui.screens.home.passwordview.PasswordsListScreen
 import com.example.vaultnfc.ui.screens.starting.ChangeMasterKeyScreen
 import com.example.vaultnfc.ui.screens.starting.ForgotPasswordScreen
 import com.example.vaultnfc.ui.screens.starting.InitialMasterKeyScreen
@@ -26,7 +25,6 @@ import com.example.vaultnfc.ui.screens.starting.RegisterScreen
 @Composable
 fun AppNavigation(application: Application) {
     val navController = rememberNavController()
-
 
     NavHost(navController = navController, startDestination = Screen.Opening.route) {
         // Starting
@@ -39,11 +37,13 @@ fun AppNavigation(application: Application) {
         composable(Screen.MasterPassword.route) { InitialMasterKeyScreen(navController) }
         composable(Screen.ChangeMasterPassword.route) { ChangeMasterKeyScreen(navController) }
 
-        // Old
-        composable(Screen.PasswordsList.route) { PasswordsListScreen(navController) }
-
         composable(Screen.AddPassword.route) { AddPasswordScreen(navController) }
-        composable(Screen.PasswordGenerator.route) { PasswordGeneratorScreen(navController, application) }
+        composable(Screen.PasswordGenerator.route) {
+            PasswordGeneratorScreen(
+                navController,
+                application
+            )
+        }
         composable(Screen.EditPassword.route) { EditPasswordScreen(navController) }
         composable(Screen.PasswordDetails.route) { PasswordDetailsScreen(navController) }
 
@@ -64,7 +64,6 @@ fun AppNavigation(application: Application) {
             }
         }
     }
-
 }
 
 

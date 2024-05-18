@@ -1,4 +1,4 @@
-package com.example.vaultnfc.ui.screens
+package com.example.vaultnfc.ui.screens.bluetooth
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -37,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.ui.components.BackgroundImageWrapper
+import com.example.vaultnfc.ui.screens.PermissionsAndFeaturesSetup
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
@@ -44,6 +46,8 @@ import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BluetoothClientScreen(application: Application, navController: NavController) {
+    BackgroundImageWrapper {
+
     val permissionViewModel: PermissionViewModel = viewModel()
     PermissionsAndFeaturesSetup(viewModel = permissionViewModel)
 
@@ -96,6 +100,7 @@ fun BluetoothClientScreen(application: Application, navController: NavController
                 }
             )
         }
+    }
     }
 }
 

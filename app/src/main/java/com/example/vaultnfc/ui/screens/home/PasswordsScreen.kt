@@ -54,6 +54,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
 import com.example.vaultnfc.ui.Screen
+import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.ButtonRed
 import com.example.vaultnfc.ui.theme.LightRed
@@ -65,80 +66,111 @@ import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PasswordsScreen(navController: NavController, application: Application) {
-    var isSidebarOpen by remember { mutableStateOf(false) }
-    val passwordsViewModel: PasswordsViewModel = viewModel()
-    val passwordsList by passwordsViewModel.passwordsList.observeAsState(emptyList())
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    var showMenu by remember { mutableStateOf(false) }
-    val myBluetoothServiceViewModel: MyBluetoothServiceViewModel = viewModel(
-        factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
-    )
+    BackgroundImageWrapper {
 
-    DisposableEffect(currentRoute) {
-        if (currentRoute == Screen.Home.route) passwordsViewModel.fetch()
-        onDispose { }
-    }
+        var isSidebarOpen by remember { mutableStateOf(false) }
+        val passwordsViewModel: PasswordsViewModel = viewModel()
+        val passwordsList by passwordsViewModel.passwordsList.observeAsState(emptyList())
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+        var showMenu by remember { mutableStateOf(false) }
+        val myBluetoothServiceViewModel: MyBluetoothServiceViewModel = viewModel(
+            factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
+        )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .height(60.dp)
-                    .fillMaxWidth()
-                    .background(color = WhiteEnd),
-                contentAlignment = Alignment.Center
-            ) {
-                IconButton(onClick = { isSidebarOpen = true }, modifier = Modifier.align(Alignment.CenterStart)) {
-                    Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = ButtonRed)
-                }
-                Image(painter = painterResource(id = R.drawable.logo_menu), contentDescription = "Logo", modifier = Modifier.align(Alignment.Center))
-            }
-            Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(passwordsList.size) { index ->
-                    val password = passwordsList[index]
-                    val backgroundColor = Color.White
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = LightRed),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp, horizontal = 16.dp)
-                            .background(color = backgroundColor)
-                            .clickable {
-                                passwordItemSelected = password
-                                navController.navigate(Screen.PasswordDetails.route)
-                            }
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(text = password.title, color = Color.Black, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
-                            Text(text = password.username, color = Color.Black)
-                        }
-                    }
-                    if (index != passwordsList.size - 1) Spacer(modifier = Modifier.height(1.dp).fillMaxWidth().background(color = Color.LightGray))
-                }
-            }
+        DisposableEffect(currentRoute) {
+            if (currentRoute == Screen.Home.route) passwordsViewModel.fetch()
+            onDispose { }
         }
-        Box(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            FloatingActionButton(onClick = { showMenu = !showMenu }, modifier = Modifier.padding(16.dp), containerColor = ButtonRed) {
-                Icon(Icons.Filled.Add, contentDescription = "Add New Password")
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column {
+                Box(
+                    modifier = Modifier
+                        .height(60.dp)
+                        .fillMaxWidth()
+                        .background(color = WhiteEnd),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(
+                        onClick = { isSidebarOpen = true },
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = ButtonRed)
+                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_menu),
+                        contentDescription = "Logo",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                Spacer(
+                    modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red)
+                )
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(passwordsList.size) { index ->
+                        val password = passwordsList[index]
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = LightRed),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp, horizontal = 16.dp)
+                                .clickable {
+                                    passwordItemSelected = password
+                                    navController.navigate(Screen.PasswordDetails.route)
+                                }
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = password.title,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                                Text(text = password.username, color = Color.Black)
+                            }
+                        }
+                        if (index != passwordsList.size - 1) Spacer(
+                            modifier = Modifier.height(1.dp).fillMaxWidth()
+                        )
+                    }
+                }
             }
-            DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false },
-                offset = DpOffset(160.dp, -70.dp)
+            Box(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                DropdownMenuItem(text = { Text("Create password", fontWeight = FontWeight.Bold) }, onClick = {
-                    showMenu = false
-                    navController.navigate(Screen.AddPassword.route)
-                })
-                DropdownMenuItem(text = { Text("Receive via Bluetooth", fontWeight = FontWeight.Bold)}, onClick = {
-                    showMenu = false
-                    navController.navigate(Screen.BluetoothServer.route)
-                })
+                FloatingActionButton(
+                    onClick = { showMenu = !showMenu },
+                    modifier = Modifier.padding(16.dp),
+                    containerColor = ButtonRed
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add New Password")
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    offset = DpOffset(160.dp, -70.dp)
+                ) {
+                    DropdownMenuItem(text = {
+                        Text(
+                            "Create password",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }, onClick = {
+                        showMenu = false
+                        navController.navigate(Screen.AddPassword.route)
+                    })
+                    DropdownMenuItem(text = {
+                        Text(
+                            "Receive via Bluetooth",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }, onClick = {
+                        showMenu = false
+                        navController.navigate(Screen.BluetoothServer.route)
+                    })
+                }
             }
         }
         if (isSidebarOpen) SideBar(onClose = { isSidebarOpen = false }, navController)
@@ -190,26 +222,14 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                     Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
                     Text("FOLDERS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
-                    repeat(20) { index -> // Example of 20 items, replace with your folder items
-                        Box(
-                            modifier = Modifier.fillMaxWidth().background(color = WhiteEnd)
-                        ) {
-                            TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
-                                Text(
-                                    "Folder $index",
-                                    modifier = Modifier.padding(8.dp),
-                                    color = BlackEnd
-                                )
-                            }
-                        }
-                    }
+                    Tags(navController)
                 }
                 Column(modifier = Modifier.padding(8.dp)) {
                     val buttonData = listOf(
                         ButtonData("PASSWORD GENERATOR") { navController.navigate(Screen.PasswordGenerator.route) },
                         ButtonData("SETTINGS") { navController.navigate(Screen.Settings.route) },
                         ButtonData("LOG OUT") {
-                            loginViewModel.logout(context)
+                            loginViewModel.logout()
                             navController.navigate(Screen.Opening.route)
                         }
                     )
@@ -225,6 +245,28 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Tags(navController: NavController) {
+
+
+
+    repeat(20) { index -> // Example of 20 items, replace with your folder items
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = WhiteEnd)
+        ) {
+            TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
+                Text(
+                    "Folder $index",
+                    modifier = Modifier.padding(8.dp),
+                    color = BlackEnd
+                )
             }
         }
     }

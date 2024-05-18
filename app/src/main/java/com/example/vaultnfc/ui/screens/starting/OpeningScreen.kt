@@ -49,6 +49,13 @@ fun OpeningScreen(navController: NavController) {
     val loginViewModel: LoginViewModel = viewModel()
 
     LaunchedEffect(Unit) {
+
+        if (loginViewModel.isAuth()) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Home.route) { inclusive = true }
+            }
+        }
+
         val (savedEmail, savedPassword) = SecureStorage.getLoginDetails(context)
         if (savedEmail != null && savedPassword != null) {
             loginViewModel.login(savedEmail, savedPassword, context) {
@@ -86,9 +93,8 @@ fun OpeningScreen(navController: NavController) {
                 onClick = {
                     isClicked = !isClicked
                     loginViewModel.loginWithGitHub(activity = context as MainActivity) {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Home.route) { inclusive = true }
-                        }
+                        System.out.println("Logged in with GitHub")
+                        navController.navigate(Screen.Home.route)
                     }
                 },
                 iconResId = R.drawable.ic_github

@@ -15,32 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.vaultnfc.model.PasswordItem
 
-@Composable
-fun FolderView(folderName: String, passwordsInFolder: List<PasswordItem>, onRemove: (PasswordItem) -> Unit) {
-    var isExpanded by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { isExpanded = !isExpanded }, // Make the card clickable
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column {
-            Text(
-                text = folderName,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(16.dp)
-            )
-            if (isExpanded) {
-                passwordsInFolder.forEach { password ->
-                    PasswordItemView(password = password, onRemove = onRemove)
-                }
-            }
-        }
-    }
-}
 

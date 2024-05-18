@@ -5,7 +5,6 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.vaultnfc.data.repository.SecureStorage
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -16,16 +15,30 @@ class LoginViewModel : ViewModel() {
 
     val loginError = MutableLiveData<String?>()
     val registrationError = MutableLiveData<String?>()
-    val isLoggedIn = MutableLiveData<Boolean>()
+    val isLoggedInMutable = MutableLiveData<Boolean>()
+
+
+    init {
+        // Check if user is already logged in
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            isLoggedInMutable.postValue(true)
+        } else {
+            isLoggedInMutable.postValue(false)
+        }
+    }
+
+    fun isAuth(): Boolean {
+        return auth.currentUser != null
+    }
 
     fun login(email: String, password: String, context: Context, onSuccess: () -> Unit) {
         if (checkUserParameters(email, password, loginError)) return
 
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                SecureStorage.saveLoginDetails(context, email, password)
                 loginError.postValue(null)
-                isLoggedIn.postValue(true)
+                isLoggedInMutable.postValue(true)
                 onSuccess()
             } else {
                 loginError.postValue(task.exception?.message ?: "Login failed")
@@ -33,20 +46,18 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun logout(context: Context) {
-        SecureStorage.clearLoginDetails(context)
+    fun logout() {
         auth.signOut()
-        isLoggedIn.postValue(false)
+        isLoggedInMutable.postValue(false)
     }
 
-    fun register(email: String, password: String, context: Context, onSuccess: () -> Unit) {
+    fun register(email: String, password: String, onSuccess: () -> Unit) {
         if (checkUserParameters(email, password, registrationError)) return
 
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                SecureStorage.saveLoginDetails(context, email, password)
                 registrationError.postValue(null)
-                isLoggedIn.postValue(true)
+                isLoggedInMutable.postValue(true)
                 onSuccess()
             } else {
                 registrationError.postValue(task.exception?.message ?: "Registration failed")
@@ -81,28 +92,27 @@ class LoginViewModel : ViewModel() {
     fun loginWithGitHub(activity: Activity, onSuccess: () -> Unit) {
         val provider = OAuthProvider.newBuilder("github.com")
 
-        // Check for pending results
+        // Check for existing accounts with the provider
         val pendingResultTask = auth.pendingAuthResult
         if (pendingResultTask != null) {
             pendingResultTask
                 .addOnCompleteListener { task ->
-                    handleGitHubSignInResult(task, activity, onSuccess)
+                    handleSignInResult(task, onSuccess)
                 }
         } else {
             auth.startActivityForSignInWithProvider(activity, provider.build())
                 .addOnCompleteListener { task ->
-                    handleGitHubSignInResult(task, activity, onSuccess)
+                    handleSignInResult(task, onSuccess)
                 }
         }
     }
 
-    private fun handleGitHubSignInResult(task: Task<AuthResult>, context: Context, onSuccess: () -> Unit) {
+    private fun handleSignInResult(task: Task<AuthResult>, onSuccess: () -> Unit) {
         if (task.isSuccessful) {
             val user = task.result?.user
             if (user != null) {
-                //SecureStorage.saveLoginDetails(context, user.email ?: "", user)
                 loginError.postValue(null)
-                isLoggedIn.postValue(true)
+                isLoggedInMutable.postValue(true)
                 onSuccess()
             } else {
                 loginError.postValue("GitHub login failed: User is null")

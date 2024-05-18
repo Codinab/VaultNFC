@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
 import com.example.vaultnfc.ui.Screen
+import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
@@ -57,113 +58,151 @@ fun PasswordDetailsScreen(navController: NavController) {
     val context = LocalContext.current
     val passwordsViewModel: PasswordsViewModel = viewModel()
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Button(
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            onClick = { navController.navigateUp() },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(10.dp)
-                .size(80.dp, 45.dp)
-                .shadow(4.dp, RoundedCornerShape(1.dp)),
-            shape = RoundedCornerShape(1.dp)
-        ) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-        }
+    BackgroundImageWrapper {
 
-        Card(
-            colors = CardDefaults.cardColors(containerColor = LightRed),
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = password.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+        Box(modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ){
+            Button(
+                colors = ButtonDefaults.buttonColors(RedEnd),
+                onClick = { navController.navigateUp() },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(10.dp)
+                    .size(80.dp, 45.dp)
+                    .shadow(4.dp, RoundedCornerShape(1.dp)),
+                shape = RoundedCornerShape(1.dp)
+            ) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+            }
 
-                Spacer(Modifier.height(10.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "Username: ${password.username}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    CopyIconButton(text = password.username, clipboardManager = clipboardManager, context = context)
-                }
-
-                Spacer(Modifier.height(14.dp))
-
-                val masterKeyViewModel: MasterKeyViewModel = viewModel()
-
-                if (masterKeyViewModel.isMasterKeySet.value == false) {
-                    navController.navigate(Screen.Opening.route) {
-                        popUpTo(Screen.Opening.route) { inclusive = true }
+            Card(
+                colors = CardDefaults.cardColors(containerColor = LightRed.copy(alpha = 0.7f)),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                //elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = password.title,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                }
 
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "Password: ${if (isPasswordVisible) passwordsViewModel.decryptPassword(password.encryptedPassword, masterKeyViewModel.getMasterKey()!!) else "******"}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    TogglePasswordVisibilityIconButton(isPasswordVisible = isPasswordVisible) {
-                        isPasswordVisible = !isPasswordVisible
+                    Spacer(Modifier.height(10.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Username: ${password.username}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        CopyIconButton(
+                            text = password.username,
+                            clipboardManager = clipboardManager,
+                            context = context
+                        )
                     }
-                    CopyIconButton(text = password.encryptedPassword, clipboardManager = clipboardManager, context = context)
-                }
 
-                Spacer(Modifier.height(14.dp))
+                    Spacer(Modifier.height(14.dp))
 
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "URI: ${password.uri}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    CopyIconButton(text = password.uri, clipboardManager = clipboardManager, context = context)
-                }
+                    val masterKeyViewModel: MasterKeyViewModel = viewModel()
 
-                Spacer(Modifier.height(18.dp))
+                    if (masterKeyViewModel.isMasterKeySet.value == false) {
+                        navController.navigate(Screen.Opening.route) {
+                            popUpTo(Screen.Opening.route) { inclusive = true }
+                        }
+                    }
 
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "Notes: ${password.notes}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Password: ${
+                                if (isPasswordVisible) passwordsViewModel.decryptPassword(
+                                    password.encryptedPassword,
+                                    masterKeyViewModel.getMasterKey()!!
+                                ) else "******"
+                            }",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TogglePasswordVisibilityIconButton(isPasswordVisible = isPasswordVisible) {
+                            isPasswordVisible = !isPasswordVisible
+                        }
+                        CopyIconButton(
+                            text = password.encryptedPassword,
+                            clipboardManager = clipboardManager,
+                            context = context
+                        )
+                    }
 
-                Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(14.dp))
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ActionButton(
-                        text = "Share with Bluetooth",
-                        onClick = { navController.navigate(Screen.BluetoothClient.route) },
-                        modifier = Modifier.size(200.dp, 45.dp)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "URI: ${password.uri}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        CopyIconButton(
+                            text = password.uri,
+                            clipboardManager = clipboardManager,
+                            context = context
+                        )
+                    }
 
-                    ActionButton(
-                        text = "Remove",
-                        onClick = {
-                            passwordsViewModel.removePassword(password)
-                            navController.popBackStack()
-                        },
-                        modifier = Modifier.size(100.dp, 45.dp)
-                    )
+                    Spacer(Modifier.height(18.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Notes: ${password.notes}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        ActionButton(
+                            text = "Share with Bluetooth",
+                            onClick = { navController.navigate(Screen.BluetoothClient.route) },
+                            modifier = Modifier.size(200.dp, 45.dp)
+                        )
+
+                        ActionButton(
+                            text = "Remove",
+                            onClick = {
+                                passwordsViewModel.removePassword(password)
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier.size(100.dp, 45.dp)
+                        )
+                    }
                 }
             }
+
         }
     }
 }

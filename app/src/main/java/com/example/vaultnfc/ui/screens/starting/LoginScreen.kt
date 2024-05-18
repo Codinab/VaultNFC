@@ -56,7 +56,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginError by viewModel.loginError.observeAsState()
-    val isLoggedIn by viewModel.isLoggedIn.observeAsState(initial = false)
+    val isLoggedIn by viewModel.isLoggedInMutable.observeAsState(initial = false)
     val context = LocalContext.current
 
     // Navigate to home screen if already logged in

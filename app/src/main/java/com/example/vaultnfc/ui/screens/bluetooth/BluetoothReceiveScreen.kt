@@ -1,4 +1,4 @@
-package com.example.vaultnfc.ui.screens
+package com.example.vaultnfc.ui.screens.bluetooth
 
 
 import PasswordsViewModel
@@ -32,12 +32,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
+import com.example.vaultnfc.ui.components.BackgroundImageWrapper
+import com.example.vaultnfc.ui.screens.PermissionsAndFeaturesSetup
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
@@ -45,6 +46,7 @@ import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BluetoothServerScreen(application: Application, navController: NavController) {
+
     val permissionViewModel: PermissionViewModel = viewModel()
     PermissionsAndFeaturesSetup(viewModel = permissionViewModel)
 
@@ -74,9 +76,11 @@ fun BluetoothServerScreen(application: Application, navController: NavController
     }
 
     Surface(
-        color = Color.White,
         modifier = Modifier.fillMaxSize()
     ) {
+
+        BackgroundImageWrapper {
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
@@ -130,6 +134,7 @@ fun BluetoothServerScreen(application: Application, navController: NavController
                 }
             }
         }
+    }
     }
 }
 

@@ -39,4 +39,5 @@
     <string name="settings_2">SETTINGS</string>
     <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
     <string name="default_web_client_id">defaultWebClientId</string>
+    <string name="enter_tag">Enter the Tag</string>
 </resources>

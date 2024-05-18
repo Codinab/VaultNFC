@@ -75,8 +75,6 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
         val recentHourlyAttempts = getRecentHourlyAttemptCount()
         val recentDailyAttempts = getRecentDailyAttemptCount()
 
-        System.out.println("Recent hourly attempts: " + recentHourlyAttempts);
-
         if (recentDailyAttempts > maxDailyAttempts) {
             // Block for the rest of the day
             _blockEndTime.value = System.currentTimeMillis() + dayMillis

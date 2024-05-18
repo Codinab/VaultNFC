@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vaultnfc.data.repository.FolderRepository
 import com.example.vaultnfc.data.repository.PasswordsRepository
-import com.example.vaultnfc.model.Folder
+import com.example.vaultnfc.data.repository.TagRepository
 import com.example.vaultnfc.model.PasswordItem
+import com.example.vaultnfc.model.Tag
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
@@ -24,32 +24,32 @@ import javax.crypto.spec.SecretKeySpec
  */
 class PasswordsViewModel : ViewModel() {
 
-    // LiveData for passwords and folders list.
+    // LiveData for passwords and Tags list.
     private val _passwordsList = MutableLiveData<List<PasswordItem>>()
     val passwordsList: LiveData<List<PasswordItem>> = _passwordsList
 
     private val passwordsRepository = PasswordsRepository()
-    private val folderRepository = FolderRepository()
+    private val tagRepository = TagRepository()
 
-    private val _foldersList = MutableLiveData<List<Folder>>()
-    val foldersList: LiveData<List<Folder>> = _foldersList
+    private val _tagsList = MutableLiveData<List<Tag>>()
+    val tagsList: LiveData<List<Tag>> = _tagsList
 
 
-    // Initialization block to fetch passwords and optionally folders.
+    // Initialization block to fetch passwords and optionally tags.
     init {
-        //addTestFolders()
+        //addTestTags()
         fetchPasswords()
-        //fetchFolders()
+        //fetchTags()
     }
 
-    fun addTestFolders() {
+    fun addTestTags() {
         viewModelScope.launch {
             try {
-                folderRepository.addFolder(Folder(name = "Personal"))
-                folderRepository.addFolder(Folder(name = "Work"))
-                Log.d("PasswordsViewModel", "Test folders added successfully")
+                tagRepository.addTag(Tag(name = "Personal"))
+                tagRepository.addTag(Tag(name = "Work"))
+                Log.d("PasswordsViewModel", "Test tags added successfully")
             } catch (e: Exception) {
-                Log.e("PasswordsViewModel", "Error adding test folders", e)
+                Log.e("PasswordsViewModel", "Error adding test tags", e)
             }
         }
     }
@@ -59,22 +59,22 @@ class PasswordsViewModel : ViewModel() {
      */
     fun fetch() {
         fetchPasswords()
-        //fetchFolders()
+        //fetchTags()
     }
 
 
-    private fun fetchFolders() {
+    private fun fetchTags() {
         viewModelScope.launch {
             try {
-                val fetchedFolders = folderRepository.getAllFolders()
-                _foldersList.value = fetchedFolders
-                Log.d("FetchFolders", "Started")
-                _foldersList.value?.forEach { folder ->
-                    Log.d("FetchFolders", "Folder: ${folder.name}")
+                val fetchedTags = tagRepository.getAllTags()
+                _tagsList.value = fetchedTags
+                Log.d("FetchTags", "Started")
+                _tagsList.value?.forEach { tag ->
+                    Log.d("FetchTags", "Tag: ${tag.name}")
                 }
-                Log.d("FetchFolders", "Ended")
+                Log.d("FetchTags", "Ended")
             } catch (e: Exception) {
-                Log.e("PasswordsViewModel", "Error fetching folders", e)
+                Log.e("PasswordsViewModel", "Error fetching tags", e)
             }
         }
     }
@@ -106,6 +106,7 @@ class PasswordsViewModel : ViewModel() {
         rawPassword: String,
         uri: String,
         notes: String,
+        tag: String
     ) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val userId = currentUser?.uid ?: return // Return early if user ID is null
@@ -123,7 +124,8 @@ class PasswordsViewModel : ViewModel() {
                     encryptedPassword = encryptedPassword,
                     uri = uri.trim(),
                     notes = notes,
-                    encryptionIV = encryptionIV
+                    encryptionIV = encryptionIV,
+                    tag = tag
                 )
                 passwordsRepository.addPassword(passwordItem)
                 fetchPasswords() // Refresh the list
