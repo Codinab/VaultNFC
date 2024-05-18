@@ -16,12 +16,15 @@ import kotlin.math.pow
 
 class MasterKeyViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val maxHourlyAttempts = 5
-    private val maxDailyAttempts = 10
+    private val maxHourlyAttempts = 4 // 5 attempts in an hour
+    private val maxDailyAttempts = 9 // 10 attempts in a day
     private val hourMillis = 3600000L // 1 hour
     private val dayMillis = 24 * 60 * 60 * 1000L // 1 day
     private val hourlyAttemptLog: MutableSet<Long> = SecureStorage.getHourlyAttemptLog(application)
     private val dailyAttemptLog: MutableSet<Long> = SecureStorage.getDailyAttemptLog(application)
+
+    private val initialBlockTimeMillis =
+        5 * 60 * 100L // 5 minutes in milliseconds for the first block
 
     private val _blockUser = MutableStateFlow(false)
     val blockUser: StateFlow<Boolean> = _blockUser.asStateFlow()
@@ -80,7 +83,9 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
             _blockUser.value = true
         } else if (recentHourlyAttempts > maxHourlyAttempts) {
             // Block based on the number of hourly attempts
-            val blockTime = 5 * 60 * 1000L * (2.0.pow((recentHourlyAttempts - 1).toDouble()).toLong())
+            val blockTime =
+                initialBlockTimeMillis * (2.0.pow((recentHourlyAttempts - maxHourlyAttempts).toDouble())
+                    .toLong())
             _blockEndTime.value = System.currentTimeMillis() + blockTime
             _blockUser.value = true
         } else {
@@ -143,5 +148,17 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
         val seconds = (remainingTime / 1000) % 60
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    //Used for debugging, delete before production
+    fun clearLoginAttempts() {
+        hourlyAttemptLog.clear()
+        dailyAttemptLog.clear()
+
+        SecureStorage.saveHourlyAttemptLog(getApplication(), hourlyAttemptLog)
+        SecureStorage.saveDailyAttemptLog(getApplication(), dailyAttemptLog)
+
+        _blockUser.value = false
+        _blockEndTime.value = null
     }
 }

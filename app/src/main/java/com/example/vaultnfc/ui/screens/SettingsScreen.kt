@@ -63,8 +63,6 @@ fun SettingsScreen(navController: NavController, application: Application) {
 
         LogoutTimerOption(settingsViewModel)
 
-        MasterKeyTimerOption(settingsViewModel)
-
         SettingsOptionRedirect(
             "Change Master Key",
             "Change the Master Key used for your data",
@@ -113,15 +111,10 @@ fun TitleBox(title: String) {
 }
 
 @Composable
-private fun NightMode(
-    isDarkThemeEnabled: Boolean,
-    settingsViewModel: SettingsViewModel,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+fun NightModeOption(isDarkThemeEnabled: Boolean, onToggle: (Boolean) -> Unit) {
+    OptionRow(
+        title = stringResource(R.string.night_mode),
+        description = stringResource(R.string.enable_dark_mode_for_the_app)
     ) {
         Switch(
             checked = isDarkThemeEnabled,
@@ -193,28 +186,6 @@ fun LogoutTimerDialog(
             }
         }
     )
-}
-
-@Composable
-fun MasterKeyTimerOption(settingsViewModel: SettingsViewModel) {
-    val options = SettingsViewModel.TIMEOUT_MODE
-    var showDialog by remember { mutableStateOf(false) }
-    val selectedOption by settingsViewModel.masterKeyTimerOption.collectAsState(initial = "Never")
-
-    if (showDialog) {
-        MasterKeyTimerDialog(options, selectedOption, settingsViewModel) { selected ->
-            settingsViewModel.setMasterKeyTimerOption(selected)
-            showDialog = false
-        }
-    }
-
-    LogoutOption(
-        label = "MasterKey Expiry Preference",
-        description = "Set the MasterKey expiry timer",
-        selectedOption = selectedOption
-    ) {
-        showDialog = true
-    }
 }
 
 @Composable

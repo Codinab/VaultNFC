@@ -1,7 +1,6 @@
 package com.example.vaultnfc.ui.screens.home.passwordview
 
 import PasswordsViewModel
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
-import com.example.vaultnfc.model.Folder
 import com.example.vaultnfc.ui.theme.RedEnd
 
 private const val s = "Password added successfully"
@@ -65,6 +63,7 @@ fun AddPasswordScreen(
 
     var selectedFolder by remember { mutableStateOf<String?>(null) }
     val folders by passwordsViewModel.foldersList.observeAsState(emptyList())
+    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier

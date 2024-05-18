@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -32,9 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
-import com.example.vaultnfc.ui.screens.home.passwordview.inputField
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 import kotlinx.coroutines.delay
@@ -45,14 +42,16 @@ fun InitialMasterKeyScreen(navController: NavController) {
     var masterKey by remember { mutableStateOf("") }
     val masterKeyError by masterKeyViewModel.masterKeyError.observeAsState()
     val blockUser by masterKeyViewModel.blockUser.collectAsState()
-    val blockEndTimeFormatted by remember { mutableStateOf(masterKeyViewModel.getBlockEndTimeFormatted()) }
     var timeUntilUnblockedFormatted by remember { mutableStateOf(masterKeyViewModel.getTimeUntilUnblockedFormatted()) }
     val savedMasterKey = masterKeyViewModel.isMasterKeySet.observeAsState()
+
+    //masterKeyViewModel.clearLoginAttempts()
 
     LaunchedEffect(blockUser) {
         while (blockUser) {
             timeUntilUnblockedFormatted = masterKeyViewModel.getTimeUntilUnblockedFormatted()
-            delay(3000L) // Update every 3 seconds
+            masterKeyViewModel.canAttempt()
+            delay(1000L) // Update every 3 seconds
         }
     }
 
@@ -73,13 +72,6 @@ fun InitialMasterKeyScreen(navController: NavController) {
                     text = "Too many attempts. Please wait before trying again.",
                     color = Color.Red,
                     fontSize = 16.sp,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "You will be unblocked at: $blockEndTimeFormatted",
-                    color = Color.Black,
-                    fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -136,8 +128,15 @@ fun ChangeMasterKeyScreen(navController: NavController) {
     var newMasterKey by remember { mutableStateOf("") }
     val masterKeyError by masterKeyViewModel.masterKeyError.observeAsState()
     val blockUser by masterKeyViewModel.blockUser.collectAsState()
-    val blockEndTimeFormatted = masterKeyViewModel.getBlockEndTimeFormatted()
-    val timeUntilUnblockedFormatted = masterKeyViewModel.getTimeUntilUnblockedFormatted()
+    var timeUntilUnblockedFormatted by remember { mutableStateOf(masterKeyViewModel.getTimeUntilUnblockedFormatted()) }
+
+    LaunchedEffect(blockUser) {
+        while (blockUser) {
+            timeUntilUnblockedFormatted = masterKeyViewModel.getTimeUntilUnblockedFormatted()
+            masterKeyViewModel.canAttempt()
+            delay(1000L)
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize().padding(16.dp)
@@ -168,13 +167,6 @@ fun ChangeMasterKeyScreen(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "You will be unblocked at: $blockEndTimeFormatted",
-                        color = Color.Black,
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
                         text = "Time remaining: $timeUntilUnblockedFormatted",
                         color = Color.Black,
                         fontSize = 14.sp,
@@ -194,12 +186,11 @@ fun ChangeMasterKeyScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                inputField(
+                TextField(
                     value = newMasterKey,
-                    icon = Icons.Default.Lock,
-                    labelId = R.string.master_key_label,
-                    iconDescId = R.string.master_key_icon_desc,
-                    onValueChange = { newMasterKey = it }
+                    onValueChange = { newMasterKey = it },
+                    label = { Text("Master Key") },
+                    isError = masterKeyError != null
                 )
 
                 if (masterKeyError != null) {
