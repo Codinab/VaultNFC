@@ -10,6 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vaultnfc.ui.screens.BluetoothClientScreen
 import com.example.vaultnfc.ui.screens.BluetoothServerScreen
+import com.example.vaultnfc.ui.screens.ChangeMasterKeyScreen
+import com.example.vaultnfc.ui.screens.InitialMasterKeyScreen
 import com.example.vaultnfc.ui.screens.SettingsScreen
 import com.example.vaultnfc.ui.screens.home.PasswordsScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
@@ -34,6 +36,8 @@ fun AppNavigation(application: Application) {
         composable(Screen.ForgotPassword.route) { ForgotPasswordScreen(navController) }
         composable(Screen.Register.route) { RegisterScreen(navController) }
         composable(Screen.Opening.route) { OpeningScreen(navController) }
+        composable(Screen.MasterPassword.route) { InitialMasterKeyScreen(navController) }
+        composable(Screen.ChangeMasterPassword.route) { ChangeMasterKeyScreen(navController) }
 
         // Old
         composable(Screen.PasswordsList.route) { PasswordsListScreen(navController) }

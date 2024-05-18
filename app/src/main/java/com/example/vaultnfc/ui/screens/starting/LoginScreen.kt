@@ -64,11 +64,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
     // Navigate to home screen if already logged in
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
-            navController.navigate(Screen.Home.route) {
-                popUpTo(Screen.Login.route) {
-                    inclusive = true
-                }
-            }
+            navController.navigate(Screen.MasterPassword.route)
         }
     }
 
@@ -132,7 +128,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         Button(
             onClick = {
                 viewModel.login(email, password, context) {
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.MasterPassword.route)
                 }
             },
             modifier = Modifier

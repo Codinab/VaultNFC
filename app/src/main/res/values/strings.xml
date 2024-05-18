@@ -8,4 +8,6 @@
     <string name="enter_the_uri">Enter the URI</string>
     <string name="enter_the_notes">Enter the Notes</string>
     <string name="start_receiving">Start Receiving</string>
+    <string name="master_key_label">Master Key</string>
+    <string name="master_key_icon_desc">Master Key Icon</string>
 </resources>

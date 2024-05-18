@@ -46,6 +46,7 @@ import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.components.BackButton
 import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
+import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 
 @Composable
 fun PasswordDetailsScreen(navController: NavController) {
@@ -137,12 +138,22 @@ fun passwordVisibilityRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
+        val masterKeyViewModel: MasterKeyViewModel = viewModel()
+        if (masterKeyViewModel.getMasterKey() == null) {
+
+            Text(
+                text = "Master Key not set",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f)
+            )
+            return
+        }
         if (isPasswordVisible) {
             Text(
                 text = "Password: ${
                     passwordsViewModel.decryptPassword(
                         password.encryptedPassword,
-                        "Test"
+                        masterKeyViewModel.getMasterKey()!!
                     )
                 }",
                 style = MaterialTheme.typography.bodyLarge,

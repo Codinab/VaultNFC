@@ -60,9 +60,7 @@ fun OpeningScreen(navController: NavController) {
         if (savedEmail != null && savedPassword != null) {
             loginViewModel.login(savedEmail, savedPassword, context) {
                 // Upon successful login, navigate to the home screen
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Opening.route) { inclusive = true }
-                }
+                navController.navigate(Screen.MasterPassword.route)
             }
         }
     }
@@ -99,7 +97,7 @@ fun OpeningScreen(navController: NavController) {
                 Button(
                     onClick = {
                         isClicked = !isClicked
-                        navController.navigate(Screen.Home.route)
+                        navController.navigate(Screen.MasterPassword.route)
                     },
                     colors = ButtonDefaults.buttonColors(WhiteEnd),
                     shape = RoundedCornerShape(1.dp),

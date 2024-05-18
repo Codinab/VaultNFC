@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
 
@@ -79,6 +80,12 @@ fun SettingsScreen(navController: NavController, application: Application) {
         LogoutTimerOption(settingsViewModel)
         MasterKeyTimerOption(settingsViewModel)
 
+        SettingsOptionRedirect(
+            "Change Master Key",
+            "Change the Master Key used for your data",
+        ) {
+            navController.navigate(Screen.ChangeMasterPassword.route)
+        }
 
         SettingsOption("Change Account Password", "Change your account password", application)
         SettingsOption("Notification Settings", "Configure notification preferences", application)
@@ -256,7 +263,41 @@ fun SettingsOption(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                Toast.makeText(application, "Not implemented", Toast.LENGTH_SHORT).show()
+                Toast
+                    .makeText(application, "Not implemented", Toast.LENGTH_SHORT)
+                    .show()
+            }
+    ) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = label,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text(
+                text = description,
+                color = Color.Gray,
+                fontSize = 12.sp
+            )
+        }
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Navigate forward")
+    }
+}
+
+@Composable
+fun SettingsOptionRedirect(
+    label: String,
+    description: String,
+    onClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable {
+                onClick()
             }
     ) {
         Column(

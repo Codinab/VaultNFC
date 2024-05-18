@@ -18,3 +18,5 @@ local.properties
 /wrapper/dists/**
 /daemon/**
 /native/**
+/wrapper/**
+**/**/.jar

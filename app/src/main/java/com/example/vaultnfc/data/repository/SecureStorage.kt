@@ -10,7 +10,6 @@ import androidx.security.crypto.MasterKeys
  */
 object SecureStorage {
     private const val FILE_NAME = "encrypted_shared_prefs"
-
     private const val EMAIL_KEY = "email"
     private const val PASSWORD_KEY = "password"
     private const val MASTER_KEY = "master_key"

@@ -5,10 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.vaultnfc.data.repository.SecureStorage
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
 class MasterKeyViewModel(application: Application) : AndroidViewModel(application) {
@@ -23,6 +23,10 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
     val masterKeyError = MutableLiveData<String?>()
     val isMasterKeySet = MutableLiveData<Boolean>()
 
+    init {
+        isMasterKeySet.value = SecureStorage.getMasterKey(application) != null
+    }
+
     fun saveMasterKey(masterKey: String) = viewModelScope.launch {
         if (isBlocked()) {
             masterKeyError.postValue("Too many attempts. Please wait before trying again.")
@@ -33,6 +37,8 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
             masterKeyError.postValue(null)
         }
     }
+
+    fun getMasterKey() = SecureStorage.getMasterKey(getApplication())
 
     fun clearMasterKey() = viewModelScope.launch {
         SecureStorage.clearMasterKey(getApplication())

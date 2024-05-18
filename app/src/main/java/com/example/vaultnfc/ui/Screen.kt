@@ -14,5 +14,7 @@ sealed class Screen(val route: String) {
     data object Opening : Screen("opening_screen")
     data object BluetoothClient : Screen("bluetooth_client_screen")
     data object BluetoothServer : Screen("bluetooth_server_screen")
+    data object MasterPassword : Screen("master_password_screen")
+    data object ChangeMasterPassword : Screen("change_master_password_screen")
 }
 
