@@ -78,22 +78,20 @@ class LoginViewModel : ViewModel() {
         return false
     }
 
-    fun loginWithGitHub(context: Context, onSuccess: () -> Unit) {
+    fun loginWithGitHub(activity: Activity, onSuccess: () -> Unit) {
         val provider = OAuthProvider.newBuilder("github.com")
 
-        // Specify any additional scopes you need for the provider
-        provider.scopes = listOf("user:email")
-
-        // Check if there are already pending results
+        // Check for pending results
         val pendingResultTask = auth.pendingAuthResult
         if (pendingResultTask != null) {
-            pendingResultTask.addOnCompleteListener { task ->
-                handleGitHubSignInResult(task, context, onSuccess)
-            }
-        } else {
-            auth.startActivityForSignInWithProvider(context as Activity, provider.build())
+            pendingResultTask
                 .addOnCompleteListener { task ->
-                    handleGitHubSignInResult(task, context, onSuccess)
+                    handleGitHubSignInResult(task, activity, onSuccess)
+                }
+        } else {
+            auth.startActivityForSignInWithProvider(activity, provider.build())
+                .addOnCompleteListener { task ->
+                    handleGitHubSignInResult(task, activity, onSuccess)
                 }
         }
     }
@@ -102,7 +100,7 @@ class LoginViewModel : ViewModel() {
         if (task.isSuccessful) {
             val user = task.result?.user
             if (user != null) {
-                SecureStorage.saveLoginDetails(context, user.email ?: "", "")
+                //SecureStorage.saveLoginDetails(context, user.email ?: "", user)
                 loginError.postValue(null)
                 isLoggedIn.postValue(true)
                 onSuccess()

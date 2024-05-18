@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">VaultNFC</string>
-    <string name="welcome_to_vaultnfc">Welcome to VaultNFC</string>
+    <string name="app_name">VaultBt</string>
+    <string name="welcome_to_vaultnfc">Welcome to VaultBt</string>
     <string name="set_the_title">Set the title</string>
     <string name="enter_the_title">Enter the Title</string>
     <string name="enter_the_username">Enter the username</string>

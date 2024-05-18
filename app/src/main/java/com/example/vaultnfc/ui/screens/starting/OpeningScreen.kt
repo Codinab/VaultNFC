@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.MainActivity
 import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.SecureStorage
 import com.example.vaultnfc.ui.Screen
@@ -84,7 +85,7 @@ fun OpeningScreen(navController: NavController) {
                 text = "Login with Github",
                 onClick = {
                     isClicked = !isClicked
-                    loginViewModel.loginWithGitHub(context) {
+                    loginViewModel.loginWithGitHub(activity = context as MainActivity) {
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Home.route) { inclusive = true }
                         }

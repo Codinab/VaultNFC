@@ -47,6 +47,7 @@ import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelecte
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
+import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 
 @Composable
 fun PasswordDetailsScreen(navController: NavController) {
@@ -103,9 +104,17 @@ fun PasswordDetailsScreen(navController: NavController) {
 
                 Spacer(Modifier.height(14.dp))
 
+                val masterKeyViewModel: MasterKeyViewModel = viewModel()
+
+                if (masterKeyViewModel.isMasterKeySet.value == false) {
+                    navController.navigate(Screen.Opening.route) {
+                        popUpTo(Screen.Opening.route) { inclusive = true }
+                    }
+                }
+
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Password: ${if (isPasswordVisible) passwordsViewModel.decryptPassword(password.encryptedPassword, "Test") else "******"}",
+                        text = "Password: ${if (isPasswordVisible) passwordsViewModel.decryptPassword(password.encryptedPassword, masterKeyViewModel.getMasterKey()!!) else "******"}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )

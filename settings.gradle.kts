@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "VaultNFC"
+rootProject.name = "VaultBt"
 include(":app")
