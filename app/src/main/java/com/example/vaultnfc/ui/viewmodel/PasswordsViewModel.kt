@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.vaultnfc.data.repository.PasswordsRepository
 import com.example.vaultnfc.data.repository.TagRepository
 import com.example.vaultnfc.model.PasswordItem
-import com.example.vaultnfc.model.Tag
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
@@ -31,27 +30,18 @@ class PasswordsViewModel : ViewModel() {
     private val passwordsRepository = PasswordsRepository()
     private val tagRepository = TagRepository()
 
-    private val _tagsList = MutableLiveData<List<Tag>>()
-    val tagsList: LiveData<List<Tag>> = _tagsList
+    private val _tagFilteredPasswords = MutableLiveData<List<PasswordItem>>(emptyList())
+    val tagFilteredPasswords: LiveData<List<PasswordItem>> = _tagFilteredPasswords
+
+
 
 
     // Initialization block to fetch passwords and optionally tags.
     init {
         //addTestTags()
         fetchPasswords()
+        removeTag()
         //fetchTags()
-    }
-
-    fun addTestTags() {
-        viewModelScope.launch {
-            try {
-                tagRepository.addTag(Tag(name = "Personal"))
-                tagRepository.addTag(Tag(name = "Work"))
-                Log.d("PasswordsViewModel", "Test tags added successfully")
-            } catch (e: Exception) {
-                Log.e("PasswordsViewModel", "Error adding test tags", e)
-            }
-        }
     }
 
     /**
@@ -59,25 +49,24 @@ class PasswordsViewModel : ViewModel() {
      */
     fun fetch() {
         fetchPasswords()
-        //fetchTags()
     }
 
-
-    private fun fetchTags() {
+    fun setTag(tag: String) {
         viewModelScope.launch {
-            try {
-                val fetchedTags = tagRepository.getAllTags()
-                _tagsList.value = fetchedTags
-                Log.d("FetchTags", "Started")
-                _tagsList.value?.forEach { tag ->
-                    Log.d("FetchTags", "Tag: ${tag.name}")
-                }
-                Log.d("FetchTags", "Ended")
-            } catch (e: Exception) {
-                Log.e("PasswordsViewModel", "Error fetching tags", e)
-            }
+            fetch()
+            _tagFilteredPasswords.value = passwordsRepository.getAllPasswords().filter { it.tag == tag }
         }
     }
+
+    fun removeTag() {
+        viewModelScope.launch {
+            fetch()
+            _tagFilteredPasswords.value = passwordsRepository.getAllPasswords()
+        }
+    }
+
+
+
     private fun fetchPasswords() {
         viewModelScope.launch {
             try {

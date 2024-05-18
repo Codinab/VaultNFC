@@ -1,44 +1,46 @@
 package com.example.vaultnfc.ui.viewmodel
 
+import PasswordsViewModel
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.vaultnfc.data.repository.TagRepository
-import com.example.vaultnfc.model.Tag
 import kotlinx.coroutines.launch
 
-class TagViewModel(private val repository: TagRepository) : ViewModel() {
+class TagViewModel(private val passwordsViewModel: PasswordsViewModel) : ViewModel() {
 
-    private val _tags = MutableLiveData<List<Tag>>()
-    val tags: LiveData<List<Tag>> get() = _tags
-
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> get() = _error
+    private val _tags = MutableLiveData<List<String>>()
+    val tags: LiveData<List<String>> get() = _tags
 
     init {
         fetchTags()
     }
 
-    fun fetchTags() {
+    private fun fetchTags() {
         viewModelScope.launch {
-            try {
-                val tagList = repository.getAllTags()
-                _tags.postValue(tagList)
-            } catch (e: Exception) {
-                _error.postValue("Error fetching tags: ${e.message}")
-            }
-        }
-    }
+            passwordsViewModel.passwordsList.observeForever { passwords ->
+                var tags = passwords.map { it.tag.trim() }.toSet().toList()
 
-    fun addTag(tag: Tag) {
-        viewModelScope.launch {
-            try {
-                repository.addTag(tag)
-                fetchTags() // Refresh the tag list after adding a new tag
-            } catch (e: Exception) {
-                _error.postValue("Error adding tag: ${e.message}")
+                //filter empty tags
+                tags = tags.filter { it.isNotEmpty() }
+
+                _tags.postValue(tags)
+                Log.d("TagViewModel", "Fetched tags: $tags")
             }
         }
     }
 }
+
+
+class TagViewModelFactory(private val passwordsViewModel: PasswordsViewModel) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TagViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return TagViewModel(passwordsViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
