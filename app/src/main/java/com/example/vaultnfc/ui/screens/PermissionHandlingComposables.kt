@@ -23,6 +23,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 import com.example.vaultnfc.util.openAppSettings
 import kotlinx.coroutines.launch
@@ -100,8 +102,8 @@ fun EnableBluetoothFeature(viewModel: PermissionViewModel) {
         } else {
             coroutineScope.launch {
                 snackbarHostState.showSnackbar(
-                    message = "Bluetooth is required for some features",
-                    actionLabel = "Settings",
+                    message = context.getString(R.string.bluetooth_is_required_for_some_features),
+                    actionLabel = context.getString(R.string.settings),
                     duration = SnackbarDuration.Long
                 ).let { actionResult ->
                     if (actionResult == SnackbarResult.ActionPerformed) {
@@ -127,18 +129,18 @@ fun EnableBluetoothFeature(viewModel: PermissionViewModel) {
 fun ShowEnableGpsDialog(application: Application, onNavigate: () -> Unit = {}) {
     AlertDialog(
         onDismissRequest = { /* Handle dismissal */ },
-        title = { Text("Enable GPS") },
-        text = { Text("This app requires GPS to be enabled for full functionality. Please enable GPS in the settings.") },
+        title = { Text(stringResource(R.string.enable_gps)) },
+        text = { Text(stringResource(R.string.this_app_requires_gps_to_be_enabled_for_full_functionality_please_enable_gps_in_the_settings)) },
         confirmButton = {
             Button(onClick = {
                 onNavigate()
             }) {
-                Text("Go to Settings")
+                Text(stringResource(R.string.go_to_settings))
             }
         },
         dismissButton = {
             Button(onClick = { /* Handle Dismiss */ }) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

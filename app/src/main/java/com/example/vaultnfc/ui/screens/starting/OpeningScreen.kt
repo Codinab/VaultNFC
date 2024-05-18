@@ -5,12 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,17 +46,12 @@ import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 fun OpeningScreen(navController: NavController) {
     var isClicked by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
     val loginViewModel: LoginViewModel = viewModel()
 
-
-    LaunchedEffect(key1 = true) {
-        // Attempt to retrieve saved credentials
+    LaunchedEffect(Unit) {
         val (savedEmail, savedPassword) = SecureStorage.getLoginDetails(context)
-        // If credentials are found, attempt to log in
         if (savedEmail != null && savedPassword != null) {
             loginViewModel.login(savedEmail, savedPassword, context) {
-                // Upon successful login, navigate to the home screen
                 navController.navigate(Screen.Home.route) {
                     popUpTo(Screen.Opening.route) { inclusive = true }
                 }
@@ -67,16 +59,14 @@ fun OpeningScreen(navController: NavController) {
         }
     }
 
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.background_logging),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
         )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -90,60 +80,62 @@ fun OpeningScreen(navController: NavController) {
                 color = WhiteEnd,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .aspectRatio(3f) // Set aspect ratio to make it square
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                Button(
-                    onClick = {
-                        isClicked = !isClicked
-                        navController.navigate(Screen.Home.route)
-                    },
-                    colors = ButtonDefaults.buttonColors(WhiteEnd),
-                    shape = RoundedCornerShape(1.dp),
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(45.dp)
-                        .align(Alignment.Center)
-                        // Ensure same width for both buttons
-                        .width(IntrinsicSize.Max) // Ensure same height for both buttons
-                        .shadow(3.dp, RoundedCornerShape(1.dp)),
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(id = R.drawable.l_google_logo),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Login with Google", color = BlackEnd)
-                    }
-                }
-            }
 
-            Button(
+            AuthButton(
+                text = "Login with Google",
+                onClick = {
+                    isClicked = !isClicked
+                    navController.navigate(Screen.Home.route)
+                },
+                iconResId = R.drawable.l_google_logo
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            AuthButton(
+                text = "Login with account",
                 onClick = {
                     isClicked = !isClicked
                     navController.navigate(Screen.Login.route)
-                },
-                colors = ButtonDefaults.buttonColors(WhiteEnd),
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(45.dp)
-                    .width(IntrinsicSize.Max) // Ensure same width for both buttons // Ensure same height for both buttons
-                    .shadow(3.dp, RoundedCornerShape(1.dp)),
-                shape = RoundedCornerShape(1.dp)
-            ) {
-                Text(text = "Login with account", color = BlackEnd)
-            }
+                }
+            )
+
             Spacer(modifier = Modifier.height(48.dp))
+
             Text(
                 text = "Create new account",
                 color = Color.White,
-                modifier = Modifier.clickable(onClick = { navController.navigate(Screen.Register.route) })
+                modifier = Modifier.clickable { navController.navigate(Screen.Register.route) }
             )
+        }
+    }
+}
+
+@Composable
+fun AuthButton(
+    text: String,
+    onClick: () -> Unit,
+    iconResId: Int? = null
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(WhiteEnd),
+        shape = RoundedCornerShape(1.dp),
+        modifier = Modifier
+            .width(200.dp)
+            .height(45.dp)
+            .shadow(3.dp, RoundedCornerShape(1.dp))
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            iconResId?.let {
+                Image(
+                    painter = painterResource(id = it),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Text(text = text, color = BlackEnd)
         }
     }
 }

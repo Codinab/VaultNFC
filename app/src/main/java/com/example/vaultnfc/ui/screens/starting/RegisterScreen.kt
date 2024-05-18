@@ -33,11 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
@@ -63,7 +65,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email", color = Color.Black) },
+            label = { Text(stringResource(R.string.email), color = Color.Black) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -72,7 +74,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                 unfocusedBorderColor = RedEnd,
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Mail, contentDescription ="Set the title")
+                Icon(imageVector = Icons.Outlined.Mail, contentDescription ="")
             }
 
         )
@@ -81,7 +83,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password", color = Color.Black) },
+            label = { Text(stringResource(R.string.password), color = Color.Black) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -91,7 +93,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                 unfocusedBorderColor = RedEnd,
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
+                Icon(imageVector = Icons.Outlined.Password, contentDescription ="")
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -99,7 +101,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password", color = Color.Black) },
+            label = { Text(stringResource(R.string.confirm_password), color = Color.Black) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -109,7 +111,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                 unfocusedBorderColor = RedEnd,
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Password, contentDescription ="Set the title")
+                Icon(imageVector = Icons.Outlined.Password, contentDescription ="")
             }
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -121,7 +123,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
                         navController.navigate(Screen.Login.route)
                     }
                 } else {
-                    loginViewModel.registrationError.postValue("Passwords do not match")
+                    loginViewModel.registrationError.postValue(context.getString(R.string.passwords_do_not_match))
                 }
             },
             modifier = Modifier
@@ -143,7 +145,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel 
 
         // Navigation to login screen
         TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
-            Text("Already have an account? Login")
+            Text(stringResource(R.string.already_have_an_account_login))
         }
     }
 }
