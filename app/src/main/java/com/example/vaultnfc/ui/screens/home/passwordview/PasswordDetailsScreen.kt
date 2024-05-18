@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -33,188 +34,159 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
-import com.example.vaultnfc.model.PasswordItem
 import com.example.vaultnfc.ui.Screen
-import com.example.vaultnfc.ui.components.BackButton
 import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
-import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
-
 
 @Composable
 fun PasswordDetailsScreen(navController: NavController) {
-
     val password = passwordItemSelected
+    var isPasswordVisible by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
     val passwordsViewModel: PasswordsViewModel = viewModel()
 
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        passwordDetailsCard(password, passwordsViewModel, clipboardManager, context, navController)
-    }
-    BackButton(navController)
-}
-
-@Composable
-fun passwordDetailsCard(
-    password: PasswordItem,  // Assuming Password is a data class
-    passwordsViewModel: PasswordsViewModel,
-    clipboardManager: ClipboardManager,
-    context: Context,
-    navController: NavController,
-) {
-    var isPasswordVisible by remember { mutableStateOf(false) }
-
-    Card(
-        colors = CardDefaults.cardColors(containerColor = LightRed),
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            passwordInfo("Username", password.username, clipboardManager, context)
-            passwordVisibilityRow(
-                password,
-                isPasswordVisible,
-                passwordsViewModel,
-                clipboardManager,
-                context
-            ) { isPasswordVisible = !isPasswordVisible }
-            passwordInfo("URI", password.uri, clipboardManager, context)
-            passwordInfo("Notes", password.notes, clipboardManager, context)
-            actionButtons(navController, password, passwordsViewModel)
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Button(
+            colors = ButtonDefaults.buttonColors(RedEnd),
+            onClick = { navController.navigateUp() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(10.dp)
+                .size(80.dp, 45.dp)
+                .shadow(4.dp, RoundedCornerShape(1.dp)),
+            shape = RoundedCornerShape(1.dp)
+        ) {
+            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
         }
-    }
-}
 
-@Composable
-fun passwordInfo(
-    label: String,
-    value: String,
-    clipboardManager: ClipboardManager,
-    context: Context,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = "$label: $value",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = {
-            clipboardManager.setText(AnnotatedString(value))
-            Toast.makeText(context, "$label copied!", Toast.LENGTH_SHORT).show()
-        }) {
-            Icon(Icons.Filled.ContentCopy, contentDescription = "Copy $label")
-        }
-    }
-    Spacer(Modifier.height(14.dp))
-}
-
-@Composable
-fun passwordVisibilityRow(
-    password: PasswordItem,
-    isPasswordVisible: Boolean,
-    passwordsViewModel: PasswordsViewModel,
-    clipboardManager: ClipboardManager,
-    context: Context,
-    onVisibilityChange: () -> Unit,  // Lambda function to toggle visibility
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        val masterKeyViewModel: MasterKeyViewModel = viewModel()
-        if (masterKeyViewModel.getMasterKey() == null) {
-
-            Text(
-                text = "Master Key not set",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
-            return
-        }
-        if (isPasswordVisible) {
-            Text(
-                text = "Password: ${
-                    passwordsViewModel.decryptPassword(
-                        password.encryptedPassword,
-                        masterKeyViewModel.getMasterKey()!!
+        Card(
+            colors = CardDefaults.cardColors(containerColor = LightRed),
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = password.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f),
+                        fontWeight = FontWeight.Bold
                     )
-                }",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
-        } else {
-            Text(
-                text = "Password: ******",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
-        }
-        IconButton(onClick = onVisibilityChange) {  // Use the lambda function to toggle visibility
-            Icon(
-                if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password"
-            )
-        }
-        IconButton(onClick = {
-            clipboardManager.setText(AnnotatedString(password.encryptedPassword))
-            Toast.makeText(context, "Password copied!", Toast.LENGTH_SHORT).show()
-        }) {
-            Icon(Icons.Filled.ContentCopy, contentDescription = "Copy Password")
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Username: ${password.username}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    CopyIconButton(text = password.username, clipboardManager = clipboardManager, context = context)
+                }
+
+                Spacer(Modifier.height(14.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Password: ${if (isPasswordVisible) passwordsViewModel.decryptPassword(password.encryptedPassword, "Test") else "******"}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TogglePasswordVisibilityIconButton(isPasswordVisible = isPasswordVisible) {
+                        isPasswordVisible = !isPasswordVisible
+                    }
+                    CopyIconButton(text = password.encryptedPassword, clipboardManager = clipboardManager, context = context)
+                }
+
+                Spacer(Modifier.height(14.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "URI: ${password.uri}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    CopyIconButton(text = password.uri, clipboardManager = clipboardManager, context = context)
+                }
+
+                Spacer(Modifier.height(18.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Notes: ${password.notes}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    ActionButton(
+                        text = "Share with Bluetooth",
+                        onClick = { navController.navigate(Screen.BluetoothClient.route) },
+                        modifier = Modifier.size(200.dp, 45.dp)
+                    )
+
+                    ActionButton(
+                        text = "Remove",
+                        onClick = {
+                            passwordsViewModel.removePassword(password)
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.size(100.dp, 45.dp)
+                    )
+                }
+            }
         }
     }
-    Spacer(Modifier.height(14.dp))
 }
 
+@Composable
+fun CopyIconButton(text: String, clipboardManager: ClipboardManager, context: Context) {
+    IconButton(onClick = {
+        clipboardManager.setText(AnnotatedString(text))
+        Toast.makeText(context, "${text.capitalize()} copied!", Toast.LENGTH_SHORT).show()
+    }) {
+        Icon(Icons.Filled.ContentCopy, contentDescription = "Copy ${text.capitalize()}")
+    }
+}
 
 @Composable
-fun actionButtons(
-    navController: NavController,
-    password: PasswordItem,
-    passwordsViewModel: PasswordsViewModel,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Button(
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            onClick = { navController.navigate(Screen.BluetoothClient.route) },
-            modifier = Modifier
-                .size(width = 200.dp, height = 45.dp),
-            shape = RoundedCornerShape(1.dp)
-        ) {
-            Text("Share with Bluetooth")
-        }
+fun TogglePasswordVisibilityIconButton(isPasswordVisible: Boolean, onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(
+            if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+            contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password"
+        )
+    }
+}
 
-        Button(
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            onClick = {
-                passwordsViewModel.removePassword(password)
-                navController.popBackStack()
-            },
-            modifier = Modifier
-                .size(width = 100.dp, height = 45.dp),
-            shape = RoundedCornerShape(1.dp)
-        ) {
-            Text("Remove")
-        }
+@Composable
+fun ActionButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        colors = ButtonDefaults.buttonColors(RedEnd),
+        onClick = onClick,
+        modifier = modifier.shadow(3.dp, RoundedCornerShape(1.dp)),
+        shape = RoundedCornerShape(1.dp)
+    ) {
+        Text(text)
     }
 }

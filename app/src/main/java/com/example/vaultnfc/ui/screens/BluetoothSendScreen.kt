@@ -44,8 +44,8 @@ import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BluetoothClientScreen(application: Application, navController: NavController) {
-
-    PermissionsAndFeaturesSetup(viewModel = PermissionViewModel(application))
+    val permissionViewModel: PermissionViewModel = viewModel()
+    PermissionsAndFeaturesSetup(viewModel = permissionViewModel)
 
     val viewModel: MyBluetoothServiceViewModel = viewModel(
         factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
@@ -65,72 +65,73 @@ fun BluetoothClientScreen(application: Application, navController: NavController
         Text("Client Screen")
         Text("Status: $toastMessages")
 
-        Button(
-            onClick = { viewModel.startDiscovery() },
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 30.dp)
-                .heightIn(min = 36.dp)
-                .widthIn(min = 100.dp)
-                .shadow(18.dp, RoundedCornerShape(1.dp)),
-            shape = RoundedCornerShape(1.dp)
-        ) {
-            Text("Discover Devices")
-        }
+        ActionButton(
+            text = "Discover Devices",
+            onClick = { viewModel.startDiscovery() }
+        )
 
-        Button(
+        ActionButton(
+            text = "Cancel",
             onClick = {
                 viewModel.disconnect()
                 navController.popBackStack()
             },
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 4.dp, bottom = 14.dp)
-                .heightIn(min = 36.dp)
-                .widthIn(min = 100.dp)
-                .shadow(18.dp, RoundedCornerShape(1.dp)),
-            shape = RoundedCornerShape(1.dp)
-        ) {
-            Text("Cancel")
-        }
-
-        HorizontalDivider(
-            color = Color.Red
+            modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
         )
 
-        Button(
+        HorizontalDivider(color = Color.Red)
+
+        ActionButton(
+            text = "Send Password",
             onClick = { viewModel.send() },
             enabled = isConnected == true,
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 4.dp, bottom = 14.dp)
-                .heightIn(min = 36.dp)
-                .widthIn(min = 100.dp)
-                .shadow(18.dp, RoundedCornerShape(1.dp)),
-            shape = RoundedCornerShape(1.dp)
-        ) {
-            Text("Send Password")
-        }
+            modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
+        )
 
         if (isConnected == false) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-                Text("Discovered Devices")
-                Spacer(modifier = Modifier.padding(bottom = 8.dp))
-                LazyColumn {
-                    items(discoveredDevices) { device ->
-                        DeviceItem(device) { selectedDevice ->
-                            viewModel.connectToDevice(selectedDevice)
-                            // Assuming you implement sending the password upon connection
-                        }
-                    }
+            DiscoveredDevicesList(
+                discoveredDevices = discoveredDevices,
+                onDeviceClicked = { device ->
+                    viewModel.connectToDevice(device)
                 }
+            )
+        }
+    }
+}
+
+@Composable
+fun ActionButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(RedEnd),
+        modifier = modifier
+            .heightIn(min = 36.dp)
+            .widthIn(min = 100.dp)
+            .shadow(18.dp, RoundedCornerShape(1.dp)),
+        shape = RoundedCornerShape(1.dp)
+    ) {
+        Text(text)
+    }
+}
+
+@Composable
+fun DiscoveredDevicesList(discoveredDevices: List<BluetoothDevice>, onDeviceClicked: (BluetoothDevice) -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(vertical = 16.dp)
+    ) {
+        Text("Discovered Devices")
+        Spacer(modifier = Modifier.padding(bottom = 8.dp))
+        LazyColumn {
+            items(discoveredDevices) { device ->
+                DeviceItem(device = device, onDeviceClicked = onDeviceClicked)
             }
         }
     }
@@ -139,7 +140,6 @@ fun BluetoothClientScreen(application: Application, navController: NavController
 @SuppressLint("MissingPermission")
 @Composable
 fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Unit) {
-    // Using Modifier.clickable to handle clicks on the entire row
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -148,9 +148,7 @@ fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Un
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            // Display device name; if null, show "Unknown Device"
             Text(text = device.name ?: "Unknown Device", fontWeight = FontWeight.Bold)
-            // Display device address
             Text(text = device.address, style = MaterialTheme.typography.bodyMedium)
         }
         Icon(
@@ -160,5 +158,6 @@ fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Un
         )
     }
 }
+
 
 

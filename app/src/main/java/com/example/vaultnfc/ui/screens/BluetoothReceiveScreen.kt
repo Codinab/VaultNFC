@@ -6,7 +6,6 @@ import android.app.Activity
 import android.app.Application
 import android.os.Build
 import android.widget.Toast
-
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -14,10 +13,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,14 +45,15 @@ import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BluetoothServerScreen(application: Application, navController: NavController) {
-    PermissionsAndFeaturesSetup(viewModel = PermissionViewModel(application))
+    val permissionViewModel: PermissionViewModel = viewModel()
+    PermissionsAndFeaturesSetup(viewModel = permissionViewModel)
 
-    val viewModel: MyBluetoothServiceViewModel = viewModel(
+    val bluetoothViewModel: MyBluetoothServiceViewModel = viewModel(
         factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
     )
 
-    val toastMessages by viewModel.toastMessages.observeAsState()
-    val passwordItem by viewModel.passwordItemToSave.observeAsState()
+    val toastMessages by bluetoothViewModel.toastMessages.observeAsState()
+    val passwordItem by bluetoothViewModel.passwordItemToSave.observeAsState()
 
     val discoverableLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -60,7 +61,7 @@ fun BluetoothServerScreen(application: Application, navController: NavController
         if (result.resultCode == Activity.RESULT_CANCELED) {
             Toast.makeText(application, "Discoverability denied", Toast.LENGTH_SHORT).show()
         } else {
-            viewModel.startServer()
+            bluetoothViewModel.startServer()
         }
     }
 
@@ -68,114 +69,96 @@ fun BluetoothServerScreen(application: Application, navController: NavController
 
     DisposableEffect(navController) {
         onDispose {
-            viewModel.disconnect()
+            bluetoothViewModel.disconnect()
         }
     }
 
     Surface(
-        color = Color.White, // Set the background color
-        modifier = Modifier.fillMaxSize(), // Fill the entire available space
+        color = Color.White,
+        modifier = Modifier.fillMaxSize()
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
             Column(
-                modifier = Modifier
-                    .wrapContentHeight(align = Alignment.CenterVertically),
+                modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                // Center content horizontally // Center content vertically
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Server Screen",
-                )
-                Text(
-                    text = "Status: $toastMessages"
+                Text(text = "Server Screen")
+                Text(text = "Status: $toastMessages")
+
+                ActionButton(
+                    text = stringResource(R.string.start_receiving),
+                    onClick = { bluetoothViewModel.enableDiscoverability(discoverableLauncher) }
                 )
 
-                Button(
+                ActionButton(
+                    text = "Back",
                     onClick = {
-                        viewModel.enableDiscoverability(discoverableLauncher)
-                    },
-                    colors = ButtonDefaults.buttonColors(RedEnd),
-                    modifier = Modifier
-                        .heightIn(min = 36.dp)
-                        .shadow(18.dp, RoundedCornerShape(1.dp)),
-                    shape = RoundedCornerShape(1.dp)
-                ) {
-                    Text(stringResource(R.string.start_receiving))
-                }
-
-                Button(
-                    onClick = {
-                        viewModel.disconnect()
+                        bluetoothViewModel.disconnect()
                         navController.popBackStack()
-                    },
-                    colors = ButtonDefaults.buttonColors(RedEnd),
-                    modifier = Modifier
-                        .heightIn(min = 36.dp)
-                        .shadow(18.dp, RoundedCornerShape(1.dp)),
-                    shape = RoundedCornerShape(1.dp)
-                ) {
-                    Text("Back")
-                }
+                    }
+                )
 
-                // Display the latest toast message
+                passwordItem?.let {
+                    Text(text = "Password Item Received: ${it.title}")
 
-                if (passwordItem != null) {
-                    val passwordItemName = passwordItem!!.title
-                    Text(
-                        text = "Password Item Received: $passwordItemName"
-                    )
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-
-                            horizontalArrangement = Arrangement.Center, // Add horizontal spacing between elements
-                            verticalAlignment = Alignment.CenterVertically, // Align elements vertically in the center
-                            // Add horizontal spacing between elements
-                        ) {
-                            Button(
-                                onClick = {
-                                    passwordsViewModel.addPasswordItem(passwordItem!!)
-                                    viewModel.disconnect()
-                                    navController.popBackStack()
-                                },
-                                colors = ButtonDefaults.buttonColors(RedEnd),
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(end = 20.dp)
-                                    .heightIn(min = 36.dp)
-                                    .widthIn(min = 100.dp)
-                                    .shadow(18.dp, RoundedCornerShape(1.dp)),
-                                shape = RoundedCornerShape(1.dp),
-
-                                // Align the button vertically in the center
-                            ) {
-                                Text("Accept")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AcceptRejectButton(
+                            text = "Accept",
+                            onClick = {
+                                passwordsViewModel.addPasswordItem(it)
+                                bluetoothViewModel.disconnect()
+                                navController.popBackStack()
                             }
-
-                            Button(
-                                onClick = {
-                                    viewModel.disconnect()
-                                    navController.popBackStack()
-                                },
-                                colors = ButtonDefaults.buttonColors(RedEnd),
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(start = 20.dp)
-                                    .heightIn(min = 36.dp)
-                                    .widthIn(min = 100.dp)
-                                    .shadow(18.dp, RoundedCornerShape(1.dp)),
-                                shape = RoundedCornerShape(1.dp)// Align the button vertically in the center
-                            ) {
-                                Text("Reject")
+                        )
+                        Spacer(modifier = Modifier.width(20.dp))
+                        AcceptRejectButton(
+                            text = "Reject",
+                            onClick = {
+                                bluetoothViewModel.disconnect()
+                                navController.popBackStack()
                             }
-                        }
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+@Composable
+fun ActionButton(text: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(RedEnd),
+        modifier = Modifier
+            .heightIn(min = 36.dp)
+            .shadow(18.dp, RoundedCornerShape(1.dp)),
+        shape = RoundedCornerShape(1.dp)
+    ) {
+        Text(text)
+    }
+}
+
+@Composable
+fun AcceptRejectButton(text: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(RedEnd),
+        modifier = Modifier
+            .heightIn(min = 36.dp)
+            .widthIn(min = 100.dp)
+            .shadow(18.dp, RoundedCornerShape(1.dp)),
+        shape = RoundedCornerShape(1.dp)
+    ) {
+        Text(text)
+    }
+}
+

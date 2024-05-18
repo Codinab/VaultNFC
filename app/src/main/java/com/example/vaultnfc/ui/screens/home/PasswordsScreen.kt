@@ -6,6 +6,7 @@ import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -65,73 +66,39 @@ import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 @Composable
 fun PasswordsScreen(navController: NavController, application: Application) {
     var isSidebarOpen by remember { mutableStateOf(false) }
-
     val passwordsViewModel: PasswordsViewModel = viewModel()
     val passwordsList by passwordsViewModel.passwordsList.observeAsState(emptyList())
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-
     var showMenu by remember { mutableStateOf(false) }
-
     val myBluetoothServiceViewModel: MyBluetoothServiceViewModel = viewModel(
         factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
     )
 
-
     DisposableEffect(currentRoute) {
-        if (currentRoute == Screen.Home.route) {
-            passwordsViewModel.fetch()
-        }
-
+        if (currentRoute == Screen.Home.route) passwordsViewModel.fetch()
         onDispose { }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column {
-            Box( // Top bar
+            Box(
                 modifier = Modifier
                     .height(60.dp)
                     .fillMaxWidth()
-                    .background(color = WhiteEnd), // Set background color to match the FloatingActionButton color
+                    .background(color = WhiteEnd),
                 contentAlignment = Alignment.Center
             ) {
-                IconButton(
-                    onClick = { isSidebarOpen = true },
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Icon(
-                        Icons.Filled.Menu,
-                        contentDescription = "Menu",
-                        tint = ButtonRed // Set color of the menu icon
-                    )
+                IconButton(onClick = { isSidebarOpen = true }, modifier = Modifier.align(Alignment.CenterStart)) {
+                    Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = ButtonRed)
                 }
-
-                // Center-aligned logo
-                Image(
-                    painter = painterResource(id = R.drawable.logo_menu),
-                    contentDescription = "Logo",
-                    modifier = Modifier.align(Alignment.Center)
-                )
-
+                Image(painter = painterResource(id = R.drawable.logo_menu), contentDescription = "Logo", modifier = Modifier.align(Alignment.Center))
             }
-
-            Spacer(
-                modifier = Modifier
-                    .height(2.dp)
-                    .fillMaxWidth()
-                    .background(color = Color.Red)
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(passwordsList.size) { index ->
                     val password = passwordsList[index]
                     val backgroundColor = Color.White
-
                     Card(
                         colors = CardDefaults.cardColors(containerColor = LightRed),
                         modifier = Modifier
@@ -143,74 +110,38 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                                 navController.navigate(Screen.PasswordDetails.route)
                             }
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = password.title,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                            Text(
-                                text = password.username,
-                                color = Color.Black
-                            )
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(text = password.title, color = Color.Black, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
+                            Text(text = password.username, color = Color.Black)
                         }
                     }
-
-                    if (index != passwordsList.size - 1) {
-                        Spacer(
-                            modifier = Modifier
-                                .height(1.dp)
-                                .fillMaxWidth()
-                                .background(color = Color.LightGray)
-                        )
-                    }
+                    if (index != passwordsList.size - 1) Spacer(modifier = Modifier.height(1.dp).fillMaxWidth().background(color = Color.LightGray))
                 }
             }
         }
-
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp), // Padding applied here affects both FAB and DropdownMenu
-            contentAlignment = Alignment.BottomEnd // Aligns children to the bottom end
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            contentAlignment = Alignment.BottomEnd
         ) {
-            // Floating Action Button for adding new password, positioned at the bottom right
-            FloatingActionButton(
-                onClick = { showMenu = !showMenu }, // Toggle the visibility of the menu
-                modifier = Modifier.padding(16.dp),
-                containerColor = ButtonRed // Set background color of the FloatingActionButton
-            ) {
+            FloatingActionButton(onClick = { showMenu = !showMenu }, modifier = Modifier.padding(16.dp), containerColor = ButtonRed) {
                 Icon(Icons.Filled.Add, contentDescription = "Add New Password")
             }
-
-            // DropdownMenu for selecting actions
             DropdownMenu(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false },
                 offset = DpOffset(160.dp, -70.dp)
             ) {
-                // Option to add a new password
                 DropdownMenuItem(text = { Text("Create password", fontWeight = FontWeight.Bold) }, onClick = {
-                    showMenu = false // Dismiss the menu
-                    navController.navigate(Screen.AddPassword.route) // Navigate to AddPassword screen
+                    showMenu = false
+                    navController.navigate(Screen.AddPassword.route)
                 })
-                // Option to receive a password via Bluetooth
                 DropdownMenuItem(text = { Text("Receive via Bluetooth", fontWeight = FontWeight.Bold)}, onClick = {
-                    showMenu = false // Dismiss the menu
-
+                    showMenu = false
                     navController.navigate(Screen.BluetoothServer.route)
                 })
             }
         }
-
-        if (isSidebarOpen) {
-            SideBar(
-                onClose = { isSidebarOpen = false }, navController
-            )
-        }
+        if (isSidebarOpen) SideBar(onClose = { isSidebarOpen = false }, navController)
     }
 }
 
@@ -224,123 +155,81 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color.Gray.copy(alpha = 0.5f))
-            .clickable { onClose() }, contentAlignment = Alignment.CenterStart
+            .clickable(onClick = onClose),
+        contentAlignment = Alignment.CenterStart
     ) {
-        Box(modifier = Modifier
-            .fillMaxHeight()
-            .widthIn(min = 200.dp, max = 250.dp)
-            .background(color = Color.White)
-            .clickable { /* do nothing on the sidebar itself */ }) {
-
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(min = 200.dp, max = 250.dp)
+                .background(color = Color.White)
+                .clickable { /* do nothing on the sidebar itself */ }
+        ) {
             Column(
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Box(
+                Column(
                     modifier = Modifier
                         .weight(1f)
                         .padding(bottom = 1.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Column {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 1.dp),
+                        contentAlignment = Alignment.Center // Aligning the image to the center vertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_menu),
+                            contentDescription = null,
+                            modifier = Modifier.size(100.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
+                    Text("FOLDERS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
+                    repeat(20) { index -> // Example of 20 items, replace with your folder items
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 1.dp),
-                            contentAlignment = Alignment.Center // Aligning the image to the center vertically
+                            modifier = Modifier.fillMaxWidth().background(color = WhiteEnd)
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.logo_menu), // Replace 'your_image' with your actual image resource
-                                contentDescription = null, modifier = Modifier.size(100.dp)
-                            )
-                        }
-                        Spacer(
-                            modifier = Modifier
-                                .height(2.dp)
-                                .fillMaxWidth()
-                                .background(color = Color.Red)
-                        )
-                        Text("FOLDERS" ,modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
-                        Spacer(
-                            modifier = Modifier
-                                .height(2.dp)
-                                .fillMaxWidth()
-                                .background(color = Color.Red)
-                        )
-
-                        repeat(20) { index -> // Example of 20 items, replace with your folder items
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(color = WhiteEnd)
-                            ) {
-                                TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
-                                    Text(
-                                        "Folder $index",
-                                        modifier = Modifier.padding(8.dp),
-                                        color = BlackEnd
-                                    )
-                                }
+                            TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
+                                Text(
+                                    "Folder $index",
+                                    modifier = Modifier.padding(8.dp),
+                                    color = BlackEnd
+                                )
                             }
                         }
                     }
                 }
-                Spacer(
-                    modifier = Modifier
-                        .height(2.dp)
-                        .fillMaxWidth()
-                        .background(color = Color.Red)
-                )
-                Column(
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    // Password Generator Button
-                    TextButton(
-                        onClick = { navController.navigate(Screen.PasswordGenerator.route) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            "PASSWORD GENERATOR",
-                            color = RedEnd,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-
-                    // Settings Button
-                    TextButton(
-                        onClick = {navController.navigate(Screen.Settings.route)},
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            "SETTINGS",
-                            color = RedEnd,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-
-                    // Log Out Button
-                    TextButton(
-                        onClick = {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    val buttonData = listOf(
+                        ButtonData("PASSWORD GENERATOR") { navController.navigate(Screen.PasswordGenerator.route) },
+                        ButtonData("SETTINGS") { navController.navigate(Screen.Settings.route) },
+                        ButtonData("LOG OUT") {
                             loginViewModel.logout(context)
                             navController.navigate(Screen.Opening.route)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            "LOG OUT",
-                            color = RedEnd,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
+                        }
+                    )
+                    buttonData.forEach { (text, action) ->
+                        TextButton(onClick = action, modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text,
+                                color = RedEnd,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
+data class ButtonData(val text: String, val action: () -> Unit)
+
 

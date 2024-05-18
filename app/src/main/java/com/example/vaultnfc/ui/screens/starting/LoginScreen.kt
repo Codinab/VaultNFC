@@ -3,7 +3,6 @@ package com.example.vaultnfc.ui.screens.starting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,10 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -51,23 +53,20 @@ import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
-    // Add state for email and password
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    // Example error handling
     val loginError by viewModel.loginError.observeAsState()
-
     val isLoggedIn by viewModel.isLoggedIn.observeAsState(initial = false)
-
     val context = LocalContext.current
 
     // Navigate to home screen if already logged in
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
-            navController.navigate(Screen.MasterPassword.route)
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -76,65 +75,46 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_menu),
-                contentDescription = null,
-                modifier = Modifier.size(200.dp)
-            )
-        }
-        // Email input
-        OutlinedTextField(
-            value = email,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = RedEnd,
-            ),
-            onValueChange = { email = it },
-            label = { Text("Email", color = Color.Black) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Email, contentDescription ="mail")
-            },
-
+        Image(
+            painter = painterResource(id = R.drawable.logo_menu),
+            contentDescription = null,
+            modifier = Modifier.size(200.dp)
         )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Email input
+        AuthTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = "Email",
+            leadingIcon = Icons.Outlined.Email,
+            keyboardType = KeyboardType.Email
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         // Password input
-        OutlinedTextField(
+        AuthTextField(
             value = password,
             onValueChange = { password = it },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = RedEnd,
-            ),
-            label = { Text("Password", color = Color.Black) },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Password, contentDescription ="password")
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            label = "Password",
+            leadingIcon = Icons.Outlined.Password,
+            keyboardType = KeyboardType.Password,
+            isPassword = true
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Login button
         Button(
             onClick = {
                 viewModel.login(email, password, context) {
-                    navController.navigate(Screen.MasterPassword.route)
+                    navController.navigate(Screen.Home.route)
                 }
             },
             modifier = Modifier
                 .width(200.dp)
                 .height(45.dp)
-                .width(IntrinsicSize.Max)
                 .shadow(3.dp, RoundedCornerShape(1.dp)),
             colors = ButtonDefaults.buttonColors(RedEnd),
             shape = RoundedCornerShape(1.dp)
@@ -148,21 +128,35 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Forgot Password Button
-        TextButton(
-            onClick = {
-                navController.navigate(Screen.ForgotPassword.route)
-            }
-        ) {
-            Text("Forgot Password?")
-        }
-        // Handle login errors
-
-
         // Navigation to registration screen
         TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-            Text("Don't have an account? Register")
+            Text(stringResource(R.string.don_t_have_an_account_register))
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AuthTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    leadingIcon: ImageVector,
+    keyboardType: KeyboardType,
+    isPassword: Boolean = false
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color.Black) },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null) },
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Red,
+            unfocusedBorderColor = RedEnd,
+        )
+    )
+}

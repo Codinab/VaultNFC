@@ -48,16 +48,19 @@ import com.example.vaultnfc.R
 import com.example.vaultnfc.model.Folder
 import com.example.vaultnfc.ui.theme.RedEnd
 
-
+private const val s = "Password added successfully"
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPasswordScreen(navController: NavController, passwordsViewModel: PasswordsViewModel = viewModel()) {
+fun AddPasswordScreen(
+    navController: NavController,
+    passwordsViewModel: PasswordsViewModel = viewModel()
+) {
     val context = LocalContext.current
     var title by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var uri by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-
     passwordsViewModel.fetch()
 
     var selectedFolder by remember { mutableStateOf<String?>(null) }
@@ -70,150 +73,100 @@ fun AddPasswordScreen(navController: NavController, passwordsViewModel: Password
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        inputField(title, Icons.Outlined.Title, R.string.enter_the_title, R.string.set_the_title) { title = it }
-        inputField(username, Icons.Outlined.Person, R.string.enter_the_username, R.string.set_the_title) { username = it }
-        inputField(password, Icons.Outlined.Password, R.string.enter_the_password, R.string.set_the_title) { password = it }
-        inputField(uri, Icons.Outlined.FindInPage, R.string.enter_the_uri, R.string.set_the_title) { uri = it }
-        inputField(notes, Icons.Outlined.NoteAlt, R.string.enter_the_notes, R.string.set_the_title) { notes = it }
-
-        folderDropdownMenu(selectedFolder, folders) { selectedFolder = it }
-
-        actionButtons(navController, context, title, passwordsViewModel, username, password, uri, notes)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun inputField(
-    value: String,
-    icon: ImageVector,
-    labelId: Int,
-    iconDescId: Int,
-    onValueChange: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier.padding(vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(text = stringResource(id = labelId), color = Color.Black) },
-            leadingIcon = {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = stringResource(id = iconDescId)
-                )
-            },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = RedEnd,
-            )
+        val textFieldModifier = Modifier.padding(vertical = 16.dp)
+        val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Red,
+            unfocusedBorderColor = RedEnd
         )
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun folderDropdownMenu(
-    selectedFolder: String?,
-    folders: List<Folder>, // Assuming Folder is a data class with a name property
-    onFolderSelected: (String?) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }  // Local mutable state for expanded
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it }  // Directly toggle the expanded state
-    ) {
-        OutlinedTextField(
-            readOnly = true,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = RedEnd,
-            ),
-            value = selectedFolder ?: "No Folder",
-            onValueChange = {},
-            label = { Text("Folder", color = Color.Black) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-        )
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("No Folder") },
-                onClick = {
-                    onFolderSelected(null)
-                    expanded = false
-                }
-            )
-            folders.forEach { folder ->
-                DropdownMenuItem(
-                    text = { Text(folder.name) },
-                    onClick = {
-                        onFolderSelected(folder.name)
-                        expanded = false
-                    }
+        val textField = @Composable { label: String, value: String, onValueChange: (String) -> Unit, icon: ImageVector ->
+            Column(
+                modifier = textFieldModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    label = { Text(text = label, color = Color.Black) },
+                    leadingIcon = { Icon(imageVector = icon, contentDescription = label) },
+                    colors = textFieldColors
                 )
             }
         }
-    }
-}
 
+        textField(stringResource(R.string.enter_the_title), title, { title = it }, Icons.Outlined.Title)
+        textField(stringResource(R.string.enter_the_username), username, { username = it }, Icons.Outlined.Person)
+        textField(stringResource(R.string.enter_the_password), password, { password = it }, Icons.Outlined.Password)
+        textField(stringResource(R.string.enter_the_uri), uri, { uri = it }, Icons.Outlined.FindInPage)
+        textField(stringResource(R.string.enter_the_notes), notes, { notes = it }, Icons.Outlined.NoteAlt)
 
-@Composable
-fun actionButtons(
-    navController: NavController,
-    context: Context,
-    title: String,
-    passwordsViewModel: PasswordsViewModel,
-    username: String,
-    password: String,
-    uri: String,
-    notes: String
-) {
-    Row(
-        modifier = Modifier
-            .padding(top = 16.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Button(
-            onClick = { navController.navigateUp() },
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .heightIn(min = 36.dp)
-                .shadow(18.dp, RoundedCornerShape(1.dp)),
-            shape = RoundedCornerShape(1.dp)
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
         ) {
-            Text("Back", color = Color.White)
-        }
-        Button(
-            onClick = {
-                if (title.isNotEmpty()) {
-                    passwordsViewModel.addPassword(title, username, password, uri, notes).also {
-                        Toast.makeText(context, "Password added successfully", Toast.LENGTH_SHORT).show()
-                        navController.navigateUp()
+            OutlinedTextField(
+                readOnly = true,
+                colors = textFieldColors,
+                value = selectedFolder ?: "No Folder",
+                onValueChange = {},
+                label = { Text("Folder", color = Color.Black) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("No Folder") },
+                    onClick = {
+                        selectedFolder = null
+                        expanded = false
                     }
-                } else {
-                    Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT).show()
+                )
+                folders.forEach { folder ->
+                    DropdownMenuItem(
+                        text = { Text(folder.name) },
+                        onClick = {
+                            selectedFolder = folder.name
+                            expanded = false
+                        }
+                    )
                 }
-            },
-            colors = ButtonDefaults.buttonColors(RedEnd),
-            modifier = Modifier
-                .heightIn(min = 36.dp)
-                .shadow(18.dp, RoundedCornerShape(1.dp)),
-            shape = RoundedCornerShape(1.dp)
+            }
+        }
+
+        Row(
+            modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Add", color = Color.White)
+            val buttonModifier = Modifier
+                .heightIn(min = 36.dp)
+                .shadow(18.dp, RoundedCornerShape(1.dp))
+
+            Button(
+                onClick = { navController.navigateUp() },
+                colors = ButtonDefaults.buttonColors(RedEnd),
+                modifier = buttonModifier.padding(end = 16.dp),
+                shape = RoundedCornerShape(1.dp)
+            ) { Text("Back", color = Color.White) }
+
+            Button(
+                onClick = {
+                    if (title.isNotEmpty()) {
+                        passwordsViewModel.addPassword(title, username, password, uri, notes).also {
+                            Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
+                            navController.navigateUp()
+                        }
+                    } else {
+                        Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(RedEnd),
+                modifier = buttonModifier,
+                shape = RoundedCornerShape(1.dp)
+            ) { Text("Add", color = Color.White) }
         }
     }
 }
