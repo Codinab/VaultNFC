@@ -1,11 +1,15 @@
 package com.example.vaultnfc.ui.viewmodel
 
+import android.app.Activity
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.vaultnfc.data.repository.SecureStorage
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.OAuthProvider
 
 class LoginViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -35,14 +39,6 @@ class LoginViewModel : ViewModel() {
         isLoggedIn.postValue(false)
     }
 
-    /**
-     * Registers a new user with an email and password.
-     *
-     * @param email The email address to be used for registration.
-     * @param password The password for the new account.
-     * @param context The context used for saving login details securely upon successful registration.
-     * @param onSuccess A callback to be invoked upon successful registration.
-     */
     fun register(email: String, password: String, context: Context, onSuccess: () -> Unit) {
         if (checkUserParameters(email, password, registrationError)) return
 
@@ -80,5 +76,41 @@ class LoginViewModel : ViewModel() {
             return true
         }
         return false
+    }
+
+    fun loginWithGitHub(context: Context, onSuccess: () -> Unit) {
+        val provider = OAuthProvider.newBuilder("github.com")
+
+        // Specify any additional scopes you need for the provider
+        provider.scopes = listOf("user:email")
+
+        // Check if there are already pending results
+        val pendingResultTask = auth.pendingAuthResult
+        if (pendingResultTask != null) {
+            pendingResultTask.addOnCompleteListener { task ->
+                handleGitHubSignInResult(task, context, onSuccess)
+            }
+        } else {
+            auth.startActivityForSignInWithProvider(context as Activity, provider.build())
+                .addOnCompleteListener { task ->
+                    handleGitHubSignInResult(task, context, onSuccess)
+                }
+        }
+    }
+
+    private fun handleGitHubSignInResult(task: Task<AuthResult>, context: Context, onSuccess: () -> Unit) {
+        if (task.isSuccessful) {
+            val user = task.result?.user
+            if (user != null) {
+                SecureStorage.saveLoginDetails(context, user.email ?: "", "")
+                loginError.postValue(null)
+                isLoggedIn.postValue(true)
+                onSuccess()
+            } else {
+                loginError.postValue("GitHub login failed: User is null")
+            }
+        } else {
+            loginError.postValue(task.exception?.message ?: "GitHub login failed")
+        }
     }
 }

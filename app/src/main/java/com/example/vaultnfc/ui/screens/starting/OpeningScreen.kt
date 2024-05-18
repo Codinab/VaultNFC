@@ -41,7 +41,6 @@ import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 
-
 @Composable
 fun OpeningScreen(navController: NavController) {
     var isClicked by remember { mutableStateOf(false) }
@@ -53,7 +52,7 @@ fun OpeningScreen(navController: NavController) {
         if (savedEmail != null && savedPassword != null) {
             loginViewModel.login(savedEmail, savedPassword, context) {
                 navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Opening.route) { inclusive = true }
+                    popUpTo(Screen.Home.route) { inclusive = true }
                 }
             }
         }
@@ -82,12 +81,16 @@ fun OpeningScreen(navController: NavController) {
             )
 
             AuthButton(
-                text = "Login with Google",
+                text = "Login with Github",
                 onClick = {
                     isClicked = !isClicked
-                    navController.navigate(Screen.Home.route)
+                    loginViewModel.loginWithGitHub(context) {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
+                    }
                 },
-                iconResId = R.drawable.l_google_logo
+                iconResId = R.drawable.ic_github
             )
 
             Spacer(modifier = Modifier.height(16.dp))
