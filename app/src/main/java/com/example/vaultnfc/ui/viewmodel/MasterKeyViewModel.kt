@@ -24,7 +24,7 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
     private val dailyAttemptLog: MutableSet<Long> = SecureStorage.getDailyAttemptLog(application)
 
     private val initialBlockTimeMillis =
-        5 * 60 * 100L // 5 minutes in milliseconds for the first block
+        5 * 60 * 500L // 5 minutes in milliseconds for the first block
 
     private val _blockUser = MutableStateFlow(false)
     val blockUser: StateFlow<Boolean> = _blockUser.asStateFlow()
