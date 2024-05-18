@@ -1,4 +1,4 @@
-package com.example.vaultnfc.ui.screens
+package com.example.vaultnfc.ui.screens.starting
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -36,6 +37,7 @@ import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.screens.home.passwordview.inputField
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun InitialMasterKeyScreen(navController: NavController) {
@@ -43,21 +45,53 @@ fun InitialMasterKeyScreen(navController: NavController) {
     var masterKey by remember { mutableStateOf("") }
     val masterKeyError by masterKeyViewModel.masterKeyError.observeAsState()
     val blockUser by masterKeyViewModel.blockUser.collectAsState()
+    val blockEndTimeFormatted by remember { mutableStateOf(masterKeyViewModel.getBlockEndTimeFormatted()) }
+    var timeUntilUnblockedFormatted by remember { mutableStateOf(masterKeyViewModel.getTimeUntilUnblockedFormatted()) }
     val savedMasterKey = masterKeyViewModel.isMasterKeySet.observeAsState()
+
+    LaunchedEffect(blockUser) {
+        while (blockUser) {
+            timeUntilUnblockedFormatted = masterKeyViewModel.getTimeUntilUnblockedFormatted()
+            delay(3000L) // Update every 3 seconds
+        }
+    }
+
+    if (savedMasterKey.value == true) {
+        navController.navigate(Screen.Home.route)
+        return
+    }
 
     if (blockUser) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Too many attempts. Please wait before trying again.",
-                color = Color.Red,
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Too many attempts. Please wait before trying again.",
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "You will be unblocked at: $blockEndTimeFormatted",
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Time remaining: $timeUntilUnblockedFormatted",
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
-    } else if (savedMasterKey.value == false) {
+    } else {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -92,10 +126,9 @@ fun InitialMasterKeyScreen(navController: NavController) {
                 Text("Submit")
             }
         }
-    } else {
-        navController.navigate(Screen.Home.route)
     }
 }
+
 
 @Composable
 fun ChangeMasterKeyScreen(navController: NavController) {
@@ -103,6 +136,8 @@ fun ChangeMasterKeyScreen(navController: NavController) {
     var newMasterKey by remember { mutableStateOf("") }
     val masterKeyError by masterKeyViewModel.masterKeyError.observeAsState()
     val blockUser by masterKeyViewModel.blockUser.collectAsState()
+    val blockEndTimeFormatted = masterKeyViewModel.getBlockEndTimeFormatted()
+    val timeUntilUnblockedFormatted = masterKeyViewModel.getTimeUntilUnblockedFormatted()
 
     Box(
         modifier = Modifier.fillMaxSize().padding(16.dp)
@@ -122,12 +157,30 @@ fun ChangeMasterKeyScreen(navController: NavController) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
-                Text(
-                    text = "Too many attempts. Please wait before trying again.",
-                    color = Color.Red,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Too many attempts. Please wait before trying again.",
+                        color = Color.Red,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "You will be unblocked at: $blockEndTimeFormatted",
+                        color = Color.Black,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Time remaining: $timeUntilUnblockedFormatted",
+                        color = Color.Black,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         } else {
             Column(

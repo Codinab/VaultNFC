@@ -10,15 +10,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vaultnfc.ui.screens.BluetoothClientScreen
 import com.example.vaultnfc.ui.screens.BluetoothServerScreen
-import com.example.vaultnfc.ui.screens.ChangeMasterKeyScreen
-import com.example.vaultnfc.ui.screens.InitialMasterKeyScreen
 import com.example.vaultnfc.ui.screens.SettingsScreen
 import com.example.vaultnfc.ui.screens.home.PasswordsScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.EditPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.PasswordDetailsScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.PasswordsListScreen
+import com.example.vaultnfc.ui.screens.starting.ChangeMasterKeyScreen
 import com.example.vaultnfc.ui.screens.starting.ForgotPasswordScreen
+import com.example.vaultnfc.ui.screens.starting.InitialMasterKeyScreen
 import com.example.vaultnfc.ui.screens.starting.LoginScreen
 import com.example.vaultnfc.ui.screens.starting.OpeningScreen
 import com.example.vaultnfc.ui.screens.starting.RegisterScreen

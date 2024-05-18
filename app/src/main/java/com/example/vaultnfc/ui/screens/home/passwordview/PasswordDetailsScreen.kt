@@ -48,6 +48,7 @@ import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 
+
 @Composable
 fun PasswordDetailsScreen(navController: NavController) {
 

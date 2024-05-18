@@ -4,15 +4,21 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 
 /**
  * Class responsible for securely storing login details and the master key using EncryptedSharedPreferences.
  */
 object SecureStorage {
     private const val FILE_NAME = "encrypted_shared_prefs"
+
     private const val EMAIL_KEY = "email"
     private const val PASSWORD_KEY = "password"
     private const val MASTER_KEY = "master_key"
+
+    private const val HOURLY_ATTEMPTS_KEY = "hourly_attempts"
+    private const val DAILY_ATTEMPTS_KEY = "daily_attempts"
 
     // Enum to manage setting keys as a clean way to handle the constants.
     enum class SettingsKey {
@@ -172,5 +178,35 @@ object SecureStorage {
     fun clearMasterKey(context: Context) {
         val prefs = getEncryptedPreferences(context)
         prefs.edit().remove(MASTER_KEY).apply()
+    }
+
+
+    private fun getAttemptLog(context: Context, key: String): MutableSet<Long> {
+        val prefs = getEncryptedPreferences(context)
+        val json = prefs.getString(key, null)
+        val type = object : TypeToken<MutableSet<Long>>() {}.type
+        return if (json != null) Gson().fromJson(json, type) else mutableSetOf()
+    }
+
+    private fun saveAttemptLog(context: Context, key: String, log: Set<Long>) {
+        val prefs = getEncryptedPreferences(context)
+        val json = Gson().toJson(log)
+        prefs.edit().putString(key, json).apply()
+    }
+
+    fun getHourlyAttemptLog(context: Context): MutableSet<Long> {
+        return getAttemptLog(context, HOURLY_ATTEMPTS_KEY)
+    }
+
+    fun saveHourlyAttemptLog(context: Context, log: Set<Long>) {
+        saveAttemptLog(context, HOURLY_ATTEMPTS_KEY, log)
+    }
+
+    fun getDailyAttemptLog(context: Context): MutableSet<Long> {
+        return getAttemptLog(context, DAILY_ATTEMPTS_KEY)
+    }
+
+    fun saveDailyAttemptLog(context: Context, log: Set<Long>) {
+        saveAttemptLog(context, DAILY_ATTEMPTS_KEY, log)
     }
 }

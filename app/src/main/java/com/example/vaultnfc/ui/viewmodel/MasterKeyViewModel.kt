@@ -1,6 +1,7 @@
 package com.example.vaultnfc.ui.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,34 +10,48 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.ConcurrentHashMap
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlin.math.pow
 
 class MasterKeyViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val maxAttempts = 5
-    private val attemptWindowMillis = 60000L  // 1 minute
-    private val attemptLog = ConcurrentHashMap<Long, Int>()
+    private val maxHourlyAttempts = 5
+    private val maxDailyAttempts = 10
+    private val hourMillis = 3600000L // 1 hour
+    private val dayMillis = 24 * 60 * 60 * 1000L // 1 day
+    private val hourlyAttemptLog: MutableSet<Long> = SecureStorage.getHourlyAttemptLog(application)
+    private val dailyAttemptLog: MutableSet<Long> = SecureStorage.getDailyAttemptLog(application)
 
     private val _blockUser = MutableStateFlow(false)
     val blockUser: StateFlow<Boolean> = _blockUser.asStateFlow()
+
+    private val _blockEndTime = MutableStateFlow<Long?>(null)
+    val blockEndTime: StateFlow<Long?> = _blockEndTime.asStateFlow()
 
     val masterKeyError = MutableLiveData<String?>()
     val isMasterKeySet = MutableLiveData<Boolean>()
 
     init {
         isMasterKeySet.value = SecureStorage.getMasterKey(application) != null
+        updateBlockState(application)
+    }
+
+    fun updateMasterKeySet() {
+        isMasterKeySet.value = SecureStorage.getMasterKey(getApplication()) != null
     }
 
     fun saveMasterKey(masterKey: String) = viewModelScope.launch {
         if (isBlocked()) {
-            masterKeyError.postValue("Too many attempts. Please wait before trying again.")
+            masterKeyError.postValue("Blocking more attempts. Please wait.")
         } else {
-            logAttempt()
+            logAttempt(getApplication())
             SecureStorage.saveMasterKey(getApplication(), masterKey)
-            isMasterKeySet.postValue(true)
-            masterKeyError.postValue(null)
+            updateMasterKeySet()
         }
     }
+
+    fun canAttempt() = !isBlocked()
 
     fun getMasterKey() = SecureStorage.getMasterKey(getApplication())
 
@@ -45,26 +60,88 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
         isMasterKeySet.postValue(false)
     }
 
-    private fun logAttempt() {
+    private fun logAttempt(context: Context) {
         val currentTime = System.currentTimeMillis()
-        attemptLog[currentTime] = (attemptLog[currentTime] ?: 0) + 1
-        cleanupOldAttempts()
-        if (getRecentAttemptCount() > maxAttempts) {
+        hourlyAttemptLog.add(currentTime)
+        dailyAttemptLog.add(currentTime)
+        cleanupOldAttempts(context)
+        updateBlockState(context)
+    }
+
+    private fun updateBlockState(context: Context) {
+        val recentHourlyAttempts = getRecentHourlyAttemptCount()
+        val recentDailyAttempts = getRecentDailyAttemptCount()
+
+        System.out.println("Recent hourly attempts: " + recentHourlyAttempts);
+
+        if (recentDailyAttempts > maxDailyAttempts) {
+            // Block for the rest of the day
+            _blockEndTime.value = System.currentTimeMillis() + dayMillis
             _blockUser.value = true
+        } else if (recentHourlyAttempts > maxHourlyAttempts) {
+            // Block based on the number of hourly attempts
+            val blockTime = 5 * 60 * 1000L * (2.0.pow((recentHourlyAttempts - 1).toDouble()).toLong())
+            _blockEndTime.value = System.currentTimeMillis() + blockTime
+            _blockUser.value = true
+        } else {
+            _blockUser.value = false
+            _blockEndTime.value = null
         }
+
+        // Save the updated logs to SecureStorage
+        SecureStorage.saveHourlyAttemptLog(context, hourlyAttemptLog)
+        SecureStorage.saveDailyAttemptLog(context, dailyAttemptLog)
     }
 
-    private fun cleanupOldAttempts() {
-        val cutoffTime = System.currentTimeMillis() - attemptWindowMillis
-        attemptLog.keys.removeIf { it < cutoffTime }
+    private fun cleanupOldAttempts(context: Context) {
+        val cutoffHourTime = System.currentTimeMillis() - hourMillis
+        hourlyAttemptLog.removeIf { it < cutoffHourTime }
+
+        val cutoffDayTime = System.currentTimeMillis() - dayMillis
+        dailyAttemptLog.removeIf { it < cutoffDayTime }
+
+        // Save the cleaned logs to SecureStorage
+        SecureStorage.saveHourlyAttemptLog(context, hourlyAttemptLog)
+        SecureStorage.saveDailyAttemptLog(context, dailyAttemptLog)
     }
 
-    private fun getRecentAttemptCount(): Int {
-        cleanupOldAttempts()
-        return attemptLog.values.sum()
+    private fun getRecentHourlyAttemptCount(): Int {
+        cleanupOldAttempts(getApplication())
+        return hourlyAttemptLog.size
+    }
+
+    private fun getRecentDailyAttemptCount(): Int {
+        cleanupOldAttempts(getApplication())
+        return dailyAttemptLog.size
     }
 
     private fun isBlocked(): Boolean {
-        return _blockUser.value
+        val currentTime = System.currentTimeMillis()
+        val endTime = _blockEndTime.value
+        if (endTime != null && currentTime < endTime) {
+            return true
+        }
+        // Unblock the user if the current time has passed the block end time
+        _blockUser.value = false
+        _blockEndTime.value = null
+        return false
+    }
+
+    fun getBlockEndTimeFormatted(): String? {
+        val endTime = _blockEndTime.value ?: return null
+        val dateFormat = SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.getDefault())
+        return dateFormat.format(endTime)
+    }
+
+    fun getTimeUntilUnblockedFormatted(): String {
+        val currentTime = System.currentTimeMillis()
+        val endTime = _blockEndTime.value ?: return "00:00:00"
+        val remainingTime = if (currentTime < endTime) endTime - currentTime else 0
+
+        val hours = remainingTime / (1000 * 60 * 60)
+        val minutes = (remainingTime / (1000 * 60)) % 60
+        val seconds = (remainingTime / 1000) % 60
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
 }
