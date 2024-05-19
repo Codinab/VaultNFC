@@ -41,52 +41,58 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
-import com.example.vaultnfc.ui.theme.RedEnd
+import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsScreen(navController: NavController, application: Application) {
     val settingsViewModel: SettingsViewModel = viewModel()
     val isDarkThemeEnabled by settingsViewModel.darkThemeEnabled.collectAsState(initial = false)
+    BackgroundImageWrapper {
+        Column(modifier = Modifier.padding(16.dp)) {
+            BackButton(navController)
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        BackButton(navController)
+            TitleBox(stringResource(R.string.settings_2))
 
-        TitleBox(stringResource(R.string.settings_2))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Spacer(modifier = Modifier.height(32.dp))
+            NightModeOption(isDarkThemeEnabled) {
+                settingsViewModel.toggleDarkTheme(it)
+            }
 
-        NightModeOption(isDarkThemeEnabled) {
-            settingsViewModel.toggleDarkTheme(it)
+            LogoutTimerOption(settingsViewModel)
+
+            SettingsOptionRedirect(
+                stringResource(R.string.change_master_key),
+                stringResource(R.string.change_the_master_key_used_for_your_data),
+            ) {
+                navController.navigate(Screen.ChangeMasterPassword.route)
+            }
+
+            SettingsOption(
+                stringResource(R.string.change_account_password),
+                stringResource(R.string.change_your_account_password), application
+            )
+            SettingsOption(
+                stringResource(R.string.notification_settings),
+                stringResource(R.string.configure_notification_preferences), application
+            )
+            SettingsOption(
+                stringResource(R.string.language),
+                stringResource(R.string.change_the_language_of_the_app), application
+            )
         }
-
-        LogoutTimerOption(settingsViewModel)
-
-        SettingsOptionRedirect(
-            stringResource(R.string.change_master_key),
-            stringResource(R.string.change_the_master_key_used_for_your_data),
-        ) {
-            navController.navigate(Screen.ChangeMasterPassword.route)
-        }
-
-        SettingsOption(stringResource(R.string.change_account_password),
-            stringResource(R.string.change_your_account_password), application)
-        SettingsOption(stringResource(R.string.notification_settings),
-            stringResource(R.string.configure_notification_preferences), application)
-        SettingsOption(
-            stringResource(R.string.language),
-            stringResource(R.string.change_the_language_of_the_app), application)
     }
 }
 
 @Composable
 fun BackButton(navController: NavController) {
     Button(
-        colors = ButtonDefaults.buttonColors(RedEnd),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
         onClick = { navController.navigateUp() },
 
     ) {
-        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -104,7 +110,7 @@ fun TitleBox(title: String) {
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.tertiary,
         )
     }
 }
@@ -154,37 +160,41 @@ fun LogoutTimerDialog(
     settingsViewModel: SettingsViewModel,
     onOptionSelected: (String) -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = { },
-        title = { Text(stringResource(R.string.select_logout_timer)) },
-        text = {
-            Column {
-                options.forEach { option ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable { onOptionSelected(option) }
-                            .padding(8.dp)
-                    ) {
-                        RadioButton(
-                            selected = option == currentSelection,
-                            onClick = { onOptionSelected(option) }
-                        )
-                        Text(
-                            text = option,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+    BackgroundImageWrapper {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(stringResource(R.string.select_logout_timer)) },
+            text = {
+                Column {
+                    options.forEach { option ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable { onOptionSelected(option) }
+                                .padding(8.dp)
+                        ) {
+                            RadioButton(
+                                selected = option == currentSelection,
+                                onClick = { onOptionSelected(option) },
+
+                            )
+                            Text(
+                                text = option,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(start = 8.dp),
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
                     }
                 }
+            },
+            confirmButton = {
+                Button(onClick = { settingsViewModel.setLogoutTimerOption(currentSelection) }) {
+                    Text(stringResource(R.string.confirm), color = MaterialTheme.colorScheme.tertiary)
+                }
             }
-        },
-        confirmButton = {
-            Button(onClick = { settingsViewModel.setLogoutTimerOption(currentSelection) }) {
-                Text(stringResource(R.string.confirm))
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -213,7 +223,8 @@ fun MasterKeyTimerDialog(
                         Text(
                             text = option,
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 8.dp)
+                            modifier = Modifier.padding(start = 8.dp),
+                            color = MaterialTheme.colorScheme.tertiary,
                         )
                     }
                 }
@@ -245,6 +256,7 @@ fun SettingsOptionRedirect(
         ) {
             Text(
                 text = label,
+                color = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier.padding(end = 8.dp)
             )
             Text(
@@ -253,12 +265,13 @@ fun SettingsOptionRedirect(
                 fontSize = 12.sp
             )
         }
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "")
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "", tint = MaterialTheme.colorScheme.tertiary)
     }
 }
 
 @Composable
 fun SettingsOption(label: String, description: String, application: Application) {
+
     OptionRow(
         title = label,
         description = description,
@@ -266,7 +279,7 @@ fun SettingsOption(label: String, description: String, application: Application)
             Toast.makeText(application, "Not implemented", Toast.LENGTH_SHORT).show()
         }
     ) {
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "")
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "", tint = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -277,8 +290,8 @@ fun LogoutOption(label: String, description: String, selectedOption: String, onC
         description = description,
         onClick = onClick
     ) {
-        Text(text = selectedOption, Modifier.padding(end = 15.dp))
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(R.string.navigate_forward))
+        Text(text = selectedOption, Modifier.padding(end = 15.dp), color = MaterialTheme.colorScheme.tertiary)
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(R.string.navigate_forward), tint = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -299,7 +312,7 @@ fun OptionRow(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = title, modifier = Modifier.padding(end = 8.dp))
+            Text(text = title, modifier = Modifier.padding(end = 8.dp), color = MaterialTheme.colorScheme.tertiary)
             Text(text = description, color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
         }
         content()

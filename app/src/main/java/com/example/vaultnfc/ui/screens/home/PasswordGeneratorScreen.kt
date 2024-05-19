@@ -43,137 +43,158 @@ import androidx.navigation.NavController
 import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.SecureStorage
 import com.example.vaultnfc.ui.components.BackButton
+import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 
 @Composable
 fun PasswordGeneratorScreen(
     navController: NavController,
     application: Application,
 ) {
-    val passwordGeneratorViewModel = PasswordGeneratorViewModel(application)
+    BackgroundImageWrapper {
+        val passwordGeneratorViewModel = PasswordGeneratorViewModel(application)
 
-    val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
+        val context = LocalContext.current
+        val clipboardManager = LocalClipboardManager.current
 
-    // State for generated password and input parameters
-    var generatedPassword by remember { mutableStateOf(passwordGeneratorViewModel.generatePassword()) }
-    var length by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultLength) }
-    var probabilityNumbers by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityNumbers) }
-    var probabilitySymbols by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilitySymbols) }
-    var probabilityUppercase by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityUppercase) }
-    var probabilityLowercase by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityLowercase) }
+        // State for generated password and input parameters
+        var generatedPassword by remember { mutableStateOf(passwordGeneratorViewModel.generatePassword()) }
+        var length by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultLength) }
+        var probabilityNumbers by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityNumbers) }
+        var probabilitySymbols by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilitySymbols) }
+        var probabilityUppercase by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityUppercase) }
+        var probabilityLowercase by remember { mutableIntStateOf(passwordGeneratorViewModel.defaultProbabilityLowercase) }
 
-    // Calculate total probability for percentage calculation
-    val totalProbability =
-        probabilityNumbers + probabilitySymbols + probabilityUppercase + probabilityLowercase
+        // Calculate total probability for percentage calculation
+        val totalProbability =
+            probabilityNumbers + probabilitySymbols + probabilityUppercase + probabilityLowercase
 
-    Column {
-        BackButton(navController)
+        Column {
+            BackButton(navController)
 
-        Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
 
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .fillMaxWidth()
-                    .wrapContentSize(Alignment.Center)
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.Center)
 
-            ) {
-                Text(
-                    text = stringResource(R.string.password_generator),
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            ParameterInputRow(stringResource(R.string.length), length, 0, onChange = { length = it }, onReset = {
-                length =
-                    passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.LENGTH_KEY)
-            })
-            ParameterInputRow(
-                stringResource(R.string.numbers),
-                probabilityNumbers,
-                totalProbability,
-                onChange = { probabilityNumbers = it },
-                onReset = {
-                    probabilityNumbers =
-                        passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.NUMBERS_PROBABILITY_KEY)
-                })
-            ParameterInputRow(
-                stringResource(R.string.symbols),
-                probabilitySymbols,
-                totalProbability,
-                onChange = { probabilitySymbols = it },
-                onReset = {
-                    probabilitySymbols =
-                        passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.SYMBOLS_PROBABILITY_KEY)
-                })
-            ParameterInputRow(
-                stringResource(R.string.uppercase),
-                probabilityUppercase,
-                totalProbability,
-                onChange = { probabilityUppercase = it },
-                onReset = {
-                    probabilityUppercase =
-                        passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.UPPERCASE_PROBABILITY_KEY)
-                })
-            ParameterInputRow(
-                stringResource(R.string.lowercase),
-                probabilityLowercase,
-                totalProbability,
-                onChange = { probabilityLowercase = it },
-                onReset = {
-                    probabilityLowercase =
-                        passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.LOWERCASE_PROBABILITY_KEY)
-                })
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
-                    generatedPassword = passwordGeneratorViewModel.generatePassword(
-                        length,
-                        probabilityNumbers,
-                        probabilitySymbols,
-                        probabilityUppercase,
-                        probabilityLowercase
+                ) {
+                    Text(
+                        text = stringResource(R.string.password_generator),
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.tertiary
                     )
-                },
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                shape = RoundedCornerShape(1.dp),
-                modifier = Modifier
-                    .widthIn(max = 200.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .shadow(10.dp, RoundedCornerShape(1.dp))
-            ) {
-                Text(stringResource(R.string.generate_password), color = MaterialTheme.colorScheme.secondary)
-            }
+                }
+                ParameterInputRow(
+                    stringResource(R.string.length),
+                    length,
+                    0,
+                    onChange = { length = it },
+                    onReset = {
+                        length =
+                            passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.LENGTH_KEY)
+                    })
+                ParameterInputRow(
+                    stringResource(R.string.numbers),
+                    probabilityNumbers,
+                    totalProbability,
+                    onChange = { probabilityNumbers = it },
+                    onReset = {
+                        probabilityNumbers =
+                            passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.NUMBERS_PROBABILITY_KEY)
+                    })
+                ParameterInputRow(
+                    stringResource(R.string.symbols),
+                    probabilitySymbols,
+                    totalProbability,
+                    onChange = { probabilitySymbols = it },
+                    onReset = {
+                        probabilitySymbols =
+                            passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.SYMBOLS_PROBABILITY_KEY)
+                    })
+                ParameterInputRow(
+                    stringResource(R.string.uppercase),
+                    probabilityUppercase,
+                    totalProbability,
+                    onChange = { probabilityUppercase = it },
+                    onReset = {
+                        probabilityUppercase =
+                            passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.UPPERCASE_PROBABILITY_KEY)
+                    })
+                ParameterInputRow(
+                    stringResource(R.string.lowercase),
+                    probabilityLowercase,
+                    totalProbability,
+                    onChange = { probabilityLowercase = it },
+                    onReset = {
+                        probabilityLowercase =
+                            passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.LOWERCASE_PROBABILITY_KEY)
+                    })
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            Text(
-                text = generatedPassword,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-            )
+                Button(
+                    onClick = {
+                        generatedPassword = passwordGeneratorViewModel.generatePassword(
+                            length,
+                            probabilityNumbers,
+                            probabilitySymbols,
+                            probabilityUppercase,
+                            probabilityLowercase
+                        )
+                    },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(1.dp),
+                    modifier = Modifier
+                        .widthIn(max = 200.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .shadow(10.dp, RoundedCornerShape(1.dp))
+                ) {
+                    Text(
+                        stringResource(R.string.generate_password),
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    clipboardManager.setText(AnnotatedString(generatedPassword))
-                    Toast.makeText(context,
-                        context.getString(R.string.password_copied), Toast.LENGTH_SHORT).show()
-                },
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                modifier = Modifier
-                    .widthIn(max = 200.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .shadow(10.dp, RoundedCornerShape(1.dp)),
-                shape = RoundedCornerShape(1.dp)
-            ) {
-                Icon(Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.copy_password))
-                Spacer(Modifier.width(4.dp))
-                Text(stringResource(R.string.copy_password), color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    text = generatedPassword,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(generatedPassword))
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.password_copied), Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier
+                        .widthIn(max = 200.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .shadow(10.dp, RoundedCornerShape(1.dp)),
+                    shape = RoundedCornerShape(1.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.ContentCopy,
+                        contentDescription = stringResource(R.string.copy_password),
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        stringResource(R.string.copy_password),
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
             }
         }
     }
@@ -197,7 +218,8 @@ fun ParameterInputRow(
         Text(
             text = "$label:", modifier = Modifier
                 .width(120.dp)
-                .padding(end = 8.dp)
+                .padding(end = 8.dp),
+            color = MaterialTheme.colorScheme.tertiary
         )
         Icon(imageVector = Icons.Filled.Remove,
             contentDescription = "Decrease $label",
@@ -208,7 +230,8 @@ fun ParameterInputRow(
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .width(40.dp)
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 8.dp),
+            color = MaterialTheme.colorScheme.tertiary
         )
         Icon(imageVector = Icons.Filled.Add,
             contentDescription = "Increase $label",
@@ -219,7 +242,8 @@ fun ParameterInputRow(
         if (total > 0) {
             val percentage = (value.toFloat() / total * 100).toInt()
             Text(
-                text = "$percentage%", modifier = Modifier.padding(start = 8.dp)
+                text = "$percentage%", modifier = Modifier.padding(start = 8.dp),
+                color = MaterialTheme.colorScheme.tertiary
             )
         }
 

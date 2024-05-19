@@ -150,7 +150,7 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                     modifier = Modifier.padding(16.dp),
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = "")
+                    Icon(Icons.Filled.Add, contentDescription = "", tint = MaterialTheme.colorScheme.tertiary)
                 }
                 DropdownMenu(
                     expanded = showMenu,
@@ -228,7 +228,7 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                         .height(2.dp)
                         .fillMaxWidth()
                         .background(color = MaterialTheme.colorScheme.primary))
-                    Text("FOLDERS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
+                    Text("FOLDERS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.tertiary)
                     Spacer(modifier = Modifier
                         .height(2.dp)
                         .fillMaxWidth()

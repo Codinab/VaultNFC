@@ -21,18 +21,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
 
 private val DarkColorScheme = darkColorScheme(
-    primary = BlackEnd,
-    secondary = WhiteEnd,
-    tertiary = BlackEnd,
-    background = LightRed,
+    primary = RedDarkEnd, // Maintain the primary color for consistency
+    secondary = BlackLabel, // Use a dark color for backgrounds
+    tertiary = WhiteEnd, // Use a light color for text to ensure readability
+    background = BlackLabel, // Use a darker shade for cards and fields background
+    onBackground = BlackBackground,
     outline = Color.Gray
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color.Red,
+    primary = RedEnd,
     secondary = WhiteEnd,
     tertiary = BlackEnd,
     background = LightRed,
+    onBackground = Color.White,
+    outline = Color.Gray
 )
 
 @Composable

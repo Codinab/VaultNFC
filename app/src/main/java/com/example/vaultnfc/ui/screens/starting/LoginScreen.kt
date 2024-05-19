@@ -46,90 +46,97 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
+import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    val loginError by viewModel.loginError.observeAsState()
-    val isLoggedIn by viewModel.isLoggedInMutable.observeAsState(initial = false)
-    val context = LocalContext.current
+    BackgroundImageWrapper {
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        val loginError by viewModel.loginError.observeAsState()
+        val isLoggedIn by viewModel.isLoggedInMutable.observeAsState(initial = false)
+        val context = LocalContext.current
 
-    // Navigate to home screen if already logged in
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn) {
-            navController.navigate(Screen.Home.route) {
-                popUpTo(Screen.Login.route) { inclusive = true }
+        // Navigate to home screen if already logged in
+        LaunchedEffect(isLoggedIn) {
+            if (isLoggedIn) {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
             }
         }
-    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo_menu),
-            contentDescription = null,
-            modifier = Modifier.size(200.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Email input
-        AuthTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = "Email",
-            leadingIcon = Icons.Outlined.Email,
-            keyboardType = KeyboardType.Email
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Password input
-        AuthTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = "Password",
-            leadingIcon = Icons.Outlined.Password,
-            keyboardType = KeyboardType.Password,
-            isPassword = true
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Login button
-        Button(
-            onClick = {
-                viewModel.login(email, password, context) {
-                    navController.navigate(Screen.Home.route)
-                }
-            },
+        Column(
             modifier = Modifier
-                .width(200.dp)
-                .height(45.dp)
-                .shadow(3.dp, RoundedCornerShape(1.dp)),
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-            shape = RoundedCornerShape(1.dp)
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Login")
-        }
+            Image(
+                painter = painterResource(id = R.drawable.logo_menu),
+                contentDescription = null,
+                modifier = Modifier.size(200.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        loginError?.let {
-            Text(text = it, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp))
-        }
+            // Email input
+            AuthTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = "Email",
+                leadingIcon = Icons.Outlined.Email,
+                keyboardType = KeyboardType.Email
+            )
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // Navigation to registration screen
-        TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-            Text(stringResource(R.string.don_t_have_an_account_register))
+            // Password input
+            AuthTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = "Password",
+                leadingIcon = Icons.Outlined.Password,
+                keyboardType = KeyboardType.Password,
+                isPassword = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Login button
+            Button(
+                onClick = {
+                    viewModel.login(email, password, context) {
+                        navController.navigate(Screen.Home.route)
+                    }
+                },
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(45.dp)
+                    .shadow(3.dp, RoundedCornerShape(1.dp)),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                shape = RoundedCornerShape(1.dp)
+            ) {
+                Text("Login", color = MaterialTheme.colorScheme.tertiary)
+            }
+
+            loginError?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Navigation to registration screen
+            TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
+                Text(stringResource(R.string.don_t_have_an_account_register), color = MaterialTheme.colorScheme.tertiary)
+            }
         }
     }
 }

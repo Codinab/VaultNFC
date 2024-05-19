@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -82,7 +83,7 @@ fun OpeningScreen(navController: NavController) {
             Text(
                 text = stringResource(id = R.string.welcome_to_vaultnfc),
                 fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.secondary,
+                color = Color.White,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -112,7 +113,7 @@ fun OpeningScreen(navController: NavController) {
 
             Text(
                 text = stringResource(R.string.create_new_account),
-                color = MaterialTheme.colorScheme.secondary,
+                color = Color.White,
                 modifier = Modifier.clickable { navController.navigate(Screen.Register.route) }
             )
         }

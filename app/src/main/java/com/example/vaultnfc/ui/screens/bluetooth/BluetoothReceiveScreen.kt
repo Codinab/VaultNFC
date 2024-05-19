@@ -148,7 +148,7 @@ fun ActionButton(text: String, onClick: () -> Unit) {
             .shadow(18.dp, RoundedCornerShape(1.dp)),
         shape = RoundedCornerShape(1.dp)
     ) {
-        Text(text)
+        Text(text, color = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -163,7 +163,7 @@ fun AcceptRejectButton(text: String, onClick: () -> Unit) {
             .shadow(18.dp, RoundedCornerShape(1.dp)),
         shape = RoundedCornerShape(1.dp)
     ) {
-        Text(text)
+        Text(text, color = MaterialTheme.colorScheme.tertiary)
     }
 }
 

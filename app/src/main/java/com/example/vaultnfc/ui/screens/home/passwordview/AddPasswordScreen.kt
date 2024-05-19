@@ -140,7 +140,7 @@ fun AddPasswordScreen(
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = buttonModifier.padding(end = 16.dp),
                     shape = RoundedCornerShape(1.dp)
-                ) { Text("Back", color = MaterialTheme.colorScheme.secondary) }
+                ) { Text("Back", color = MaterialTheme.colorScheme.tertiary) }
 
                 Button(
                     onClick = {
@@ -165,7 +165,7 @@ fun AddPasswordScreen(
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = buttonModifier,
                     shape = RoundedCornerShape(1.dp)
-                ) { Text("Add", color = MaterialTheme.colorScheme.secondary) }
+                ) { Text("Add", color = MaterialTheme.colorScheme.tertiary) }
             }
         }
     }
