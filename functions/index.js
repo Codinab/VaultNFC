@@ -7,7 +7,6 @@ exports.onPasswordChange = functions.firestore
     .document("users/{userId}/passwords/{passwordId}")
     .onWrite(async (change, context) => {
       const userId = context.params.userId;
-      const passwordId = context.params.passwordId;
       const newValue = change.after.exists ? change.after.data() : null;
       const previousValue = change.before.exists ? change.before.data() : null;
 
@@ -15,6 +14,8 @@ exports.onPasswordChange = functions.firestore
 
       if (!newValue) {
         // Document deleted
+        let body = `Password with title "${previousValue.title}" has been deleted.`;
+
         notification = {
           title: "Password Deleted",
           body: `Password with title "${previousValue.title}" has been deleted.`,
@@ -37,7 +38,11 @@ exports.onPasswordChange = functions.firestore
       }
 
       if (notification) {
-        const userTokens = await admin.firestore().collection("users").doc(userId).collection("tokens").get();
+        const userTokens = await admin.firestore()
+            .collection("users")
+            .doc(userId)
+            .collection("tokens")
+            .get();
 
         const tokens = [];
         userTokens.forEach((doc) => {
@@ -50,7 +55,10 @@ exports.onPasswordChange = functions.firestore
           };
 
           try {
-            await admin.messaging().sendMulticast({tokens, ...payload});
+            await admin.messaging().sendMulticast({
+              tokens,
+              ...payload,
+            });
             console.log("Notification sent successfully.");
           } catch (error) {
             console.error("Error sending notification:", error);
