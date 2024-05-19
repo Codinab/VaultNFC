@@ -23,8 +23,7 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
     val bluetoothEnableEvent: LiveData<Event<Unit>> = _bluetoothEnableEvent
 
     private val _bluetoothPermissionRequestEvent = MutableLiveData<Event<Array<String>>>()
-    val bluetoothPermissionRequestEvent: LiveData<Event<Array<String>>> =
-        _bluetoothPermissionRequestEvent
+    val bluetoothPermissionRequestEvent: LiveData<Event<Array<String>>> = _bluetoothPermissionRequestEvent
 
     private val _bluetoothStateChangeEvent = MutableLiveData<Event<Int>>()
     val bluetoothStateChangeEvent: LiveData<Event<Int>> = _bluetoothStateChangeEvent
@@ -34,7 +33,6 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
 
     private val _gpsEnabledEvent = MutableLiveData<Event<Boolean>>()
     val gpsEnabledEvent: LiveData<Event<Boolean>> = _gpsEnabledEvent
-
 
     private val _navigateToSettingsEvent = MutableLiveData<Event<Unit>>()
     val navigateToSettingsEvent: LiveData<Event<Unit>> = _navigateToSettingsEvent
@@ -79,11 +77,9 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
      */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun requestNotificationPermissions() {
-        _notificationPermissionRequestEvent.value = Event(
-            arrayOf(
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-        )
+        if (_notificationPermissionRequestEvent.value == null || _notificationPermissionRequestEvent.value?.hasBeenHandled == true) {
+            _notificationPermissionRequestEvent.value = Event(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        }
     }
 
     /**
@@ -118,9 +114,9 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
             }
         }
     }
+
     companion object {
         const val BLUETOOTH_PERMISSION_REQUEST_CODE = 1001
         const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
     }
 }
-

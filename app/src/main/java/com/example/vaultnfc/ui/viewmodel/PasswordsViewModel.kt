@@ -8,7 +8,6 @@ import com.example.vaultnfc.data.repository.PasswordsRepository
 import com.example.vaultnfc.data.repository.TagRepository
 import com.example.vaultnfc.model.PasswordItem
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
 import java.util.Base64
@@ -144,7 +143,6 @@ class PasswordsViewModel : ViewModel() {
                 )
                 passwordsRepository.addPassword(passwordItem)
                 fetchPasswords()
-                triggerPasswordAddedNotification(userId, passwordItem)
             } catch (e: Exception) {
                 Log.e("PasswordsViewModel", "Error adding password", e)
             }
@@ -164,7 +162,6 @@ class PasswordsViewModel : ViewModel() {
             try {
                 passwordsRepository.removePassword(passwordItem.id)
                 fetchPasswords()
-                triggerPasswordRemovedNotification(userId, passwordItem)
             } catch (e: Exception) {
                 Log.e("PasswordsViewModel", "Error removing password", e)
             }
@@ -186,26 +183,6 @@ class PasswordsViewModel : ViewModel() {
                 Log.e("PasswordsViewModel", "Error adding password", e)
             }
         }
-    }
-
-    private fun triggerPasswordAddedNotification(userId: String, passwordItem: PasswordItem) {
-        val db = FirebaseFirestore.getInstance()
-        val notificationData = hashMapOf(
-            "title" to "Password Added",
-            "body" to "A new password has been added: ${passwordItem.title}",
-            "channelId" to "vault_password_creation_channel"
-        )
-        db.collection("users").document(userId).collection("notifications").add(notificationData)
-    }
-
-    private fun triggerPasswordRemovedNotification(userId: String, passwordItem: PasswordItem) {
-        val db = FirebaseFirestore.getInstance()
-        val notificationData = hashMapOf(
-            "title" to "Password Removed",
-            "body" to "A password has been removed: ${passwordItem.title}",
-            "channelId" to "vault_password_deletion_channel"
-        )
-        db.collection("users").document(userId).collection("notifications").add(notificationData)
     }
 
 
