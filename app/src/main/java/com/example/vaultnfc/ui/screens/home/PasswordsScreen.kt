@@ -30,6 +30,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,9 +42,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -55,14 +56,10 @@ import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
-import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.ButtonRed
-import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
-import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
-import com.example.vaultnfc.ui.viewmodel.TagViewModel
-import com.example.vaultnfc.ui.viewmodel.TagViewModelFactory
+import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -71,13 +68,13 @@ fun PasswordsScreen(navController: NavController, application: Application) {
 
         var isSidebarOpen by remember { mutableStateOf(false) }
         val passwordsViewModel: PasswordsViewModel = viewModel()
-        val passwordsList by passwordsViewModel.tagFilteredPasswords.observeAsState(emptyList())
+        val passwordsList by passwordsViewModel.passwordsList.observeAsState(emptyList())
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         var showMenu by remember { mutableStateOf(false) }
-
-
-
+        val myBluetoothServiceViewModel: MyBluetoothServiceViewModel = viewModel(
+            factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
+        )
 
         DisposableEffect(currentRoute) {
             if (currentRoute == Screen.Home.route) passwordsViewModel.fetch()
@@ -90,18 +87,18 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                     modifier = Modifier
                         .height(60.dp)
                         .fillMaxWidth()
-                        .background(color = WhiteEnd),
+                        .background(color = MaterialTheme.colorScheme.secondary),
                     contentAlignment = Alignment.Center
                 ) {
                     IconButton(
                         onClick = { isSidebarOpen = true },
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = ButtonRed)
+                        Icon(Icons.Filled.Menu, contentDescription = "", tint = ButtonRed)
                     }
                     Image(
                         painter = painterResource(id = R.drawable.logo_menu),
-                        contentDescription = "Logo",
+                        contentDescription = "",
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -109,13 +106,13 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                     modifier = Modifier
                         .height(2.dp)
                         .fillMaxWidth()
-                        .background(color = Color.Red)
+                        .background(color = MaterialTheme.colorScheme.primary)
                 )
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(passwordsList.size) { index ->
                         val password = passwordsList[index]
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = LightRed),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp, horizontal = 16.dp)
@@ -127,11 +124,11 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = password.title,
-                                    color = Color.Black,
+                                    color = MaterialTheme.colorScheme.tertiary,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(bottom = 4.dp)
                                 )
-                                Text(text = password.username, color = Color.Black)
+                                Text(text = password.username, color = MaterialTheme.colorScheme.tertiary)
                             }
                         }
                         if (index != passwordsList.size - 1) Spacer(
@@ -151,9 +148,9 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                 FloatingActionButton(
                     onClick = { showMenu = !showMenu },
                     modifier = Modifier.padding(16.dp),
-                    containerColor = ButtonRed
+                    containerColor = MaterialTheme.colorScheme.primary
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add New Password")
+                    Icon(Icons.Filled.Add, contentDescription = "", tint = MaterialTheme.colorScheme.tertiary)
                 }
                 DropdownMenu(
                     expanded = showMenu,
@@ -162,7 +159,7 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                 ) {
                     DropdownMenuItem(text = {
                         Text(
-                            "Create password",
+                            stringResource(R.string.create_password),
                             fontWeight = FontWeight.Bold
                         )
                     }, onClick = {
@@ -171,7 +168,7 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                     })
                     DropdownMenuItem(text = {
                         Text(
-                            "Receive via Bluetooth",
+                            stringResource(R.string.receive_via_bluetooth),
                             fontWeight = FontWeight.Bold
                         )
                     }, onClick = {
@@ -181,27 +178,20 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                 }
             }
         }
-        if (isSidebarOpen) SideBar(
-            onClose = { isSidebarOpen = false },
-            navController,
-            passwordsViewModel
-        )
+        if (isSidebarOpen) SideBar(onClose = { isSidebarOpen = false }, navController)
     }
 }
 
 
+
 @Composable
-fun SideBar(
-    onClose: () -> Unit,
-    navController: NavController,
-    passwordsViewModel: PasswordsViewModel,
-) {
+fun SideBar(onClose: () -> Unit, navController: NavController) {
     val loginViewModel: LoginViewModel = viewModel()
     val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Gray.copy(alpha = 0.5f))
+            .background(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             .clickable(onClick = onClose),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -209,7 +199,7 @@ fun SideBar(
             modifier = Modifier
                 .fillMaxHeight()
                 .widthIn(min = 200.dp, max = 250.dp)
-                .background(color = Color.White)
+                .background(color = MaterialTheme.colorScheme.secondary)
                 .clickable { /* do nothing on the sidebar itself */ }
         ) {
             Column(
@@ -234,26 +224,22 @@ fun SideBar(
                             modifier = Modifier.size(100.dp)
                         )
                     }
-                    Spacer(
-                        modifier = Modifier
-                            .height(2.dp)
-                            .fillMaxWidth()
-                            .background(color = Color.Red)
-                    )
-                    Text("TAGS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
-                    Spacer(
-                        modifier = Modifier
-                            .height(2.dp)
-                            .fillMaxWidth()
-                            .background(color = Color.Red)
-                    )
-                    Tags(passwordsViewModel)
+                    Spacer(modifier = Modifier
+                        .height(2.dp)
+                        .fillMaxWidth()
+                        .background(color = MaterialTheme.colorScheme.primary))
+                    Text("FOLDERS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.tertiary)
+                    Spacer(modifier = Modifier
+                        .height(2.dp)
+                        .fillMaxWidth()
+                        .background(color = MaterialTheme.colorScheme.primary))
+                    Tags(navController)
                 }
                 Column(modifier = Modifier.padding(8.dp)) {
                     val buttonData = listOf(
-                        ButtonData("PASSWORD GENERATOR") { navController.navigate(Screen.PasswordGenerator.route) },
-                        ButtonData("SETTINGS") { navController.navigate(Screen.Settings.route) },
-                        ButtonData("LOG OUT") {
+                        ButtonData(stringResource(R.string.password_generator_MAYUS)) { navController.navigate(Screen.PasswordGenerator.route) },
+                        ButtonData(stringResource(R.string.settings_MAYUS)) { navController.navigate(Screen.Settings.route) },
+                        ButtonData(stringResource(R.string.log_out)) {
                             loginViewModel.logout()
                             navController.navigate(Screen.Opening.route)
                         }
@@ -276,50 +262,26 @@ fun SideBar(
 }
 
 @Composable
-private fun Tags(passwordsViewModel: PasswordsViewModel) {
-    val tagViewModel: TagViewModel = viewModel(factory = TagViewModelFactory(passwordsViewModel))
-    val tags by tagViewModel.tags.observeAsState(emptyList())
+private fun Tags(navController: NavController) {
 
-    if (tags.isEmpty()) {
-        Text("No tags available")
-    } else {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = WhiteEnd)
-            ) {
-                TextButton(onClick = { passwordsViewModel.removeTag() }) {
-                    Text(
-                        text = "ALL PASSWORDS",
-                        modifier = Modifier
-                            .padding(8.dp),
-                        color = BlackEnd
-                    )
-                }
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
 
-            for (tag in tags) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = WhiteEnd)
-                ) {
-                    TextButton(onClick = { passwordsViewModel.setTag(tag) }) {
-                        Text(
-                            text = tag,
-                            modifier = Modifier.padding(8.dp),
-                            color = BlackEnd
-                        )
-                    }
-                }
+    repeat(20) { index -> // Example of 20 items, replace with your folder items
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.secondary)
+        ) {
+            TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
+                Text(
+                    "Folder $index",
+                    modifier = Modifier.padding(8.dp),
+                    color = MaterialTheme.colorScheme.tertiary
+                )
             }
         }
     }
 }
-
 
 data class ButtonData(val text: String, val action: () -> Unit)
 

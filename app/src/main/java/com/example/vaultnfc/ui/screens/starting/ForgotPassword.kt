@@ -33,16 +33,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
-import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,26 +65,28 @@ fun ForgotPasswordScreen(navController: NavController, viewModel: LoginViewModel
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("Reset your password",
+        Text(
+            stringResource(R.string.reset_your_password),
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.Black)
+            color = MaterialTheme.colorScheme.tertiary)
 
-        Text("Please enter your email address to receive a link to reset your password.",
+        Text(
+            stringResource(R.string.please_enter_your_email_address_to_receive_a_link_to_reset_your_password),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 8.dp, bottom = 20.dp))
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = RedEnd
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Email, contentDescription = "Email Icon")
+                Icon(imageVector = Icons.Outlined.Email, contentDescription = "")
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
@@ -101,20 +102,20 @@ fun ForgotPasswordScreen(navController: NavController, viewModel: LoginViewModel
                 .height(45.dp)
                 .width(IntrinsicSize.Max)
                 .shadow(3.dp, RoundedCornerShape(1.dp)),
-            colors = ButtonDefaults.buttonColors(RedEnd),
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(1.dp)
         ) {
-            Text("Send Reset Link")
+            Text(stringResource(R.string.send_reset_link))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Row {
             TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
-                Text("Back to Login")
+                Text(stringResource(R.string.back_to_login))
             }
             TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-                Text("Register")
+                Text(stringResource(R.string.register))
             }
         }
     }

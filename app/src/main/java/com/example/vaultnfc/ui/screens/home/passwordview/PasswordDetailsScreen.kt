@@ -38,16 +38,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
-import com.example.vaultnfc.ui.theme.LightRed
-import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 
 @Composable
@@ -64,7 +64,7 @@ fun PasswordDetailsScreen(navController: NavController) {
             contentAlignment = Alignment.Center
         ){
             Button(
-                colors = ButtonDefaults.buttonColors(RedEnd),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 onClick = { navController.navigateUp() },
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -73,11 +73,11 @@ fun PasswordDetailsScreen(navController: NavController) {
                     .shadow(4.dp, RoundedCornerShape(1.dp)),
                 shape = RoundedCornerShape(1.dp)
             ) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Filled.ArrowBack, contentDescription = "")
             }
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = LightRed.copy(alpha = 0.7f)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
@@ -133,7 +133,7 @@ fun PasswordDetailsScreen(navController: NavController) {
                                 if (isPasswordVisible) passwordsViewModel.decryptPassword(
                                     password.encryptedPassword,
                                     masterKeyViewModel.getMasterKey()!!
-                                ) else "******"
+                                ) else stringResource(R.string.no_password)
                             }",
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f)
@@ -186,13 +186,13 @@ fun PasswordDetailsScreen(navController: NavController) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         ActionButton(
-                            text = "Share with Bluetooth",
+                            text = stringResource(R.string.share_with_bluetooth),
                             onClick = { navController.navigate(Screen.BluetoothClient.route) },
                             modifier = Modifier.size(200.dp, 45.dp)
                         )
 
                         ActionButton(
-                            text = "Remove",
+                            text = stringResource(R.string.remove),
                             onClick = {
                                 passwordsViewModel.removePassword(password)
                                 navController.popBackStack()
@@ -222,7 +222,9 @@ fun TogglePasswordVisibilityIconButton(isPasswordVisible: Boolean, onClick: () -
     IconButton(onClick = onClick) {
         Icon(
             if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-            contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password"
+            contentDescription = if (isPasswordVisible) stringResource(R.string.hide_password) else stringResource(
+                R.string.show_password
+            )
         )
     }
 }
@@ -230,7 +232,7 @@ fun TogglePasswordVisibilityIconButton(isPasswordVisible: Boolean, onClick: () -
 @Composable
 fun ActionButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
-        colors = ButtonDefaults.buttonColors(RedEnd),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
         onClick = onClick,
         modifier = modifier.shadow(3.dp, RoundedCornerShape(1.dp)),
         shape = RoundedCornerShape(1.dp)

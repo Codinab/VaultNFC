@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
  * @property application The application context used for initializing preferences.
  */
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+
+
     private val themePreference = ThemePreference(application)
 
     /**

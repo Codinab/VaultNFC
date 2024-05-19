@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +40,6 @@ import androidx.navigation.NavController
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.screens.PermissionsAndFeaturesSetup
-import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 
@@ -142,13 +142,13 @@ fun BluetoothServerScreen(application: Application, navController: NavController
 fun ActionButton(text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(RedEnd),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
         modifier = Modifier
             .heightIn(min = 36.dp)
             .shadow(18.dp, RoundedCornerShape(1.dp)),
         shape = RoundedCornerShape(1.dp)
     ) {
-        Text(text)
+        Text(text, color = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -156,14 +156,14 @@ fun ActionButton(text: String, onClick: () -> Unit) {
 fun AcceptRejectButton(text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(RedEnd),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
         modifier = Modifier
             .heightIn(min = 36.dp)
             .widthIn(min = 100.dp)
             .shadow(18.dp, RoundedCornerShape(1.dp)),
         shape = RoundedCornerShape(1.dp)
     ) {
-        Text(text)
+        Text(text, color = MaterialTheme.colorScheme.tertiary)
     }
 }
 
