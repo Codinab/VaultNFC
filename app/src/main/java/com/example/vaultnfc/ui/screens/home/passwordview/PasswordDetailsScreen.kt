@@ -133,7 +133,7 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                     ) {
                         Text(
                             text = "Password: ${
-                                if (isPasswordVisible) passwordsViewModel.decryptPassword(
+                                if (isPasswordVisible) PasswordsViewModel.decryptPassword(
                                     password.encryptedPassword,
                                     masterKeyViewModel.getMasterKey()!!
                                 ) else stringResource(R.string.no_password)

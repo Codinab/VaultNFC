@@ -1,4 +1,3 @@
-
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -194,62 +193,64 @@ class PasswordsViewModel(private val application: Application) : ViewModel() {
     }
 
 
-    // SecureRandom for IV generation
-    private val secureRandom = SecureRandom()
+    companion object {
+        // SecureRandom for IV generation
+        private val secureRandom = SecureRandom()
 
-    /**
-     * Encrypts a plaintext password using AES encryption with CTR mode and no padding.
-     * A new salt and IV are generated for each encryption process.
-     *
-     * @param data The plaintext data to be encrypted.
-     * @param password The password used to generate the encryption key.
-     * @return The encrypted data, encoded as a Base64 string.
-     */
-    fun encryptPassword(data: String, password: String): String {
-        val salt = ByteArray(16) // Generate a new salt for each encryption
-        secureRandom.nextBytes(salt)
-        val key = deriveKeyFromPassword(password, salt)
-        val cipher = Cipher.getInstance("AES/CTR/NoPadding")
-        val ivBytes = ByteArray(16) // Initialization Vector
-        secureRandom.nextBytes(ivBytes)
-        val ivSpec = IvParameterSpec(ivBytes)
-        cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
-        val encryptedData = cipher.doFinal(data.toByteArray(Charsets.UTF_8))
-        // Concatenate salt, IV, and encrypted data for transmission
-        return Base64.getEncoder().encodeToString(salt + ivBytes + encryptedData)
+        /**
+         * Encrypts a plaintext password using AES encryption with CTR mode and no padding.
+         * A new salt and IV are generated for each encryption process.
+         *
+         * @param data The plaintext data to be encrypted.
+         * @param password The password used to generate the encryption key.
+         * @return The encrypted data, encoded as a Base64 string.
+         */
+        fun encryptPassword(data: String, password: String): String {
+            val salt = ByteArray(16) // Generate a new salt for each encryption
+            secureRandom.nextBytes(salt)
+            val key = deriveKeyFromPassword(password, salt)
+            val cipher = Cipher.getInstance("AES/CTR/NoPadding")
+            val ivBytes = ByteArray(16) // Initialization Vector
+            secureRandom.nextBytes(ivBytes)
+            val ivSpec = IvParameterSpec(ivBytes)
+            cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
+            val encryptedData = cipher.doFinal(data.toByteArray(Charsets.UTF_8))
+            // Concatenate salt, IV, and encrypted data for transmission
+            return Base64.getEncoder().encodeToString(salt + ivBytes + encryptedData)
+        }
+
+        /**
+         * Decrypts an encrypted string using AES encryption with CTR mode and no padding.
+         *
+         * @param encrypted The encrypted data, encoded as a Base64 string.
+         * @param password The password used to generate the decryption key.
+         * @return The decrypted plaintext data.
+         */
+        fun decryptPassword(encrypted: String, password: String): String {
+            val decoded = Base64.getDecoder().decode(encrypted)
+            val salt = decoded.copyOfRange(0, 16)
+            val iv = decoded.copyOfRange(16, 32)
+            val encryptedData = decoded.copyOfRange(32, decoded.size)
+            val key = deriveKeyFromPassword(password, salt)
+            val cipher = Cipher.getInstance("AES/CTR/NoPadding")
+            val ivSpec = IvParameterSpec(iv)
+            cipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
+            val decryptedData = cipher.doFinal(encryptedData)
+            return String(decryptedData, Charsets.UTF_8)
+        }
+
+        private fun deriveKeyFromPassword(password: String, salt: ByteArray): SecretKeySpec {
+            val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+            val spec = PBEKeySpec(password.toCharArray(), salt, 65536, 256)
+            return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")
+        }
+
+
+        private fun generateEncryptionIV(): String {
+            // Implement IV generation logic here
+            return "IV" // Return the generated IV
+        }
+
     }
-
-    /**
-     * Decrypts an encrypted string using AES encryption with CTR mode and no padding.
-     *
-     * @param encrypted The encrypted data, encoded as a Base64 string.
-     * @param password The password used to generate the decryption key.
-     * @return The decrypted plaintext data.
-     */
-    fun decryptPassword(encrypted: String, password: String): String {
-        val decoded = Base64.getDecoder().decode(encrypted)
-        val salt = decoded.copyOfRange(0, 16)
-        val iv = decoded.copyOfRange(16, 32)
-        val encryptedData = decoded.copyOfRange(32, decoded.size)
-        val key = deriveKeyFromPassword(password, salt)
-        val cipher = Cipher.getInstance("AES/CTR/NoPadding")
-        val ivSpec = IvParameterSpec(iv)
-        cipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
-        val decryptedData = cipher.doFinal(encryptedData)
-        return String(decryptedData, Charsets.UTF_8)
-    }
-
-    private fun deriveKeyFromPassword(password: String, salt: ByteArray): SecretKeySpec {
-        val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val spec = PBEKeySpec(password.toCharArray(), salt, 65536, 256)
-        return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")
-    }
-
-
-    private fun generateEncryptionIV(): String {
-        // Implement IV generation logic here
-        return "IV" // Return the generated IV
-    }
-
 
 }

@@ -26,9 +26,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -49,59 +53,70 @@ import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 fun BluetoothClientScreen(application: Application, navController: NavController) {
     BackgroundImageWrapper {
 
-    val permissionViewModel: PermissionViewModel = viewModel()
-    PermissionsAndFeaturesSetup(viewModel = permissionViewModel)
+        val permissionViewModel: PermissionViewModel = viewModel()
+        PermissionsAndFeaturesSetup(viewModel = permissionViewModel)
 
-    val viewModel: MyBluetoothServiceViewModel = viewModel(
-        factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
-    )
-
-    val discoveredDevices by viewModel.discoveredDevices.observeAsState(initial = emptyList())
-    val isConnected by viewModel.isConnected.observeAsState()
-    val toastMessages by viewModel.toastMessages.observeAsState()
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp)
-    ) {
-        Text(stringResource(R.string.client_screen), color = MaterialTheme.colorScheme.tertiary)
-        Text("Status: $toastMessages", color = MaterialTheme.colorScheme.tertiary)
-
-        ActionButton(
-            text = (stringResource(R.string.discover_devices)),
-            onClick = { viewModel.startDiscovery() }
+        val viewModel: MyBluetoothServiceViewModel = viewModel(
+            factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
         )
 
-        ActionButton(
-            text = stringResource(R.string.cancel),
-            onClick = {
-                viewModel.disconnect()
-                navController.popBackStack()
-            },
-            modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
-        )
+        val discoveredDevices by viewModel.discoveredDevices.observeAsState(initial = emptyList())
+        val isConnected by viewModel.isConnected.observeAsState()
+        val toastMessages by viewModel.toastMessages.observeAsState()
+        var encryptionKey by remember { mutableStateOf("") }
 
-        HorizontalDivider(color = Color.Red)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(30.dp)
+        ) {
+            Text(stringResource(R.string.client_screen), color = MaterialTheme.colorScheme.tertiary)
+            Text("Status: $toastMessages", color = MaterialTheme.colorScheme.tertiary)
 
-        ActionButton(
-            text = stringResource(R.string.send_password),
-            onClick = { viewModel.send() },
-            enabled = isConnected == true,
-            modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
-        )
-
-        if (isConnected == false) {
-            DiscoveredDevicesList(
-                discoveredDevices = discoveredDevices,
-                onDeviceClicked = { device ->
-                    viewModel.connectToDevice(device)
-                }
+            ActionButton(
+                text = (stringResource(R.string.discover_devices)),
+                onClick = { viewModel.startDiscovery() }
             )
+
+            ActionButton(
+                text = stringResource(R.string.cancel),
+                onClick = {
+                    viewModel.disconnect()
+                    navController.popBackStack()
+                },
+                modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
+            )
+
+            HorizontalDivider(color = Color.Red)
+
+            // Encryption key input
+            TextField(
+                value = encryptionKey,
+                onValueChange = {
+                    encryptionKey = it
+                },
+                label = { Text(stringResource(R.string.encryption_key)) },
+                modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
+            )
+
+            ActionButton(
+                text = stringResource(R.string.send_password),
+                onClick = { viewModel.send() },
+                enabled = isConnected == true && encryptionKey.isNotEmpty(),
+                modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
+            )
+
+            if (isConnected == false) {
+                DiscoveredDevicesList(
+                    discoveredDevices = discoveredDevices,
+                    onDeviceClicked = { device ->
+                        viewModel.connectToDevice(device)
+                    }
+                )
+            }
         }
-    }
     }
 }
 
@@ -110,7 +125,7 @@ fun ActionButton(
     text: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Button(
         onClick = onClick,
@@ -127,13 +142,19 @@ fun ActionButton(
 }
 
 @Composable
-fun DiscoveredDevicesList(discoveredDevices: List<BluetoothDevice>, onDeviceClicked: (BluetoothDevice) -> Unit) {
+fun DiscoveredDevicesList(
+    discoveredDevices: List<BluetoothDevice>,
+    onDeviceClicked: (BluetoothDevice) -> Unit,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.padding(vertical = 16.dp)
     ) {
-        Text(stringResource(R.string.discovered_devices), color = MaterialTheme.colorScheme.tertiary)
+        Text(
+            stringResource(R.string.discovered_devices),
+            color = MaterialTheme.colorScheme.tertiary
+        )
         Spacer(modifier = Modifier.padding(bottom = 8.dp))
         LazyColumn {
             items(discoveredDevices) { device ->
@@ -154,8 +175,16 @@ fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Un
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = device.name ?: stringResource(R.string.unknown_device), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.tertiary)
-            Text(text = device.address, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.tertiary)
+            Text(
+                text = device.name ?: stringResource(R.string.unknown_device),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.tertiary
+            )
+            Text(
+                text = device.address,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.tertiary
+            )
         }
         Icon(
             imageVector = Icons.Default.Bluetooth,
