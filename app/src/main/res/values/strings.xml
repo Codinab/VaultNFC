@@ -43,6 +43,7 @@
     <string name="title_cannot_be_empty">Title cannot be empty</string>
     <string name="change_the_master_key_used_for_your_data">Change the Master Key used for your data</string>
     <string name="change_master_key">Change Master Key</string>
+
     <string name="password_update_channel_id">vault_password_update_channel</string>
     <string name="password_update_channel_name">Password Update Notifications</string>
     <string name="password_update_channel_description">Notifications for password updates</string>
@@ -98,4 +99,7 @@
     <string name="sync_with_cloud">Sync with Cloud</string>
     <string name="sync_data_with_cloud">Synchronize data with the cloud</string>
 
+    <string name="password_creation_notification">Password Creation Notification</string>
+    <string name="password_update_notification">Password Update Notification</string>
+    <string name="password_deletion_notification">Password Deletion Notification</string>
 </resources>

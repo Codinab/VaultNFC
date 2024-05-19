@@ -3,10 +3,11 @@ package com.example.vaultnfc.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vaultnfc.data.SyncManager
 import com.example.vaultnfc.data.preferences.DataUsagePreference
 import com.example.vaultnfc.data.preferences.LogoutTimerPreference
 import com.example.vaultnfc.data.preferences.MasterKeyTimerPreference
-import com.example.vaultnfc.data.SyncManager
+import com.example.vaultnfc.data.preferences.NotificationPreference
 import com.example.vaultnfc.data.preferences.SyncPreference
 import com.example.vaultnfc.data.preferences.ThemePreference
 import kotlinx.coroutines.flow.Flow
@@ -102,6 +103,42 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setSyncWithCloud(isEnabled: Boolean) = viewModelScope.launch {
         syncPreference.setSyncWithCloud(isEnabled)
         syncManager.updateSyncSettings()
+    }
+
+    private val notificationPreference = NotificationPreference(application)
+
+    /**
+     * Flows that emit the current notification preferences.
+     */
+    val passwordCreationNotification: Flow<Boolean> = notificationPreference.passwordCreationNotification
+    val passwordUpdateNotification: Flow<Boolean> = notificationPreference.passwordUpdateNotification
+    val passwordDeletionNotification: Flow<Boolean> = notificationPreference.passwordDeletionNotification
+
+    /**
+     * Sets the notification preferences.
+     *
+     * @param isEnabled Whether the notification should be enabled or not.
+     */
+    fun setPasswordCreationNotification(isEnabled: Boolean) = viewModelScope.launch {
+        notificationPreference.setPasswordCreationNotification(isEnabled)
+    }
+
+    /**
+     * Sets the notification preferences.
+     *
+     * @param isEnabled Whether the notification should be enabled or not.
+     */
+    fun setPasswordUpdateNotification(isEnabled: Boolean) = viewModelScope.launch {
+        notificationPreference.setPasswordUpdateNotification(isEnabled)
+    }
+
+    /**
+     * Sets the notification preferences.
+     *
+     * @param isEnabled Whether the notification should be enabled or not.
+     */
+    fun setPasswordDeletionNotification(isEnabled: Boolean) = viewModelScope.launch {
+        notificationPreference.setPasswordDeletionNotification(isEnabled)
     }
 
     /**

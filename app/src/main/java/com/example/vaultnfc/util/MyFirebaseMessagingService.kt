@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.vaultnfc.MainActivity
 import com.example.vaultnfc.R
+import com.example.vaultnfc.data.preferences.NotificationPreference
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -25,7 +26,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val title = remoteMessage.notification?.title
         val body = remoteMessage.notification?.body
         val data = remoteMessage.data
-        val channelId = data["channelId"] ?: getString(R.string.password_update_channel_id)
+        val channelId = remoteMessage.notification?.channelId ?: getString(R.string.password_update_channel_id)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             handleNotification(title, body, channelId)
@@ -81,7 +82,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 Toast.makeText(application, "$title: $body", Toast.LENGTH_SHORT).show()
                 return
             }
-            notify(notificationId, notificationBuilder.build())
+
+            val notificationPreference = NotificationPreference(application)
+            if (notificationPreference.isChannelEnabled(application, channelId))
+                notify(notificationId, notificationBuilder.build())
         }
     }
 }

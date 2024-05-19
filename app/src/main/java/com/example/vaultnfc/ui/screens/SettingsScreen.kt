@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,6 +52,11 @@ fun SettingsScreen(navController: NavController, application: Application) {
     val isDarkThemeEnabled by settingsViewModel.darkThemeEnabled.collectAsState(initial = false)
     val useMobileData by settingsViewModel.useMobileData.collectAsState(initial = true)
     val syncWithCloud by settingsViewModel.syncWithCloud.collectAsState(initial = true)
+    val passwordCreationNotification by settingsViewModel.passwordCreationNotification.collectAsState(initial = true)
+    val passwordUpdateNotification by settingsViewModel.passwordUpdateNotification.collectAsState(initial = true)
+    val passwordDeletionNotification by settingsViewModel.passwordDeletionNotification.collectAsState(initial = true)
+
+    var isNotificationSettingsExpanded by remember { mutableStateOf(false) }
 
 
     BackgroundImageWrapper {
@@ -73,13 +80,15 @@ fun SettingsScreen(navController: NavController, application: Application) {
                 navController.navigate(Screen.ChangeMasterPassword.route)
             }
 
-            SettingsOption(
-                stringResource(R.string.change_account_password),
-                stringResource(R.string.change_your_account_password), application
-            )
-            SettingsOption(
-                stringResource(R.string.notification_settings),
-                stringResource(R.string.configure_notification_preferences), application
+            NotificationSettingsDropdown(
+                isExpanded = isNotificationSettingsExpanded,
+                onToggleExpand = { isNotificationSettingsExpanded = !isNotificationSettingsExpanded },
+                passwordCreationNotification = passwordCreationNotification,
+                onPasswordCreationToggle = { settingsViewModel.setPasswordCreationNotification(it) },
+                passwordUpdateNotification = passwordUpdateNotification,
+                onPasswordUpdateToggle = { settingsViewModel.setPasswordUpdateNotification(it) },
+                passwordDeletionNotification = passwordDeletionNotification,
+                onPasswordDeletionToggle = { settingsViewModel.setPasswordDeletionNotification(it) }
             )
 
             DataUsageOption(useMobileData) {
@@ -352,3 +361,74 @@ fun SyncOption(syncWithCloud: Boolean, onToggle: (Boolean) -> Unit) {
         )
     }
 }
+
+@Composable
+fun NotificationSettingsDropdown(
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit,
+    passwordCreationNotification: Boolean,
+    onPasswordCreationToggle: (Boolean) -> Unit,
+    passwordUpdateNotification: Boolean,
+    onPasswordUpdateToggle: (Boolean) -> Unit,
+    passwordDeletionNotification: Boolean,
+    onPasswordDeletionToggle: (Boolean) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onToggleExpand() }
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.notification_settings),
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.tertiary
+            )
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary
+            )
+        }
+        if (isExpanded) {
+            NotificationOption(
+                title = stringResource(R.string.password_creation_notification),
+                isEnabled = passwordCreationNotification,
+                onToggle = onPasswordCreationToggle
+            )
+            NotificationOption(
+                title = stringResource(R.string.password_update_notification),
+                isEnabled = passwordUpdateNotification,
+                onToggle = onPasswordUpdateToggle
+            )
+            NotificationOption(
+                title = stringResource(R.string.password_deletion_notification),
+                isEnabled = passwordDeletionNotification,
+                onToggle = onPasswordDeletionToggle
+            )
+        }
+    }
+}
+
+@Composable
+fun NotificationOption(title: String, isEnabled: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.tertiary
+        )
+        Switch(
+            checked = isEnabled,
+            onCheckedChange = onToggle,
+        )
+    }
+}
+
