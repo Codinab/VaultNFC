@@ -104,4 +104,5 @@
     <string name="password_creation_notification">Password Creation Notification</string>
     <string name="password_update_notification">Password Update Notification</string>
     <string name="password_deletion_notification">Password Deletion Notification</string>
+    <string name="encryption_key">Encryption key for the transfer</string>
 </resources>

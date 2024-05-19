@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -26,10 +27,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -68,6 +73,8 @@ fun BluetoothServerScreen(application: Application, navController: NavController
     }
 
     val passwordsViewModel = PasswordsViewModel(application)
+    var encryptionKey by remember { mutableStateOf("") }
+
 
     DisposableEffect(navController) {
         onDispose {
@@ -106,6 +113,16 @@ fun BluetoothServerScreen(application: Application, navController: NavController
                     }
                 )
 
+                // Encryption key input
+                TextField(
+                    value = encryptionKey,
+                    onValueChange = {
+                        encryptionKey = it
+                    },
+                    label = { Text(stringResource(R.string.encryption_key)) },
+                    modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
+                )
+
                 passwordItem?.let {
                     Text(text = "Password Item Received: ${it.title}")
 
@@ -120,7 +137,8 @@ fun BluetoothServerScreen(application: Application, navController: NavController
                                 passwordsViewModel.addPasswordItem(it)
                                 bluetoothViewModel.disconnect()
                                 navController.popBackStack()
-                            }
+                            },
+                            enabled = encryptionKey.isNotEmpty()
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                         AcceptRejectButton(
@@ -152,8 +170,9 @@ fun ActionButton(text: String, onClick: () -> Unit) {
     }
 }
 
+//Mutable boolean for the accept/reject button enabled state
 @Composable
-fun AcceptRejectButton(text: String, onClick: () -> Unit) {
+fun AcceptRejectButton(text: String, onClick: () -> Unit, enabled: Boolean = true) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
@@ -161,7 +180,8 @@ fun AcceptRejectButton(text: String, onClick: () -> Unit) {
             .heightIn(min = 36.dp)
             .widthIn(min = 100.dp)
             .shadow(18.dp, RoundedCornerShape(1.dp)),
-        shape = RoundedCornerShape(1.dp)
+        shape = RoundedCornerShape(1.dp),
+        enabled = enabled
     ) {
         Text(text, color = MaterialTheme.colorScheme.tertiary)
     }

@@ -56,11 +56,9 @@ import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.PasswordSelected.passwordItemSelected
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
-import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.ButtonRed
 import com.example.vaultnfc.ui.theme.LightGray
 import com.example.vaultnfc.ui.theme.RedEnd
-import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 import com.example.vaultnfc.ui.viewmodel.TagViewModel
