@@ -2,9 +2,11 @@ package com.example.vaultnfc
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +15,9 @@ import com.example.vaultnfc.ui.AppNavigation
 import com.example.vaultnfc.ui.theme.VaultNFCTheme
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 /**
  * The main activity for the application, serving as the entry point.
@@ -45,6 +50,17 @@ class MainActivity : ComponentActivity() {
 
         createNotificationChannels()
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+            saveTokenToFirestore(token)
+        }
+
 
         // Setting content view with Compose UI
         setContent {
@@ -53,6 +69,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun saveTokenToFirestore(token: String?) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+        if (token != null) {
+            db.collection("users").document(userId).collection("tokens").document(token).set(mapOf("token" to token))
+        }
+    }
+
 
     private fun createNotificationChannels() {
         val notificationManager: NotificationManager =
