@@ -159,7 +159,8 @@ fun AddPasswordScreen(
                                 navController.navigateUp()
                             }
                         } else {
-                            Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT)
+                            Toast.makeText(context,
+                                context.getString(R.string.title_cannot_be_empty), Toast.LENGTH_SHORT)
                                 .show()
                         }
                     },

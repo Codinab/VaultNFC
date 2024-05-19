@@ -30,6 +30,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -57,7 +58,6 @@ import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.ButtonRed
-import com.example.vaultnfc.ui.theme.LightRed
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
@@ -111,7 +111,7 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                     items(passwordsList.size) { index ->
                         val password = passwordsList[index]
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = LightRed),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp, horizontal = 16.dp)

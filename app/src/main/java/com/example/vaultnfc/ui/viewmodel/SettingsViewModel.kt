@@ -7,6 +7,7 @@ import com.example.vaultnfc.data.LogoutTimerPreference
 import com.example.vaultnfc.data.MasterKeyTimerPreference
 import com.example.vaultnfc.data.ThemePreference
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -15,6 +16,8 @@ import kotlinx.coroutines.launch
  * @property application The application context used for initializing preferences.
  */
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val _darkThemeEnabled = MutableStateFlow(true)
     private val themePreference = ThemePreference(application)
 
     /**

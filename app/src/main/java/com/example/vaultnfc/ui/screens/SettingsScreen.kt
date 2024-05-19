@@ -64,8 +64,8 @@ fun SettingsScreen(navController: NavController, application: Application) {
         LogoutTimerOption(settingsViewModel)
 
         SettingsOptionRedirect(
-            "Change Master Key",
-            "Change the Master Key used for your data",
+            stringResource(R.string.change_master_key),
+            stringResource(R.string.change_the_master_key_used_for_your_data),
         ) {
             navController.navigate(Screen.ChangeMasterPassword.route)
         }

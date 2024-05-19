@@ -13,7 +13,6 @@ import com.example.vaultnfc.ui.screens.bluetooth.BluetoothClientScreen
 import com.example.vaultnfc.ui.screens.bluetooth.BluetoothServerScreen
 import com.example.vaultnfc.ui.screens.home.PasswordsScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.AddPasswordScreen
-import com.example.vaultnfc.ui.screens.home.passwordview.EditPasswordScreen
 import com.example.vaultnfc.ui.screens.home.passwordview.PasswordDetailsScreen
 import com.example.vaultnfc.ui.screens.starting.ChangeMasterKeyScreen
 import com.example.vaultnfc.ui.screens.starting.ForgotPasswordScreen
@@ -44,7 +43,6 @@ fun AppNavigation(application: Application) {
                 application
             )
         }
-        composable(Screen.EditPassword.route) { EditPasswordScreen(navController) }
         composable(Screen.PasswordDetails.route) { PasswordDetailsScreen(navController) }
 
         //Bluetooth
