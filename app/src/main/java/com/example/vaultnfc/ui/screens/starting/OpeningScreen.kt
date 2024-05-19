@@ -50,7 +50,7 @@ fun OpeningScreen(navController: NavController) {
     LaunchedEffect(Unit) {
 
         if (loginViewModel.isAuth()) {
-            navController.navigate(Screen.Home.route) {
+            navController.navigate(Screen.MasterPassword.route) {
                 popUpTo(Screen.Home.route) { inclusive = true }
             }
         }
@@ -58,7 +58,7 @@ fun OpeningScreen(navController: NavController) {
         val (savedEmail, savedPassword) = SecureStorage.getLoginDetails(context)
         if (savedEmail != null && savedPassword != null) {
             loginViewModel.login(savedEmail, savedPassword, context) {
-                navController.navigate(Screen.Home.route) {
+                navController.navigate(Screen.MasterPassword.route) {
                     popUpTo(Screen.Home.route) { inclusive = true }
                 }
             }
@@ -93,7 +93,7 @@ fun OpeningScreen(navController: NavController) {
                     isClicked = !isClicked
                     loginViewModel.loginWithGitHub(activity = context as MainActivity) {
                         System.out.println(context.getString(R.string.logged_in_with_github))
-                        navController.navigate(Screen.Home.route)
+                        navController.navigate(Screen.MasterPassword.route)
                     }
                 },
                 iconResId = R.drawable.ic_github

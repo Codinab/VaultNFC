@@ -36,12 +36,17 @@ class MasterKeyViewModel(application: Application) : AndroidViewModel(applicatio
     val isMasterKeySet = MutableLiveData<Boolean>()
 
     init {
-        isMasterKeySet.value = SecureStorage.getMasterKey(application) != null
+        updateMasterKeySet()
         updateBlockState(application)
     }
 
     fun updateMasterKeySet() {
-        isMasterKeySet.value = SecureStorage.getMasterKey(getApplication()) != null
+        isMasterKeySet.value =
+            SecureStorage.getMasterKey(getApplication()) != null &&
+            SecureStorage.getMasterKey(getApplication())!!.isNotEmpty()
+
+        System.out.println("MasterKeyViewModel: updateMasterKeySet: isMasterKeySet: ${isMasterKeySet.value}" +
+                "Master key: " + SecureStorage.getMasterKey(getApplication()))
     }
 
     fun saveMasterKey(masterKey: String) = viewModelScope.launch {
