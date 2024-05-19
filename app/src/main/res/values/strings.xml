@@ -40,7 +40,4 @@
     <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
     <string name="default_web_client_id">defaultWebClientId</string>
     <string name="enter_tag">Enter the Tag</string>
-    <string name="title_cannot_be_empty">Title cannot be empty</string>
-    <string name="change_the_master_key_used_for_your_data">Change the Master Key used for your data</string>
-    <string name="change_master_key">Change Master Key</string>
 </resources>

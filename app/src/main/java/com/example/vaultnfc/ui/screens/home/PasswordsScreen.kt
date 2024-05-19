@@ -61,7 +61,8 @@ import com.example.vaultnfc.ui.theme.ButtonRed
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
-import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
+import com.example.vaultnfc.ui.viewmodel.TagViewModel
+import com.example.vaultnfc.ui.viewmodel.TagViewModelFactory
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -70,13 +71,13 @@ fun PasswordsScreen(navController: NavController, application: Application) {
 
         var isSidebarOpen by remember { mutableStateOf(false) }
         val passwordsViewModel: PasswordsViewModel = viewModel()
-        val passwordsList by passwordsViewModel.passwordsList.observeAsState(emptyList())
+        val passwordsList by passwordsViewModel.tagFilteredPasswords.observeAsState(emptyList())
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         var showMenu by remember { mutableStateOf(false) }
-        val myBluetoothServiceViewModel: MyBluetoothServiceViewModel = viewModel(
-            factory = MyBluetoothServiceViewModel.MyBluetoothServiceViewModelFactory(application)
-        )
+
+
+
 
         DisposableEffect(currentRoute) {
             if (currentRoute == Screen.Home.route) passwordsViewModel.fetch()
@@ -105,7 +106,10 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                     )
                 }
                 Spacer(
-                    modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red)
+                    modifier = Modifier
+                        .height(2.dp)
+                        .fillMaxWidth()
+                        .background(color = Color.Red)
                 )
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(passwordsList.size) { index ->
@@ -131,13 +135,17 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                             }
                         }
                         if (index != passwordsList.size - 1) Spacer(
-                            modifier = Modifier.height(1.dp).fillMaxWidth()
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
                         )
                     }
                 }
             }
             Box(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 FloatingActionButton(
@@ -173,14 +181,21 @@ fun PasswordsScreen(navController: NavController, application: Application) {
                 }
             }
         }
-        if (isSidebarOpen) SideBar(onClose = { isSidebarOpen = false }, navController)
+        if (isSidebarOpen) SideBar(
+            onClose = { isSidebarOpen = false },
+            navController,
+            passwordsViewModel
+        )
     }
 }
 
 
-
 @Composable
-fun SideBar(onClose: () -> Unit, navController: NavController) {
+fun SideBar(
+    onClose: () -> Unit,
+    navController: NavController,
+    passwordsViewModel: PasswordsViewModel,
+) {
     val loginViewModel: LoginViewModel = viewModel()
     val context = LocalContext.current
     Box(
@@ -219,10 +234,20 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
                             modifier = Modifier.size(100.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
-                    Text("FOLDERS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(2.dp).fillMaxWidth().background(color = Color.Red))
-                    Tags(navController)
+                    Spacer(
+                        modifier = Modifier
+                            .height(2.dp)
+                            .fillMaxWidth()
+                            .background(color = Color.Red)
+                    )
+                    Text("TAGS", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
+                    Spacer(
+                        modifier = Modifier
+                            .height(2.dp)
+                            .fillMaxWidth()
+                            .background(color = Color.Red)
+                    )
+                    Tags(passwordsViewModel)
                 }
                 Column(modifier = Modifier.padding(8.dp)) {
                     val buttonData = listOf(
@@ -251,26 +276,50 @@ fun SideBar(onClose: () -> Unit, navController: NavController) {
 }
 
 @Composable
-private fun Tags(navController: NavController) {
+private fun Tags(passwordsViewModel: PasswordsViewModel) {
+    val tagViewModel: TagViewModel = viewModel(factory = TagViewModelFactory(passwordsViewModel))
+    val tags by tagViewModel.tags.observeAsState(emptyList())
 
+    if (tags.isEmpty()) {
+        Text("No tags available")
+    } else {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = WhiteEnd)
+            ) {
+                TextButton(onClick = { passwordsViewModel.removeTag() }) {
+                    Text(
+                        text = "ALL PASSWORDS",
+                        modifier = Modifier
+                            .padding(8.dp),
+                        color = BlackEnd
+                    )
+                }
+            }
 
+            Spacer(modifier = Modifier.height(8.dp))
 
-    repeat(20) { index -> // Example of 20 items, replace with your folder items
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = WhiteEnd)
-        ) {
-            TextButton(onClick = { navController.navigate(Screen.Home.route) }) {
-                Text(
-                    "Folder $index",
-                    modifier = Modifier.padding(8.dp),
-                    color = BlackEnd
-                )
+            for (tag in tags) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = WhiteEnd)
+                ) {
+                    TextButton(onClick = { passwordsViewModel.setTag(tag) }) {
+                        Text(
+                            text = tag,
+                            modifier = Modifier.padding(8.dp),
+                            color = BlackEnd
+                        )
+                    }
+                }
             }
         }
     }
 }
+
 
 data class ButtonData(val text: String, val action: () -> Unit)
 

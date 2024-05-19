@@ -1,5 +1,8 @@
 package com.example.vaultnfc
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -40,12 +43,50 @@ class MainActivity : ComponentActivity() {
             currentLogoutOption = option
         }
 
+        createNotificationChannels()
+
+
         // Setting content view with Compose UI
         setContent {
             VaultNFCTheme {
                 AppNavigation(application)
             }
         }
+    }
+
+    private fun createNotificationChannels() {
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+
+        // Password update notification channel
+        val updateChannelId = getString(R.string.password_update_channel_id)
+        val updateChannelName = getString(R.string.password_update_channel_name)
+        val updateChannelDescription = getString(R.string.password_update_channel_description)
+        val updateChannel = NotificationChannel(updateChannelId, updateChannelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = updateChannelDescription
+        }
+
+        // Password creation notification channel
+        val creationChannelId = getString(R.string.password_creation_channel_id)
+        val creationChannelName = getString(R.string.password_creation_channel_name)
+        val creationChannelDescription = getString(R.string.password_creation_channel_description)
+        val creationChannel = NotificationChannel(creationChannelId, creationChannelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = creationChannelDescription
+        }
+
+        // Password deletion notification channel
+        val deletionChannelId = getString(R.string.password_deletion_channel_id)
+        val deletionChannelName = getString(R.string.password_deletion_channel_name)
+        val deletionChannelDescription = getString(R.string.password_deletion_channel_description)
+        val deletionChannel = NotificationChannel(deletionChannelId, deletionChannelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = deletionChannelDescription
+        }
+
+        // Register all channels with the system
+        notificationManager.createNotificationChannel(updateChannel)
+        notificationManager.createNotificationChannel(creationChannel)
+        notificationManager.createNotificationChannel(deletionChannel)
     }
 
     /**
@@ -76,4 +117,6 @@ class MainActivity : ComponentActivity() {
             loginViewModel.logout()
         }
     }
+
+
 }
