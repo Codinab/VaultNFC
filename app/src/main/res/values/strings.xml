@@ -54,6 +54,7 @@
     <string name="password_deletion_channel_id">vault_password_deletion_channel</string>
     <string name="password_deletion_channel_name">Password Deletion Notifications</string>
     <string name="password_deletion_channel_description">Notifications for password deletion</string>
+
     <string name="discover_devices">Discover Devices</string>
     <string name="client_screen">Client Screen</string>
     <string name="send_password">Send Password</string>

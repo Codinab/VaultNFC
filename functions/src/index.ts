@@ -46,12 +46,32 @@ export const onPasswordChange = functions.firestore
 
       if (tokens.length > 0) {
         const payload = {
-          notification,
+          tokens,
+          notification: {
+            title: notification.title,
+            body: notification.body,
+          },
+          android: {
+            notification: {
+              channelId: notification.channelId,
+            },
+          },
+          apns: {
+            payload: {
+              aps: {
+                sound: "default",
+                alert: {
+                  title: notification.title,
+                  body: notification.body,
+                },
+              },
+            },
+          },
         };
 
         try {
-          await admin.messaging().sendMulticast({ tokens, ...payload });
-          console.log("Notification sent successfully.");
+          const response = await admin.messaging().sendMulticast(payload);
+          console.log(`Notifications sent successfully to ${response.successCount} devices.`);
         } catch (error) {
           console.error("Error sending notification:", error);
         }

@@ -1,10 +1,13 @@
 package com.example.vaultnfc.util
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.Manifest
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.vaultnfc.MainActivity
@@ -24,7 +27,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val data = remoteMessage.data
         val channelId = data["channelId"] ?: getString(R.string.password_update_channel_id)
 
-        sendNotification(title, body, channelId)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            handleNotification(title, body, channelId)
+        } else {
+            Toast.makeText(this, "$title: $body", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onNewToken(token: String) {
@@ -37,15 +44,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val db = FirebaseFirestore.getInstance()
         val deviceData = hashMapOf("token" to token)
         db.collection("users").document(userId).collection("devices").document(token).set(deviceData)
+            .addOnSuccessListener {
+                // Log or handle successful token saving
+            }
+            .addOnFailureListener { e ->
+                // Log or handle failure in saving token
+                e.printStackTrace()
+            }
     }
 
-    private fun sendNotification(title: String?, body: String?, channelId: String) {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun handleNotification(title: String?, body: String?, channelId: String) {
         val notificationId = 1
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.logo_menu)
@@ -56,6 +71,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setAutoCancel(true)
 
         with(NotificationManagerCompat.from(this)) {
+            if (ActivityCompat.checkSelfPermission(
+                    application,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Request permissions if not granted
+                ActivityCompat.requestPermissions(MainActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+                Toast.makeText(application, "$title: $body", Toast.LENGTH_SHORT).show()
+                return
+            }
             notify(notificationId, notificationBuilder.build())
         }
     }
