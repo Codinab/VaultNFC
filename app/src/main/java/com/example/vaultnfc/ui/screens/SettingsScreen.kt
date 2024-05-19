@@ -48,6 +48,10 @@ import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
 fun SettingsScreen(navController: NavController, application: Application) {
     val settingsViewModel: SettingsViewModel = viewModel()
     val isDarkThemeEnabled by settingsViewModel.darkThemeEnabled.collectAsState(initial = false)
+    val useMobileData by settingsViewModel.useMobileData.collectAsState(initial = true)
+    val syncWithCloud by settingsViewModel.syncWithCloud.collectAsState(initial = true)
+
+
     BackgroundImageWrapper {
         Column(modifier = Modifier.padding(16.dp)) {
             BackButton(navController)
@@ -77,10 +81,14 @@ fun SettingsScreen(navController: NavController, application: Application) {
                 stringResource(R.string.notification_settings),
                 stringResource(R.string.configure_notification_preferences), application
             )
-            SettingsOption(
-                stringResource(R.string.language),
-                stringResource(R.string.change_the_language_of_the_app), application
-            )
+
+            DataUsageOption(useMobileData) {
+                settingsViewModel.setUseMobileData(it)
+            }
+
+            SyncOption(syncWithCloud) {
+                settingsViewModel.setSyncWithCloud(it)
+            }
         }
     }
 }
@@ -316,5 +324,31 @@ fun OptionRow(
             Text(text = description, color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
         }
         content()
+    }
+}
+
+@Composable
+fun DataUsageOption(useMobileData: Boolean, onToggle: (Boolean) -> Unit) {
+    OptionRow(
+        title = stringResource(R.string.use_mobile_data),
+        description = stringResource(R.string.enable_mobile_data_usage)
+    ) {
+        Switch(
+            checked = useMobileData,
+            onCheckedChange = onToggle,
+        )
+    }
+}
+
+@Composable
+fun SyncOption(syncWithCloud: Boolean, onToggle: (Boolean) -> Unit) {
+    OptionRow(
+        title = stringResource(R.string.sync_with_cloud),
+        description = stringResource(R.string.sync_data_with_cloud)
+    ) {
+        Switch(
+            checked = syncWithCloud,
+            onCheckedChange = onToggle,
+        )
     }
 }

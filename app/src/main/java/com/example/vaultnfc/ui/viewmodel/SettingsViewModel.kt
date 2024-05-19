@@ -3,9 +3,12 @@ package com.example.vaultnfc.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vaultnfc.data.LogoutTimerPreference
-import com.example.vaultnfc.data.MasterKeyTimerPreference
-import com.example.vaultnfc.data.ThemePreference
+import com.example.vaultnfc.data.preferences.DataUsagePreference
+import com.example.vaultnfc.data.preferences.LogoutTimerPreference
+import com.example.vaultnfc.data.preferences.MasterKeyTimerPreference
+import com.example.vaultnfc.data.SyncManager
+import com.example.vaultnfc.data.preferences.SyncPreference
+import com.example.vaultnfc.data.preferences.ThemePreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -15,6 +18,8 @@ import kotlinx.coroutines.launch
  * @property application The application context used for initializing preferences.
  */
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val syncManager = SyncManager(application)
 
 
     private val themePreference = ThemePreference(application)
@@ -63,6 +68,40 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
      */
     fun setMasterKeyTimerOption(option: String) = viewModelScope.launch {
         masterKeyTimerPreference.setMasterKeyTimerOption(option)
+    }
+
+    private val dataUsagePreference = DataUsagePreference(application)
+
+    /**
+     * A Flow that emits the current data usage preference (use mobile data or Wi-Fi only).
+     */
+    val useMobileData: Flow<Boolean> = dataUsagePreference.useMobileData
+
+    /**
+     * Sets the data usage preference.
+     *
+     * @param isEnabled Whether the app should use mobile data.
+     */
+    fun setUseMobileData(isEnabled: Boolean) = viewModelScope.launch {
+        dataUsagePreference.setUseMobileData(isEnabled)
+        syncManager.updateSyncSettings()
+    }
+
+    private val syncPreference = SyncPreference(application)
+
+    /**
+     * A Flow that emits the current synchronization preference (sync with cloud or local storage).
+     */
+    val syncWithCloud: Flow<Boolean> = syncPreference.syncWithCloud
+
+    /**
+     * Sets the synchronization preference.
+     *
+     * @param isEnabled Whether the app should synchronize with the cloud.
+     */
+    fun setSyncWithCloud(isEnabled: Boolean) = viewModelScope.launch {
+        syncPreference.setSyncWithCloud(isEnabled)
+        syncManager.updateSyncSettings()
     }
 
     /**

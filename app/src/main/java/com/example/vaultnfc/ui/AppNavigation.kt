@@ -2,6 +2,7 @@ package com.example.vaultnfc.ui
 
 
 import PasswordGeneratorScreen
+import PasswordsViewModel
 import android.app.Application
 import android.os.Build
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import com.example.vaultnfc.ui.screens.starting.RegisterScreen
 @Composable
 fun AppNavigation(application: Application) {
     val navController = rememberNavController()
+    val passwordsViewModel = PasswordsViewModel(application)
 
     NavHost(navController = navController, startDestination = Screen.Opening.route) {
         // Starting
@@ -36,14 +38,14 @@ fun AppNavigation(application: Application) {
         composable(Screen.MasterPassword.route) { InitialMasterKeyScreen(navController) }
         composable(Screen.ChangeMasterPassword.route) { ChangeMasterKeyScreen(navController) }
 
-        composable(Screen.AddPassword.route) { AddPasswordScreen(navController) }
+        composable(Screen.AddPassword.route) { AddPasswordScreen(navController, passwordsViewModel) }
         composable(Screen.PasswordGenerator.route) {
             PasswordGeneratorScreen(
                 navController,
                 application
             )
         }
-        composable(Screen.PasswordDetails.route) { PasswordDetailsScreen(navController) }
+        composable(Screen.PasswordDetails.route) { PasswordDetailsScreen(navController, application) }
 
         //Bluetooth
         //composable(Screen.Bluetooth.route) { BluetoothScreen(application, bluetoothViewModel) }

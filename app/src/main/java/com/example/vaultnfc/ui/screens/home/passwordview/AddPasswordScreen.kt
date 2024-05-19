@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
@@ -47,7 +46,7 @@ private const val s = "Password added successfully"
 @Composable
 fun AddPasswordScreen(
     navController: NavController,
-    passwordsViewModel: PasswordsViewModel = viewModel()
+    passwordsViewModel: PasswordsViewModel
 ) {
     BackgroundImageWrapper {
 

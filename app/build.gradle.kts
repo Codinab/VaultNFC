@@ -97,6 +97,7 @@ dependencies {
     // Messaging
     implementation ("com.google.firebase:firebase-messaging")
     implementation ("com.google.firebase:firebase-analytics")
+    implementation("androidx.lifecycle:lifecycle-service:2.8.0")
 
 
 

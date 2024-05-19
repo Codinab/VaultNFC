@@ -1,12 +1,13 @@
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vaultnfc.data.repository.PasswordsRepository
-import com.example.vaultnfc.data.repository.TagRepository
 import com.example.vaultnfc.model.PasswordItem
+import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
@@ -21,14 +22,13 @@ import javax.crypto.spec.SecretKeySpec
  * ViewModel for handling password-related operations including encryption,
  * decryption, and managing password items.
  */
-class PasswordsViewModel : ViewModel() {
+class PasswordsViewModel(private val application: Application) : ViewModel() {
 
     // LiveData for passwords and Tags list.
     private val _passwordsList = MutableLiveData<List<PasswordItem>>()
     val passwordsList: LiveData<List<PasswordItem>> = _passwordsList
 
     private val passwordsRepository = PasswordsRepository()
-    private val tagRepository = TagRepository()
 
     private val _tagFilteredPasswords = MutableLiveData<List<PasswordItem>>(emptyList())
     val tagFilteredPasswords: LiveData<List<PasswordItem>> = _tagFilteredPasswords
@@ -125,10 +125,18 @@ class PasswordsViewModel : ViewModel() {
     ) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val userId = currentUser?.uid ?: return
+        val masterKeyViewModel = MasterKeyViewModel(application)
+
+        if (masterKeyViewModel.isMasterKeySet.value != true) {
+            masterKeyViewModel.masterKeyError.postValue("Master key not set")
+            return
+        }
 
         viewModelScope.launch {
             try {
-                val encryptedPassword = encryptPassword(rawPassword.trim(), "Test")
+                val encryptedPassword = encryptPassword(rawPassword.trim(),
+                    masterKeyViewModel.getMasterKey()!!
+                )
                 val encryptionIV = generateEncryptionIV()
                 val passwordItem = PasswordItem(
                     userId = userId,

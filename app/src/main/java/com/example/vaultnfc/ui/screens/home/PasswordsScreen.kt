@@ -71,7 +71,7 @@ fun PasswordsScreen(navController: NavController, application: Application) {
     BackgroundImageWrapper {
 
         var isSidebarOpen by remember { mutableStateOf(false) }
-        val passwordsViewModel: PasswordsViewModel = viewModel()
+        val passwordsViewModel = PasswordsViewModel(application)
         val passwordsList by passwordsViewModel.tagFilteredPasswords.observeAsState(emptyList())
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route

@@ -67,7 +67,7 @@ fun BluetoothServerScreen(application: Application, navController: NavController
         }
     }
 
-    val passwordsViewModel: PasswordsViewModel = viewModel()
+    val passwordsViewModel = PasswordsViewModel(application)
 
     DisposableEffect(navController) {
         onDispose {

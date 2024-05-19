@@ -1,6 +1,7 @@
 package com.example.vaultnfc.ui.screens.home.passwordview
 
 import PasswordsViewModel
+import android.app.Application
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -51,12 +52,12 @@ import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 
 @Composable
-fun PasswordDetailsScreen(navController: NavController) {
+fun PasswordDetailsScreen(navController: NavController, application: Application) {
     val password = passwordItemSelected
     var isPasswordVisible by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
-    val passwordsViewModel: PasswordsViewModel = viewModel()
+    val passwordsViewModel = PasswordsViewModel(application)
 
     BackgroundImageWrapper {
 

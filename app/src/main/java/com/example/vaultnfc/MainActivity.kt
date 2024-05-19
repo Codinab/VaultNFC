@@ -25,6 +25,8 @@ import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
 import com.example.vaultnfc.util.EventObserver
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.PersistentCacheSettings
 import com.google.firebase.messaging.FirebaseMessaging
 
 /**
@@ -70,6 +72,20 @@ class MainActivity : ComponentActivity() {
 
         createNotificationChannels()
 
+        handeTokenSaving()
+
+        setFirestoreCacheSettings()
+
+
+        // Setting content view with Compose UI
+        setContent {
+            VaultNFCTheme {
+                AppNavigation(application)
+            }
+        }
+    }
+
+    private fun handeTokenSaving() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
@@ -80,14 +96,19 @@ class MainActivity : ComponentActivity() {
             val token = task.result
             saveTokenToFirestore(token)
         }
+    }
 
+    private fun setFirestoreCacheSettings() {
+        val firestore = FirebaseFirestore.getInstance()
+        val cacheSettings = PersistentCacheSettings.newBuilder()
+            .setSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            .build()
 
-        // Setting content view with Compose UI
-        setContent {
-            VaultNFCTheme {
-                AppNavigation(application)
-            }
-        }
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setLocalCacheSettings(cacheSettings)
+            .build()
+
+        firestore.firestoreSettings = settings
     }
 
     private fun saveTokenToFirestore(token: String?) {
