@@ -94,6 +94,11 @@ dependencies {
     // Preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
+    // Messaging
+    implementation ("com.google.firebase:firebase-messaging")
+    implementation ("com.google.firebase:firebase-analytics")
+
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

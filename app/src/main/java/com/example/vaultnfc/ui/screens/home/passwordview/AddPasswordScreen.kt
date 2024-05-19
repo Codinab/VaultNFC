@@ -157,6 +157,7 @@ fun AddPasswordScreen(
                             ).also {
                                 Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
                                 navController.navigateUp()
+                                passwordsViewModel.fetch()
                             }
                         } else {
                             Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT)

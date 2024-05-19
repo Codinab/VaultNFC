@@ -1,5 +1,6 @@
 package com.example.vaultnfc.ui.viewmodel
 
+import android.Manifest
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.BLUETOOTH
 import android.Manifest.permission.BLUETOOTH_ADMIN
@@ -9,7 +10,7 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context.BLUETOOTH_SERVICE
-import android.content.Context.LOCATION_SERVICE
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
@@ -27,6 +28,9 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
 
     private val _bluetoothStateChangeEvent = MutableLiveData<Event<Int>>()
     val bluetoothStateChangeEvent: LiveData<Event<Int>> = _bluetoothStateChangeEvent
+
+    private val _notificationPermissionRequestEvent = MutableLiveData<Event<Array<String>>>()
+    val notificationPermissionRequestEvent: LiveData<Event<Array<String>>> = _notificationPermissionRequestEvent
 
     private val _gpsEnabledEvent = MutableLiveData<Event<Boolean>>()
     val gpsEnabledEvent: LiveData<Event<Boolean>> = _gpsEnabledEvent
@@ -71,12 +75,52 @@ class PermissionViewModel(private val application: Application) : AndroidViewMod
     }
 
     /**
+     * Requests necessary permissions for notifications.
+     */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    fun requestNotificationPermissions() {
+        _notificationPermissionRequestEvent.value = Event(
+            arrayOf(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        )
+    }
+
+    /**
      * Handles the scenario when permissions are denied by the user.
      *
      * This function sets an event to navigate to the app settings, allowing the user to manually enable permissions.
      */
     fun handlePermissionDenied() {
         _navigateToSettingsEvent.value = Event(Unit)
+    }
+
+    fun onRequestPermissionsResult(
+        requestCode: Int,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            BLUETOOTH_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                    // Bluetooth permissions granted
+                } else {
+                    // Handle permission denial
+                    handlePermissionDenied()
+                }
+            }
+            NOTIFICATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                    // Notification permissions granted
+                } else {
+                    // Handle permission denial
+                    handlePermissionDenied()
+                }
+            }
+        }
+    }
+    companion object {
+        const val BLUETOOTH_PERMISSION_REQUEST_CODE = 1001
+        const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
     }
 }
 

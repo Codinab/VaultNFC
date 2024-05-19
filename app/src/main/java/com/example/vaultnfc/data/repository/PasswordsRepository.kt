@@ -10,8 +10,11 @@ import kotlinx.coroutines.tasks.await
  */
 class PasswordsRepository {
     private val db = FirebaseFirestore.getInstance()
-    private val collectionRef = db.collection("passwords")
     private val auth = FirebaseAuth.getInstance()
+
+    private fun getUserPasswordsCollection() =
+        auth.currentUser?.let { db.collection("users").document(it.uid).collection("passwords") }
+            ?: throw IllegalStateException("User must be authenticated to perform this operation.")
 
     /**
      * Adds a password item to the Firestore collection.
@@ -19,10 +22,9 @@ class PasswordsRepository {
      * @param passwordItem The password item to be added.
      */
     suspend fun addPassword(passwordItem: PasswordItem) {
-        // Ensure there's a user signed in before attempting to add a password
         val currentUser = auth.currentUser
         if (currentUser != null && passwordItem.userId == currentUser.uid) {
-            collectionRef.add(passwordItem).await()
+            getUserPasswordsCollection().add(passwordItem).await()
         } else {
             throw IllegalStateException("User must be authenticated to add passwords.")
         }
@@ -34,10 +36,9 @@ class PasswordsRepository {
      * @param passwordId The ID of the password item to be removed.
      */
     suspend fun removePassword(passwordId: String) {
-        // Additional logic may be needed to ensure only the owner can delete a password.
-        val document = collectionRef.document(passwordId).get().await()
+        val document = getUserPasswordsCollection().document(passwordId).get().await()
         if (document.exists() && document.toObject(PasswordItem::class.java)?.userId == auth.currentUser?.uid) {
-            collectionRef.document(passwordId).delete().await()
+            getUserPasswordsCollection().document(passwordId).delete().await()
         } else {
             throw IllegalStateException("Cannot delete a password that does not belong to the current user.")
         }
@@ -49,15 +50,8 @@ class PasswordsRepository {
      * @return A list of all password items in the collection.
      */
     suspend fun getAllPasswords(): List<PasswordItem> {
-        val currentUserUID = auth.currentUser?.uid
-        if (currentUserUID != null) {
-            return collectionRef
-                .whereEqualTo("userId", currentUserUID)
-                .get().await().documents.mapNotNull { document ->
-                    document.toObject(PasswordItem::class.java)?.copy(id = document.id)
-                }
-        } else {
-            throw IllegalStateException("User must be authenticated to fetch passwords.")
+        return getUserPasswordsCollection().get().await().documents.mapNotNull { document ->
+            document.toObject(PasswordItem::class.java)
         }
     }
 }
