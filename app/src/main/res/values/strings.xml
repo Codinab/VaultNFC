@@ -91,5 +91,7 @@
     <string name="logged_in_with_github">Logged in with Github</string>
     <string name="login_with_account">Login with account</string>
     <string name="create_new_account">Create new account</string>
+    <string name="no_tags_available">No tags available</string>
+    <string name="all_passwords">ALL PASSWORDS</string>
 
 </resources>

@@ -18,6 +18,7 @@ import com.example.vaultnfc.ui.viewmodel.SettingsViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * The main activity for the application, serving as the entry point.
