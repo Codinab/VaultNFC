@@ -67,8 +67,8 @@ fun BluetoothClientScreen(application: Application, navController: NavController
             .fillMaxSize()
             .padding(30.dp)
     ) {
-        Text(stringResource(R.string.client_screen))
-        Text("Status: $toastMessages")
+        Text(stringResource(R.string.client_screen), color = MaterialTheme.colorScheme.tertiary)
+        Text("Status: $toastMessages", color = MaterialTheme.colorScheme.tertiary)
 
         ActionButton(
             text = (stringResource(R.string.discover_devices)),
@@ -122,7 +122,7 @@ fun ActionButton(
             .shadow(18.dp, RoundedCornerShape(1.dp)),
         shape = RoundedCornerShape(1.dp)
     ) {
-        Text(text)
+        Text(text, color = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -133,7 +133,7 @@ fun DiscoveredDevicesList(discoveredDevices: List<BluetoothDevice>, onDeviceClic
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.padding(vertical = 16.dp)
     ) {
-        Text(stringResource(R.string.discovered_devices))
+        Text(stringResource(R.string.discovered_devices), color = MaterialTheme.colorScheme.tertiary)
         Spacer(modifier = Modifier.padding(bottom = 8.dp))
         LazyColumn {
             items(discoveredDevices) { device ->
@@ -154,13 +154,14 @@ fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Un
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = device.name ?: stringResource(R.string.unknown_device), fontWeight = FontWeight.Bold)
-            Text(text = device.address, style = MaterialTheme.typography.bodyMedium)
+            Text(text = device.name ?: stringResource(R.string.unknown_device), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.tertiary)
+            Text(text = device.address, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.tertiary)
         }
         Icon(
             imageVector = Icons.Default.Bluetooth,
             contentDescription = "",
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically),
+            tint = MaterialTheme.colorScheme.tertiary
         )
     }
 }

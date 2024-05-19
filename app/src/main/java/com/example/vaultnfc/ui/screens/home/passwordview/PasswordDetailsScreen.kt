@@ -74,7 +74,7 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                     .shadow(4.dp, RoundedCornerShape(1.dp)),
                 shape = RoundedCornerShape(1.dp)
             ) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "")
+                Icon(Icons.Filled.ArrowBack, contentDescription = "", tint = MaterialTheme.colorScheme.tertiary)
             }
 
             Card(
@@ -93,7 +93,8 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                             text = password.title,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
 
@@ -106,7 +107,8 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                         Text(
                             text = "Username: ${password.username}",
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                         CopyIconButton(
                             text = password.username,
@@ -137,7 +139,8 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                                 ) else stringResource(R.string.no_password)
                             }",
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                         TogglePasswordVisibilityIconButton(isPasswordVisible = isPasswordVisible) {
                             isPasswordVisible = !isPasswordVisible
@@ -158,7 +161,8 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                         Text(
                             text = "URI: ${password.uri}",
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                         CopyIconButton(
                             text = password.uri,
@@ -176,7 +180,8 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                         Text(
                             text = "Notes: ${password.notes}",
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
 
@@ -195,7 +200,7 @@ fun PasswordDetailsScreen(navController: NavController, application: Application
                         ActionButton(
                             text = stringResource(R.string.remove),
                             onClick = {
-                                passwordsViewModel.removePassword(password)
+                                passwordsViewModel.removePassword(password,)
                                 navController.popBackStack()
                             },
                             modifier = Modifier.size(100.dp, 45.dp)
@@ -214,7 +219,7 @@ fun CopyIconButton(text: String, clipboardManager: ClipboardManager, context: Co
         clipboardManager.setText(AnnotatedString(text))
         Toast.makeText(context, "${text.capitalize()} copied!", Toast.LENGTH_SHORT).show()
     }) {
-        Icon(Icons.Filled.ContentCopy, contentDescription = "Copy ${text.capitalize()}")
+        Icon(Icons.Filled.ContentCopy, contentDescription = "Copy ${text.capitalize()}", tint = MaterialTheme.colorScheme.tertiary,)
     }
 }
 
@@ -223,6 +228,7 @@ fun TogglePasswordVisibilityIconButton(isPasswordVisible: Boolean, onClick: () -
     IconButton(onClick = onClick) {
         Icon(
             if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = if (isPasswordVisible) stringResource(R.string.hide_password) else stringResource(
                 R.string.show_password
             )
@@ -238,6 +244,6 @@ fun ActionButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifie
         modifier = modifier.shadow(3.dp, RoundedCornerShape(1.dp)),
         shape = RoundedCornerShape(1.dp)
     ) {
-        Text(text)
+        Text(text, color = MaterialTheme.colorScheme.tertiary)
     }
 }

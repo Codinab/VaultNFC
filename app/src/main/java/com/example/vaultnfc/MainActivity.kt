@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.PersistentCacheSettings
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * The main activity for the application, serving as the entry point.

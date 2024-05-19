@@ -17,6 +17,6 @@ val WhiteEnd = Color(0xFFF5EDED)
 val LightRed= Color(0xFFFFB8BA)
 val ButtonRed= Color(0xFFee2400)
 val BlackEnd = Color(0xFF000000)
-
+val LightGray = Color(0xFFAFAFAF)
 val BlackBackground = Color(0xFF404040 )
 val BlackLabel = Color(0xFF212124)

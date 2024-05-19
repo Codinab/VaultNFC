@@ -58,6 +58,7 @@ import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.theme.BlackEnd
 import com.example.vaultnfc.ui.theme.ButtonRed
+import com.example.vaultnfc.ui.theme.LightGray
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
@@ -271,20 +272,20 @@ private fun Tags(passwordsViewModel: PasswordsViewModel) {
     val tags by tagViewModel.tags.observeAsState(emptyList())
 
     if (tags.isEmpty()) {
-        Text("No tags available")
+        Text(stringResource(R.string.no_tags_available), color = MaterialTheme.colorScheme.tertiary)
     } else {
         Column {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = WhiteEnd)
+                    .background(color = LightGray)
             ) {
                 TextButton(onClick = { passwordsViewModel.removeTag() }) {
                     Text(
-                        text = "ALL PASSWORDS",
+                        text = stringResource(R.string.all_passwords),
                         modifier = Modifier
                             .padding(8.dp),
-                        color = BlackEnd
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                 }
             }
@@ -295,13 +296,13 @@ private fun Tags(passwordsViewModel: PasswordsViewModel) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = WhiteEnd)
+                        .background(color = LightGray)
                 ) {
                     TextButton(onClick = { passwordsViewModel.setTag(tag) }) {
                         Text(
                             text = tag,
                             modifier = Modifier.padding(8.dp),
-                            color = BlackEnd
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }
@@ -309,7 +310,6 @@ private fun Tags(passwordsViewModel: PasswordsViewModel) {
         }
     }
 }
-
 
 data class ButtonData(val text: String, val action: () -> Unit)
 
