@@ -33,13 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
 import com.example.vaultnfc.ui.screens.PermissionsAndFeaturesSetup
-import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MyBluetoothServiceViewModel
 import com.example.vaultnfc.ui.viewmodel.PermissionViewModel
 
@@ -66,16 +67,16 @@ fun BluetoothClientScreen(application: Application, navController: NavController
             .fillMaxSize()
             .padding(30.dp)
     ) {
-        Text("Client Screen")
+        Text(stringResource(R.string.client_screen))
         Text("Status: $toastMessages")
 
         ActionButton(
-            text = "Discover Devices",
+            text = (stringResource(R.string.discover_devices)),
             onClick = { viewModel.startDiscovery() }
         )
 
         ActionButton(
-            text = "Cancel",
+            text = stringResource(R.string.cancel),
             onClick = {
                 viewModel.disconnect()
                 navController.popBackStack()
@@ -86,7 +87,7 @@ fun BluetoothClientScreen(application: Application, navController: NavController
         HorizontalDivider(color = Color.Red)
 
         ActionButton(
-            text = "Send Password",
+            text = stringResource(R.string.send_password),
             onClick = { viewModel.send() },
             enabled = isConnected == true,
             modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
@@ -114,7 +115,7 @@ fun ActionButton(
     Button(
         onClick = onClick,
         enabled = enabled,
-        colors = ButtonDefaults.buttonColors(RedEnd),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
         modifier = modifier
             .heightIn(min = 36.dp)
             .widthIn(min = 100.dp)
@@ -132,7 +133,7 @@ fun DiscoveredDevicesList(discoveredDevices: List<BluetoothDevice>, onDeviceClic
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.padding(vertical = 16.dp)
     ) {
-        Text("Discovered Devices")
+        Text(stringResource(R.string.discovered_devices))
         Spacer(modifier = Modifier.padding(bottom = 8.dp))
         LazyColumn {
             items(discoveredDevices) { device ->
@@ -153,12 +154,12 @@ fun DeviceItem(device: BluetoothDevice, onDeviceClicked: (BluetoothDevice) -> Un
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = device.name ?: "Unknown Device", fontWeight = FontWeight.Bold)
+            Text(text = device.name ?: stringResource(R.string.unknown_device), fontWeight = FontWeight.Bold)
             Text(text = device.address, style = MaterialTheme.typography.bodyMedium)
         }
         Icon(
             imageVector = Icons.Default.Bluetooth,
-            contentDescription = "Bluetooth Device",
+            contentDescription = "",
             modifier = Modifier.align(Alignment.CenterVertically)
         )
     }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -38,8 +38,6 @@ import com.example.vaultnfc.MainActivity
 import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.SecureStorage
 import com.example.vaultnfc.ui.Screen
-import com.example.vaultnfc.ui.theme.BlackEnd
-import com.example.vaultnfc.ui.theme.WhiteEnd
 import com.example.vaultnfc.ui.viewmodel.LoginViewModel
 
 @Composable
@@ -84,16 +82,16 @@ fun OpeningScreen(navController: NavController) {
             Text(
                 text = stringResource(id = R.string.welcome_to_vaultnfc),
                 fontSize = 24.sp,
-                color = WhiteEnd,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             AuthButton(
-                text = "Login with Github",
+                text = stringResource(R.string.login_with_github),
                 onClick = {
                     isClicked = !isClicked
                     loginViewModel.loginWithGitHub(activity = context as MainActivity) {
-                        System.out.println("Logged in with GitHub")
+                        System.out.println(context.getString(R.string.logged_in_with_github))
                         navController.navigate(Screen.Home.route)
                     }
                 },
@@ -103,7 +101,7 @@ fun OpeningScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             AuthButton(
-                text = "Login with account",
+                text = stringResource(R.string.login_with_account),
                 onClick = {
                     isClicked = !isClicked
                     navController.navigate(Screen.Login.route)
@@ -113,8 +111,8 @@ fun OpeningScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Text(
-                text = "Create new account",
-                color = Color.White,
+                text = stringResource(R.string.create_new_account),
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.clickable { navController.navigate(Screen.Register.route) }
             )
         }
@@ -129,7 +127,7 @@ fun AuthButton(
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(WhiteEnd),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
         shape = RoundedCornerShape(1.dp),
         modifier = Modifier
             .width(200.dp)
@@ -145,7 +143,7 @@ fun AuthButton(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            Text(text = text, color = BlackEnd)
+            Text(text = text, color = MaterialTheme.colorScheme.tertiary)
         }
     }
 }

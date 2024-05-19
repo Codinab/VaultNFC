@@ -1,3 +1,4 @@
+
 import android.app.Application
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,17 +32,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.vaultnfc.R
 import com.example.vaultnfc.data.repository.SecureStorage
 import com.example.vaultnfc.ui.components.BackButton
-import com.example.vaultnfc.ui.theme.RedEnd
 
 @Composable
 fun PasswordGeneratorScreen(
@@ -77,17 +79,18 @@ fun PasswordGeneratorScreen(
 
             ) {
                 Text(
-                    text = "PASSWORD GENERATOR",
+                    text = stringResource(R.string.password_generator),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
-                    color = RedEnd
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
-            ParameterInputRow("Length", length, 0, onChange = { length = it }, onReset = {
+            ParameterInputRow(stringResource(R.string.length), length, 0, onChange = { length = it }, onReset = {
                 length =
                     passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.LENGTH_KEY)
             })
-            ParameterInputRow("Numbers",
+            ParameterInputRow(
+                stringResource(R.string.numbers),
                 probabilityNumbers,
                 totalProbability,
                 onChange = { probabilityNumbers = it },
@@ -95,7 +98,8 @@ fun PasswordGeneratorScreen(
                     probabilityNumbers =
                         passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.NUMBERS_PROBABILITY_KEY)
                 })
-            ParameterInputRow("Symbols",
+            ParameterInputRow(
+                stringResource(R.string.symbols),
                 probabilitySymbols,
                 totalProbability,
                 onChange = { probabilitySymbols = it },
@@ -103,7 +107,8 @@ fun PasswordGeneratorScreen(
                     probabilitySymbols =
                         passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.SYMBOLS_PROBABILITY_KEY)
                 })
-            ParameterInputRow("Uppercase",
+            ParameterInputRow(
+                stringResource(R.string.uppercase),
                 probabilityUppercase,
                 totalProbability,
                 onChange = { probabilityUppercase = it },
@@ -111,7 +116,8 @@ fun PasswordGeneratorScreen(
                     probabilityUppercase =
                         passwordGeneratorViewModel.clearSetting(SecureStorage.SettingsKey.UPPERCASE_PROBABILITY_KEY)
                 })
-            ParameterInputRow("Lowercase",
+            ParameterInputRow(
+                stringResource(R.string.lowercase),
                 probabilityLowercase,
                 totalProbability,
                 onChange = { probabilityLowercase = it },
@@ -132,14 +138,14 @@ fun PasswordGeneratorScreen(
                         probabilityLowercase
                     )
                 },
-                colors = ButtonDefaults.buttonColors(RedEnd),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(1.dp),
                 modifier = Modifier
                     .widthIn(max = 200.dp)
                     .align(Alignment.CenterHorizontally)
                     .shadow(10.dp, RoundedCornerShape(1.dp))
             ) {
-                Text("Generate Password", color = Color.White)
+                Text(stringResource(R.string.generate_password), color = MaterialTheme.colorScheme.secondary)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -155,18 +161,19 @@ fun PasswordGeneratorScreen(
             Button(
                 onClick = {
                     clipboardManager.setText(AnnotatedString(generatedPassword))
-                    Toast.makeText(context, "Password copied!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.password_copied), Toast.LENGTH_SHORT).show()
                 },
-                colors = ButtonDefaults.buttonColors(RedEnd),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .widthIn(max = 200.dp)
                     .align(Alignment.CenterHorizontally)
                     .shadow(10.dp, RoundedCornerShape(1.dp)),
                 shape = RoundedCornerShape(1.dp)
             ) {
-                Icon(Icons.Filled.ContentCopy, contentDescription = "Copy Password")
+                Icon(Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.copy_password))
                 Spacer(Modifier.width(4.dp))
-                Text("Copy Password", color = Color.White)
+                Text(stringResource(R.string.copy_password), color = MaterialTheme.colorScheme.secondary)
             }
         }
     }
@@ -194,7 +201,7 @@ fun ParameterInputRow(
         )
         Icon(imageVector = Icons.Filled.Remove,
             contentDescription = "Decrease $label",
-            tint = RedEnd,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.clickable { if (value > 0) onChange(value - 1) })
         Text(
             text = "$value",
@@ -205,7 +212,7 @@ fun ParameterInputRow(
         )
         Icon(imageVector = Icons.Filled.Add,
             contentDescription = "Increase $label",
-            tint = RedEnd,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.clickable { onChange(value + 1) })
 
         // Display the percentage if applicable
@@ -220,7 +227,7 @@ fun ParameterInputRow(
 
         Icon(imageVector = Icons.Filled.Restore,
             contentDescription = "Reset $label",
-            tint = Color.Gray,
+            tint = MaterialTheme.colorScheme.outline,
             modifier = Modifier
                 .clickable {
                     onReset()

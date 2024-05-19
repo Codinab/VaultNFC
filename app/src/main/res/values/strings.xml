@@ -40,4 +40,56 @@
     <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
     <string name="default_web_client_id">defaultWebClientId</string>
     <string name="enter_tag">Enter the Tag</string>
+    <string name="title_cannot_be_empty">Title cannot be empty</string>
+    <string name="change_the_master_key_used_for_your_data">Change the Master Key used for your data</string>
+    <string name="change_master_key">Change Master Key</string>
+    <string name="password_update_channel_id">vault_password_update_channel</string>
+    <string name="password_update_channel_name">Password Update Notifications</string>
+    <string name="password_update_channel_description">Notifications for password updates</string>
+
+    <string name="password_creation_channel_id">vault_password_creation_channel</string>
+    <string name="password_creation_channel_name">Password Creation Notifications</string>
+    <string name="password_creation_channel_description">Notifications for password creation</string>
+
+    <string name="password_deletion_channel_id">vault_password_deletion_channel</string>
+    <string name="password_deletion_channel_name">Password Deletion Notifications</string>
+    <string name="password_deletion_channel_description">Notifications for password deletion</string>
+    <string name="discover_devices">Discover Devices</string>
+    <string name="client_screen">Client Screen</string>
+    <string name="send_password">Send Password</string>
+    <string name="discovered_devices">Discovered devices</string>
+    <string name="unknown_device">Unknown Device</string>
+    <string name="reset_your_password">Reset your password</string>
+    <string name="please_enter_your_email_address_to_receive_a_link_to_reset_your_password">Please enter your email address to receive a link to reset your password</string>
+    <string name="send_reset_link">Send reset link</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="register">Register</string>
+    <string name="too_many_attempts_please_wait_before_trying_again">Too many attempts please wait before trying again</string>
+    <string name="enter_master_key">Enter Master key</string>
+    <string name="master_key">Master key</string>
+    <string name="submit">Submit</string>
+    <string name="password_generator">Password Generator</string>
+    <string name="length">Length</string>
+    <string name="numbers">Numbers</string>
+    <string name="symbols">Symbols</string>
+    <string name="uppercase">Uppercase</string>
+    <string name="lowercase">Lowercase</string>
+    <string name="generate_password">Generate Password</string>
+    <string name="password_copied">Password Copied!</string>
+    <string name="copy_password">Copy Password</string>
+    <string name="create_password">Create Password</string>
+    <string name="receive_via_bluetooth">Receive via Bluetooth</string>
+    <string name="password_generator_MAYUS">PASSWORD GENERATOR</string>
+    <string name="settings_MAYUS">SETTINGS</string>
+    <string name="log_out">LOG OUT</string>
+    <string name="no_password">******</string>
+    <string name="share_with_bluetooth">Share with Bluetooth</string>
+    <string name="remove">Remove</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show Password</string>
+    <string name="login_with_github">Login with Github</string>
+    <string name="logged_in_with_github">Logged in with Github</string>
+    <string name="login_with_account">Login with account</string>
+    <string name="create_new_account">Create new account</string>
+
 </resources>

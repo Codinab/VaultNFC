@@ -32,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -105,7 +104,7 @@ fun TitleBox(title: String) {
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
-            color = RedEnd,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -250,11 +249,11 @@ fun SettingsOptionRedirect(
             )
             Text(
                 text = description,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.outline,
                 fontSize = 12.sp
             )
         }
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Navigate forward")
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "")
     }
 }
 
@@ -301,7 +300,7 @@ fun OptionRow(
             modifier = Modifier.weight(1f)
         ) {
             Text(text = title, modifier = Modifier.padding(end = 8.dp))
-            Text(text = description, color = Color.Gray, fontSize = 12.sp)
+            Text(text = description, color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
         }
         content()
     }

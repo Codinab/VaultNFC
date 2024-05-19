@@ -12,6 +12,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -25,12 +26,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.Screen
 import com.example.vaultnfc.ui.theme.RedEnd
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
@@ -69,15 +72,15 @@ fun InitialMasterKeyScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Too many attempts. Please wait before trying again.",
-                    color = Color.Red,
+                    text = stringResource(R.string.too_many_attempts_please_wait_before_trying_again),
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Time remaining: $timeUntilUnblockedFormatted",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.tertiary,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
@@ -90,19 +93,19 @@ fun InitialMasterKeyScreen(navController: NavController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Enter Master Key", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.enter_master_key), fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(16.dp))
 
             TextField(
                 value = masterKey,
                 onValueChange = { masterKey = it },
-                label = { Text("Master Key") },
+                label = { Text(stringResource(R.string.master_key)) },
                 isError = masterKeyError != null
             )
 
             if (masterKeyError != null) {
-                Text(text = masterKeyError ?: "", color = Color.Red, fontSize = 12.sp)
+                Text(text = masterKeyError ?: "", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -115,7 +118,7 @@ fun InitialMasterKeyScreen(navController: NavController) {
                     navController.navigate(Screen.Home.route)
                 }
             }) {
-                Text("Submit")
+                Text(stringResource(R.string.submit))
             }
         }
     }
@@ -139,7 +142,9 @@ fun ChangeMasterKeyScreen(navController: NavController) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
         // Back button at the top left corner
         Button(

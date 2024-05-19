@@ -21,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -32,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -41,7 +41,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.vaultnfc.R
 import com.example.vaultnfc.ui.components.BackgroundImageWrapper
-import com.example.vaultnfc.ui.theme.RedEnd
 
 private const val s = "Password added successfully"
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,8 +72,8 @@ fun AddPasswordScreen(
         ) {
             val textFieldModifier = Modifier.padding(vertical = 16.dp)
             val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = RedEnd
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary
             )
 
             val textField =
@@ -86,7 +85,7 @@ fun AddPasswordScreen(
                         OutlinedTextField(
                             value = value,
                             onValueChange = onValueChange,
-                            label = { Text(text = label, color = Color.Black) },
+                            label = { Text(text = label, color = MaterialTheme.colorScheme.tertiary) },
                             leadingIcon = { Icon(imageVector = icon, contentDescription = label) },
                             colors = textFieldColors,
                         )
@@ -139,10 +138,10 @@ fun AddPasswordScreen(
 
                 Button(
                     onClick = { navController.navigateUp() },
-                    colors = ButtonDefaults.buttonColors(RedEnd),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = buttonModifier.padding(end = 16.dp),
                     shape = RoundedCornerShape(1.dp)
-                ) { Text("Back", color = Color.White) }
+                ) { Text("Back", color = MaterialTheme.colorScheme.secondary) }
 
                 Button(
                     onClick = {
@@ -165,10 +164,10 @@ fun AddPasswordScreen(
                                 .show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(RedEnd),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = buttonModifier,
                     shape = RoundedCornerShape(1.dp)
-                ) { Text("Add", color = Color.White) }
+                ) { Text("Add", color = MaterialTheme.colorScheme.secondary) }
             }
         }
     }
