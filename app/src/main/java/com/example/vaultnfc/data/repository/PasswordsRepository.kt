@@ -51,7 +51,13 @@ class PasswordsRepository {
      */
     suspend fun getAllPasswords(): List<PasswordItem> {
         return getUserPasswordsCollection().get().await().documents.mapNotNull { document ->
-            document.toObject(PasswordItem::class.java)
+            val passwordItem = document.toObject(PasswordItem::class.java)
+            if (passwordItem != null) {
+                if (passwordItem.id.isEmpty()) passwordItem.copy(id = document.id).also {
+                    getUserPasswordsCollection().document(document.id).set(it).await()
+                }
+                else passwordItem
+            } else null
         }
     }
 }

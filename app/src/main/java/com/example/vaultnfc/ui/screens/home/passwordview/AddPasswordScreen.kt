@@ -60,7 +60,6 @@ fun AddPasswordScreen(
         var uri by remember { mutableStateOf("") }
         var notes by remember { mutableStateOf("") }
         var tag by remember { mutableStateOf("") }
-        passwordsViewModel.fetch()
 
 
         Column(
@@ -157,7 +156,6 @@ fun AddPasswordScreen(
                             ).also {
                                 Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
                                 navController.navigateUp()
-                                passwordsViewModel.fetch()
                             }
                         } else {
                             Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT)
