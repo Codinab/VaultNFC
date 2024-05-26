@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vaultnfc.data.repository.PasswordsRepository
+import com.example.vaultnfc.data.repository.TagSelected.tagSelected
 import com.example.vaultnfc.model.PasswordItem
 import com.example.vaultnfc.ui.viewmodel.MasterKeyViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -32,7 +33,6 @@ class PasswordsViewModel(private val application: Application) : ViewModel() {
     private val _tagFilteredPasswords = MutableLiveData<List<PasswordItem>>(emptyList())
     val tagFilteredPasswords: LiveData<List<PasswordItem>> = _tagFilteredPasswords
 
-    private var currentTag: String = ""
 
 
 
@@ -49,10 +49,10 @@ class PasswordsViewModel(private val application: Application) : ViewModel() {
         viewModelScope.launch {
             try {
                 val allPasswords = passwordsRepository.getAllPasswords()
-                _tagFilteredPasswords.value = if (currentTag.isEmpty()) {
+                _tagFilteredPasswords.value = if (tagSelected.isEmpty()) {
                     allPasswords
                 } else {
-                    allPasswords.filter { it.tag == currentTag }
+                    allPasswords.filter { it.tag == tagSelected }
                 }
             } catch (e: Exception) {
                 Log.e("PasswordsViewModel", "Error fetching passwords", e)
@@ -71,7 +71,7 @@ class PasswordsViewModel(private val application: Application) : ViewModel() {
     fun setTag(tag: String) {
         viewModelScope.launch {
             try {
-                currentTag = tag
+                tagSelected = tag
                 fetch()
             } catch (e: Exception) {
                 Log.e("PasswordsViewModel", "Error fetching passwords", e)
@@ -82,7 +82,7 @@ class PasswordsViewModel(private val application: Application) : ViewModel() {
     fun removeTag() {
         viewModelScope.launch {
             try {
-                currentTag = ""
+                tagSelected = ""
                 fetch()
             } catch (e: Exception) {
                 Log.e("PasswordsViewModel", "Error fetching passwords", e)
